@@ -1,8 +1,15 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import { getFrequencyLabel, getScheduleLabel } from "@/lib/subscriptions/utils";
 import type { Subscription } from "@/types/finance";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 interface SubscriptionListCardProps {
   subscription: Subscription;
@@ -13,30 +20,45 @@ interface SubscriptionListCardProps {
 export function SubscriptionListCard({ subscription, onEdit, onDelete }: SubscriptionListCardProps) {
   return (
     <div className="rounded-2xl border border-border/60 p-4">
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex-1">
           <p className="font-semibold">{subscription.description}</p>
           <p className="text-xs text-muted-foreground">{subscription.category?.name ?? "Sem categoria"}</p>
         </div>
-        <Badge variant="outline" className="text-xs">
-          {getFrequencyLabel(subscription.frequency)}
-        </Badge>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+              <MoreHorizontal className="h-4 w-4" />
+              <span className="sr-only">Abrir menu</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => onEdit(subscription)}>
+              <Pencil className="mr-2 h-4 w-4" />
+              Editar
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onDelete(subscription)}
+              className="text-destructive focus:text-destructive"
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Cancelar assinatura
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
       <div className="mt-3 flex items-center justify-between">
         <strong>{currencyFormatter.format(subscription.amount)}</strong>
-        <Badge className={subscription.isActive ? "bg-emerald-100 text-emerald-800" : "bg-muted text-muted-foreground"}>
-          {subscription.isActive ? "Ativa" : "Inativa"}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="text-xs">
+            {getFrequencyLabel(subscription.frequency)}
+          </Badge>
+          <Badge className={subscription.isActive ? "bg-emerald-100 text-emerald-800" : "bg-muted text-muted-foreground"}>
+            {subscription.isActive ? "Ativa" : "Inativa"}
+          </Badge>
+        </div>
       </div>
       <p className="mt-2 text-xs text-muted-foreground">Dia programado: {getScheduleLabel(subscription)}</p>
-      <div className="mt-4 flex gap-2">
-        <Button size="sm" className="flex-1" variant="outline" onClick={() => onEdit(subscription)}>
-          Editar
-        </Button>
-        <Button size="sm" className="flex-1" variant="destructive" onClick={() => onDelete(subscription)}>
-          Cancelar
-        </Button>
-      </div>
     </div>
   );
 }

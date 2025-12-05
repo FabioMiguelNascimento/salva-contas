@@ -7,6 +7,12 @@ import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -28,7 +34,7 @@ import { cn, getTransactionCategoryLabel } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Filter, Trash2 } from "lucide-react";
+import { Filter, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 export default function ExtratoPage() {
@@ -198,7 +204,7 @@ export default function ExtratoPage() {
                   <TableHead>Categoria</TableHead>
                   <TableHead>Tipo</TableHead>
                   <TableHead>Valor</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
+                  <TableHead className="w-12" />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -234,14 +240,28 @@ export default function ExtratoPage() {
                         {transaction.type === "income" ? "+" : "-"}
                         {currencyFormatter.format(transaction.amount)}
                       </TableCell>
-                      <TableCell className="flex justify-end gap-2">
-                        <Button size="sm" variant="outline" onClick={() => openEdit(transaction)}>
-                          Editar
-                        </Button>
-                        <Button size="sm" variant="destructive" onClick={() => setDeleteDialog({ open: true, transaction })}>
-                          <Trash2 className="mr-1 h-4 w-4" />
-                          Excluir
-                        </Button>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-8 w-8">
+                              <MoreHorizontal className="h-4 w-4" />
+                              <span className="sr-only">Abrir menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => openEdit(transaction)}>
+                              <Pencil className="mr-2 h-4 w-4" />
+                              Editar
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setDeleteDialog({ open: true, transaction })}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Excluir
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </TableCell>
                     </TableRow>
                   ))
@@ -262,29 +282,44 @@ export default function ExtratoPage() {
               : paginatedTransactions.length
               ? paginatedTransactions.map((transaction) => (
                   <div key={transaction.id} className="rounded-2xl border border-border/60 p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
                         <p className="font-semibold">{transaction.description}</p>
                         <p className="text-xs text-muted-foreground">{formatTransactionDate(transaction)}</p>
                       </div>
-                      <Badge className={cn("text-xs", transaction.type === "income" ? "bg-emerald-100 text-emerald-900" : "bg-destructive/15 text-destructive") }>
-                        {transaction.type === "income" ? "Receita" : "Despesa"}
-                      </Badge>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+                            <MoreHorizontal className="h-4 w-4" />
+                            <span className="sr-only">Abrir menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => openEdit(transaction)}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => setDeleteDialog({ open: true, transaction })}
+                            className="text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                     <div className="mt-3 flex items-center justify-between text-sm">
                       <Badge variant="outline">{getTransactionCategoryLabel(transaction)}</Badge>
-                      <span className={cn("font-semibold", transaction.type === "income" ? "text-emerald-600" : "text-destructive") }>
-                        {transaction.type === "income" ? "+" : "-"}
-                        {currencyFormatter.format(transaction.amount)}
-                      </span>
-                    </div>
-                    <div className="mt-4 flex gap-2">
-                      <Button className="flex-1" size="sm" variant="outline" onClick={() => openEdit(transaction)}>
-                        Editar
-                      </Button>
-                      <Button className="flex-1" size="sm" variant="destructive" onClick={() => setDeleteDialog({ open: true, transaction })}>
-                        Excluir
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Badge className={cn("text-xs", transaction.type === "income" ? "bg-emerald-100 text-emerald-900" : "bg-destructive/15 text-destructive") }>
+                          {transaction.type === "income" ? "Receita" : "Despesa"}
+                        </Badge>
+                        <span className={cn("font-semibold", transaction.type === "income" ? "text-emerald-600" : "text-destructive") }>
+                          {transaction.type === "income" ? "+" : "-"}
+                          {currencyFormatter.format(transaction.amount)}
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))

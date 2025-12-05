@@ -1,11 +1,16 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import { getFrequencyLabel } from "@/lib/subscriptions/utils";
 import type { Subscription } from "@/types/finance";
-import { Trash2 } from "lucide-react";
-import type { ReactNode } from "react";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 const dateFormatter = new Intl.DateTimeFormat("pt-BR");
 
@@ -13,10 +18,9 @@ interface SubscriptionTableProps {
   subscriptions: Subscription[];
   onEdit: (subscription: Subscription) => void;
   onDelete: (subscription: Subscription) => void;
-  actionsHeader?: ReactNode;
 }
 
-export function SubscriptionTable({ subscriptions, onEdit, onDelete, actionsHeader = "Ações" }: SubscriptionTableProps) {
+export function SubscriptionTable({ subscriptions, onEdit, onDelete }: SubscriptionTableProps) {
   return (
     <Table>
       <TableHeader>
@@ -26,7 +30,7 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete, actionsHead
           <TableHead>Categoria</TableHead>
           <TableHead>Frequência</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead className="text-right">{actionsHeader}</TableHead>
+          <TableHead className="w-12" />
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -52,15 +56,28 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete, actionsHead
                 {subscription.isActive ? "Ativa" : "Inativa"}
               </Badge>
             </TableCell>
-            <TableCell className="text-right">
-              <div className="flex justify-end gap-2">
-                <Button size="sm" variant="outline" onClick={() => onEdit(subscription)}>
-                  Editar
-                </Button>
-                <Button size="sm" variant="destructive" onClick={() => onDelete(subscription)}>
-                  <Trash2 className="mr-1 h-4 w-4" />Cancelar
-                </Button>
-              </div>
+            <TableCell>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <MoreHorizontal className="h-4 w-4" />
+                    <span className="sr-only">Abrir menu</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={() => onEdit(subscription)}>
+                    <Pencil className="mr-2 h-4 w-4" />
+                    Editar
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => onDelete(subscription)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Cancelar assinatura
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </TableCell>
           </TableRow>
         ))}
