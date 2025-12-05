@@ -1,5 +1,6 @@
 "use client";
 
+import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFinance } from "@/hooks/use-finance";
+import { currencyFormatter, getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
 import { cn, getTransactionCategoryLabel } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { differenceInCalendarDays, format, isPast, subDays } from "date-fns";
@@ -20,39 +22,17 @@ import {
   AlertTriangle,
   ArrowDownRight,
   ArrowUpRight,
-  RefreshCcw,
   TrendingUp,
-  Wallet2,
+  Wallet2
 } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
 
-const currency = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
-
 export default function DashboardPage() {
-  const { metrics, transactions, pendingBills, filters, setFilters, isLoading, isSyncing, lastSync, refresh } =
+  const { metrics, transactions, pendingBills, filters, setFilters, isLoading, lastSync } =
     useFinance();
 
-  const months = [
-    { value: 1, label: "Jan" },
-    { value: 2, label: "Fev" },
-    { value: 3, label: "Mar" },
-    { value: 4, label: "Abr" },
-    { value: 5, label: "Mai" },
-    { value: 6, label: "Jun" },
-    { value: 7, label: "Jul" },
-    { value: 8, label: "Ago" },
-    { value: 9, label: "Set" },
-    { value: 10, label: "Out" },
-    { value: 11, label: "Nov" },
-    { value: 12, label: "Dez" },
-  ];
-
-  const currentYear = new Date().getFullYear();
-  const years = [currentYear - 1, currentYear, currentYear + 1];
+  const years = getAvailableYears();
 
   const kpis = [
     {
@@ -133,7 +113,7 @@ export default function DashboardPage() {
   const categoryBreakdown = metrics?.categoryBreakdown ?? [];
   const donutTotal = categoryBreakdown.reduce((sum, item) => sum + item.total, 0);
 
-  const formatValue = (value: number | string) => (typeof value === "number" ? currency.format(value) : value);
+  const formatValue = (value: number | string) => (typeof value === "number" ? currencyFormatter.format(value) : value);
 
   const handleMonthChange = (value: string) => {
     setFilters({ ...filters, month: Number(value) });
@@ -145,45 +125,36 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
-        <div>
-          <p className="text-xs uppercase tracking-[0.4em] text-muted-foreground">Visão geral</p>
-          <h1 className="text-3xl font-semibold">Dashboard Financeiro</h1>
-          <p className="text-sm text-muted-foreground">
-            {lastSync ? `Atualizado ${format(new Date(lastSync), "dd 'de' MMMM, HH:mm", { locale: ptBR })}` : "Sincronizando dados..."}
-          </p>
-        </div>
-        <div className="flex flex-1 flex-wrap gap-3 lg:justify-end">
-          <Select value={String(filters.month)} onValueChange={handleMonthChange}>
-            <SelectTrigger className="w-[110px]">
-              <SelectValue placeholder="Mês" />
-            </SelectTrigger>
-            <SelectContent>
-              {months.map((month) => (
-                <SelectItem key={month.value} value={String(month.value)}>
-                  {month.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={String(filters.year)} onValueChange={handleYearChange}>
-            <SelectTrigger className="w-[110px]">
-              <SelectValue placeholder="Ano" />
-            </SelectTrigger>
-            <SelectContent>
-              {years.map((year) => (
-                <SelectItem key={year} value={String(year)}>
-                  {year}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button variant="outline" onClick={refresh} disabled={isSyncing} className="gap-2">
-            <RefreshCcw className={cn("h-4 w-4", isSyncing && "animate-spin")} />
-            Atualizar
-          </Button>
-        </div>
-      </div>
+      <PageHeader
+        tag="Visão geral"
+        title="Dashboard Financeiro"
+        description={lastSync ? `Atualizado ${format(new Date(lastSync), "dd 'de' MMMM, HH:mm", { locale: ptBR })}` : "Sincronizando dados..."}
+      >
+        <Select value={String(filters.month)} onValueChange={handleMonthChange}>
+          <SelectTrigger className="w-[110px]">
+            <SelectValue placeholder="Mês" />
+          </SelectTrigger>
+          <SelectContent>
+            {monthsShort.map((month) => (
+              <SelectItem key={month.value} value={String(month.value)}>
+                {month.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={String(filters.year)} onValueChange={handleYearChange}>
+          <SelectTrigger className="w-[110px]">
+            <SelectValue placeholder="Ano" />
+          </SelectTrigger>
+          <SelectContent>
+            {years.map((year) => (
+              <SelectItem key={year} value={String(year)}>
+                {year}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </PageHeader>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {kpis.map((item) => (
@@ -239,7 +210,7 @@ export default function DashboardPage() {
                     <span className="h-3 w-3 rounded-full" style={{ backgroundColor: chartColors[index % chartColors.length] }} />
                     <span className="text-sm font-medium">{item.category}</span>
                   </div>
-                  <span className="text-sm text-muted-foreground">{currency.format(item.total)}</span>
+                  <span className="text-sm text-muted-foreground">{currencyFormatter.format(item.total)}</span>
                 </div>
               ))}
             </div>
@@ -279,7 +250,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm font-semibold">{bill.description}</p>
-                    <p className="text-xs text-muted-foreground">{currency.format(bill.amount)}</p>
+                    <p className="text-xs text-muted-foreground">{currencyFormatter.format(bill.amount)}</p>
                   </div>
                   <Badge variant={isPast(new Date(bill.dueDate ?? 0)) ? "destructive" : "secondary"}>
                     {bill.dueDate ? format(new Date(bill.dueDate), "dd/MM") : "—"}
@@ -333,7 +304,7 @@ function SpendingBarChart({ data }: { data: { day: string; amount: number }[] })
               </div>
             </div>
             <div className="text-center">
-              <p className="text-sm font-semibold">{currency.format(item.amount)}</p>
+              <p className="text-sm font-semibold">{currencyFormatter.format(item.amount)}</p>
               <p className="text-xs text-muted-foreground">{item.day}</p>
             </div>
           </div>
@@ -363,7 +334,7 @@ function CategoryDonut({ data, total }: { data: { category: string; total: numbe
         <div className="h-full w-full rounded-full" style={{ background }} />
         <div className="absolute inset-6 flex flex-col items-center justify-center rounded-full bg-card text-center">
           <span className="text-xs uppercase tracking-widest text-muted-foreground">Total</span>
-          <strong className="text-lg">{currency.format(total)}</strong>
+          <strong className="text-lg">{currencyFormatter.format(total)}</strong>
         </div>
       </div>
     </div>
@@ -384,7 +355,7 @@ function TransactionRow({ transaction }: { transaction: Transaction }) {
       <div className="text-right">
         <p className={cn("text-sm font-semibold", isIncome ? "text-emerald-600" : "text-destructive")}>
           {isIncome ? "+" : "-"}
-          {currency.format(transaction.amount)}
+          {currencyFormatter.format(transaction.amount)}
         </p>
         <Badge variant={isIncome ? "secondary" : "outline"} className="text-xs">
           {isIncome ? "Receita" : transaction.status === "pending" ? "Pendente" : "Despesa"}

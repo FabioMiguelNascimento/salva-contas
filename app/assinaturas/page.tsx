@@ -1,8 +1,9 @@
 "use client";
 
-import { SubscriptionDeleteDialog } from "@/components/subscriptions/subscription-delete-dialog";
-import { SubscriptionEditDialog } from "@/components/subscriptions/subscription-edit-dialog";
-import { SubscriptionForm } from "@/components/subscriptions/subscription-form";
+import { PageHeader } from "@/components/page-header";
+import { SubscriptionCreateSheet } from "@/components/subscriptions/subscription-create-sheet";
+import { SubscriptionDeleteSheet } from "@/components/subscriptions/subscription-delete-sheet";
+import { SubscriptionEditSheet } from "@/components/subscriptions/subscription-edit-sheet";
 import { SubscriptionListCard } from "@/components/subscriptions/subscription-list-card";
 import { SubscriptionSummaryCard } from "@/components/subscriptions/subscription-summary-card";
 import { SubscriptionTable } from "@/components/subscriptions/subscription-table";
@@ -29,13 +30,13 @@ export default function SubscriptionsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <p className="text-xs uppercase tracking-[0.4em] text-muted-foreground">Recorrências</p>
-        <h1 className="text-3xl font-semibold">Assinaturas e débitos automáticos</h1>
-        <p className="text-sm text-muted-foreground">
-          Configure regras para Netflix, aluguel e outros serviços para que o AI Finance gere as transações sem digitação.
-        </p>
-      </div>
+      <PageHeader
+        tag="Recorrências"
+        title="Assinaturas e débitos automáticos"
+        description="Configure regras para Netflix, aluguel e outros serviços para que o AI Finance gere as transações sem digitação."
+      >
+        <SubscriptionCreateSheet form={form} />
+      </PageHeader>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SubscriptionSummaryCard
@@ -61,77 +62,65 @@ export default function SubscriptionsPage() {
         ))}
       </section>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <CardTitle>Assinaturas configuradas</CardTitle>
-              <CardDescription>Gerencie e acompanhe todas as recorrências automatizadas.</CardDescription>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button variant={activeFilter === "all" ? "default" : "outline"} size="sm" onClick={() => setActiveFilter("all")}>
-                Todas
+      <Card>
+        <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <CardTitle>Assinaturas configuradas</CardTitle>
+            <CardDescription>Gerencie e acompanhe todas as recorrências automatizadas.</CardDescription>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Button variant={activeFilter === "all" ? "default" : "outline"} size="sm" onClick={() => setActiveFilter("all")}>
+              Todas
+            </Button>
+            {frequencyOptions.map((option) => (
+              <Button
+                key={option.value}
+                variant={activeFilter === option.value ? "default" : "outline"}
+                size="sm"
+                onClick={() => setActiveFilter(option.value)}
+              >
+                {option.label}
               </Button>
-              {frequencyOptions.map((option) => (
-                <Button
-                  key={option.value}
-                  variant={activeFilter === option.value ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setActiveFilter(option.value)}
-                >
-                  {option.label}
-                </Button>
+            ))}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <div className="space-y-3">
+              {Array.from({ length: 4 }).map((_, index) => (
+                <div key={index} className="h-14 w-full animate-pulse rounded-xl bg-muted/50" />
               ))}
             </div>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <div className="space-y-3">
-                {Array.from({ length: 4 }).map((_, index) => (
-                  <div key={index} className="h-14 w-full animate-pulse rounded-xl bg-muted/50" />
-                ))}
+          ) : subscriptions.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">
+              Nenhuma assinatura cadastrada ainda. Clique em "Nova Assinatura" para criar a primeira regra.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="hidden md:block">
+                <SubscriptionTable
+                  subscriptions={filteredSubscriptions}
+                  onEdit={editorActions.openEdit}
+                  onDelete={editorActions.requestDelete}
+                />
               </div>
-            ) : subscriptions.length === 0 ? (
-              <div className="rounded-2xl border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">
-                Nenhuma assinatura cadastrada ainda. Utilize o formulário ao lado para criar a primeira regra.
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="hidden md:block">
-                  <SubscriptionTable
-                    subscriptions={filteredSubscriptions}
+              <div className="grid gap-3 md:hidden">
+                {filteredSubscriptions.map((subscription) => (
+                  <SubscriptionListCard
+                    key={subscription.id}
+                    subscription={subscription}
                     onEdit={editorActions.openEdit}
                     onDelete={editorActions.requestDelete}
                   />
-                </div>
-                <div className="grid gap-3 md:hidden">
-                  {filteredSubscriptions.map((subscription) => (
-                    <SubscriptionListCard
-                      key={subscription.id}
-                      subscription={subscription}
-                      onEdit={editorActions.openEdit}
-                      onDelete={editorActions.requestDelete}
-                    />
-                  ))}
-                </div>
+                ))}
               </div>
-            )}
-          </CardContent>
-        </Card>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Nova assinatura</CardTitle>
-            <CardDescription>Informe os parâmetros para gerar o lançamento automaticamente.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <SubscriptionForm form={form} />
-          </CardContent>
-        </Card>
-      </div>
-
-      <SubscriptionEditDialog editor={editor} />
-      <SubscriptionDeleteDialog editor={editor} />
+      <SubscriptionEditSheet editor={editor} />
+      <SubscriptionDeleteSheet editor={editor} />
     </div>
   );
 }

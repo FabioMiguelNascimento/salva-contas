@@ -2,6 +2,7 @@
 
 import { DatePicker } from "@/components/date-picker";
 import { NewTransactionDialog } from "@/components/new-transaction-dialog";
+import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,43 +11,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { useFinance } from "@/hooks/use-finance";
+import { currencyFormatter, getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
 import { cn, getTransactionCategoryLabel } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Filter, RefreshCcw, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-
-const months = [
-  { value: 1, label: "Jan" },
-  { value: 2, label: "Fev" },
-  { value: 3, label: "Mar" },
-  { value: 4, label: "Abr" },
-  { value: 5, label: "Mai" },
-  { value: 6, label: "Jun" },
-  { value: 7, label: "Jul" },
-  { value: 8, label: "Ago" },
-  { value: 9, label: "Set" },
-  { value: 10, label: "Out" },
-  { value: 11, label: "Nov" },
-  { value: 12, label: "Dez" },
-];
-
-const currency = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
 
 export default function ExtratoPage() {
   const {
@@ -74,8 +56,7 @@ export default function ExtratoPage() {
   const [editStatus, setEditStatus] = useState("paid");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const currentYear = new Date().getFullYear();
-  const years = [currentYear - 1, currentYear, currentYear + 1];
+  const years = getAvailableYears();
   const pageSize = 8;
 
   const filteredTransactions = useMemo(() => {
@@ -145,13 +126,11 @@ export default function ExtratoPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-2">
-        <p className="text-xs uppercase tracking-[0.4em] text-muted-foreground">Histórico</p>
-        <h1 className="text-3xl font-semibold">Extrato e transações</h1>
-        <p className="text-sm text-muted-foreground">
-          Consulte todas as movimentações processadas pela IA. Filtre por período, categoria e status para investigações detalhadas.
-        </p>
-      </div>
+      <PageHeader
+        tag="Histórico"
+        title="Extrato e transações"
+        description="Consulte todas as movimentações processadas pela IA. Filtre por período, categoria e status para investigações detalhadas."
+      />
 
       <Card>
         <CardHeader className="gap-4">
@@ -165,7 +144,7 @@ export default function ExtratoPage() {
                 <SelectValue placeholder="Mês" />
               </SelectTrigger>
               <SelectContent>
-                {months.map((month) => (
+                {monthsShort.map((month) => (
                   <SelectItem key={month.value} value={String(month.value)}>
                     {month.label}
                   </SelectItem>
@@ -256,7 +235,7 @@ export default function ExtratoPage() {
                       </TableCell>
                       <TableCell className={cn("font-semibold", transaction.type === "income" ? "text-emerald-600" : "text-destructive") }>
                         {transaction.type === "income" ? "+" : "-"}
-                        {currency.format(transaction.amount)}
+                        {currencyFormatter.format(transaction.amount)}
                       </TableCell>
                       <TableCell className="flex justify-end gap-2">
                         <Button size="sm" variant="outline" onClick={() => openEdit(transaction)}>
@@ -299,7 +278,7 @@ export default function ExtratoPage() {
                       <Badge variant="outline">{getTransactionCategoryLabel(transaction)}</Badge>
                       <span className={cn("font-semibold", transaction.type === "income" ? "text-emerald-600" : "text-destructive") }>
                         {transaction.type === "income" ? "+" : "-"}
-                        {currency.format(transaction.amount)}
+                        {currencyFormatter.format(transaction.amount)}
                       </span>
                     </div>
                     <div className="mt-4 flex gap-2">

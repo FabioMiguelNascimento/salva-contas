@@ -14,6 +14,7 @@ import {
     LayoutDashboard,
     Menu,
     ReceiptText,
+    RefreshCcw,
     Repeat,
     Settings,
 } from "lucide-react";
@@ -65,7 +66,7 @@ const baseNavItems: NavItem[] = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { pendingBills } = useFinance();
+  const { pendingBills, refresh, isSyncing } = useFinance();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
   const navItems = useMemo(
@@ -133,22 +134,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           );
         })}
       </div>
-      <div className="rounded-2xl bg-linear-to-br from-emerald-500 to-emerald-600 p-5 text-white">
-        <p className="text-sm uppercase tracking-widest text-white/80">Assistente IA</p>
-        <h2 className="mt-1 text-xl font-semibold">Capture gastos em segundos</h2>
-        <p className="mt-2 text-sm text-white/80">
-          Envie recibos, prints ou mensagens e deixe o Gemini organizar tudo automaticamente.
-        </p>
-        <div className="mt-4">
-          <NewTransactionDialog
-            trigger={
-              <Button className="w-full bg-white text-emerald-600 hover:bg-white/90">
-                Nova Transação
-              </Button>
-            }
-          />
-        </div>
-      </div>
+
       <div className="mt-auto space-y-4">
         <Separator />
         <div className="flex items-center gap-3">
@@ -169,12 +155,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-muted/30">
-      <div className="mx-auto flex max-w-[1600px] flex-col lg:flex-row">
-        <aside className="hidden w-full max-w-xs border-r bg-sidebar px-5 py-6 shadow-sm lg:block">
+      {/* Desktop Topbar - Fixed at top */}
+      <header className="hidden lg:flex fixed top-0 left-0 right-0 z-50 h-14 items-center justify-end gap-3 border-b bg-card px-6 shadow-sm">
+        <Button variant="outline" onClick={refresh} disabled={isSyncing} className="gap-2">
+          <RefreshCcw className={cn("h-4 w-4", isSyncing && "animate-spin")} />
+          Atualizar
+        </Button>
+        <NewTransactionDialog
+          trigger={<Button>Nova Transação</Button>}
+        />
+      </header>
+
+      <div className="flex min-h-screen">
+        {/* Desktop Sidebar - Fixed at left */}
+        <aside className="hidden lg:flex fixed top-14 left-0 bottom-0 w-72 flex-col border-r bg-sidebar px-5 py-6 shadow-sm z-40">
           <SidebarContent />
         </aside>
 
-        <div className="flex-1">
+        {/* Main content area */}
+        <div className="flex-1 lg:ml-72 lg:pt-14">
+          {/* Mobile Header */}
           <header className="flex items-center gap-3 border-b bg-card px-4 py-3 shadow-sm lg:hidden">
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
@@ -204,6 +204,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </main>
         </div>
       </div>
+
+      {/* Mobile FAB */}
       <div className="fixed bottom-6 right-6 lg:hidden">
         <NewTransactionDialog
           trigger={

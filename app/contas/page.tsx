@@ -1,6 +1,7 @@
 "use client";
 
 import { DatePicker } from "@/components/date-picker";
+import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +13,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useFinance } from "@/hooks/use-finance";
+import { currencyFormatter } from "@/lib/subscriptions/constants";
 import { cn, getTransactionCategoryLabel } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { differenceInCalendarDays, format } from "date-fns";
@@ -20,11 +22,6 @@ import { AlertTriangle, Calendar, CheckCircle2, PencilLine, ShieldCheck } from "
 import Link from "next/link";
 import type { ComponentType, SVGProps } from "react";
 import { useMemo, useState } from "react";
-
-const currency = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
 
 const filterTabs = [
   { value: "all", label: "Todas" },
@@ -114,26 +111,24 @@ export default function ContasPage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col gap-2">
-        <p className="text-xs uppercase tracking-[0.4em] text-muted-foreground">Fluxo futuro</p>
-        <h1 className="text-3xl font-semibold">Contas a pagar</h1>
-        <p className="text-sm text-muted-foreground">
-          Monitore boletos, antecipações e despesas recorrentes. Integração com IA garante leitura precisa dos vencimentos.
-        </p>
-      </div>
+      <PageHeader
+        tag="Fluxo futuro"
+        title="Contas a pagar"
+        description="Monitore boletos, antecipações e despesas recorrentes. Integração com IA garante leitura precisa dos vencimentos."
+      />
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SummaryCard
           icon={Calendar}
           label="Total pendente"
-          value={currency.format(summary.total)}
+          value={currencyFormatter.format(summary.total)}
           highlight="Inclui todos os lançamentos aguardando pagamento"
         />
         <SummaryCard
           icon={AlertTriangle}
           label="Atrasados"
           value={`${summary.overdueCount} boletos`}
-          highlight={currency.format(summary.overdueAmount)}
+          highlight={currencyFormatter.format(summary.overdueAmount)}
           variant="danger"
         />
         <SummaryCard
@@ -206,7 +201,7 @@ export default function ContasPage() {
                         <TableCell>
                           <StatusBadge bill={bill} />
                         </TableCell>
-                        <TableCell>{currency.format(bill.amount)}</TableCell>
+                        <TableCell>{currencyFormatter.format(bill.amount)}</TableCell>
                         <TableCell>{bill.dueDate ? format(new Date(bill.dueDate), "dd/MM", { locale: ptBR }) : "—"}</TableCell>
                         <TableCell>{formatDaysRemaining(bill)}</TableCell>
                         <TableCell className="flex justify-end gap-2">
@@ -250,7 +245,7 @@ export default function ContasPage() {
                       <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
                         <div>
                           <p className="text-muted-foreground">Valor</p>
-                          <p>{currency.format(bill.amount)}</p>
+                          <p>{currencyFormatter.format(bill.amount)}</p>
                         </div>
                         <div>
                           <p className="text-muted-foreground">Vence</p>
