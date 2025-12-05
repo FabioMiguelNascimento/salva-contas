@@ -1,16 +1,17 @@
+import { CategorySelect } from "@/components/category-select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-    Sheet,
-    SheetBody,
-    SheetContent,
-    SheetDescription,
-    SheetFooter,
-    SheetHeader,
-    SheetTitle,
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
 } from "@/components/ui/sheet";
 import type { SubscriptionEditorHook } from "@/hooks/use-subscription-editor";
 import { frequencyOptions, months, weekDays } from "@/lib/subscriptions/constants";
@@ -44,8 +45,11 @@ export function SubscriptionEditSheet({ editor }: SubscriptionEditSheetProps) {
                 <Input value={values.amount} onChange={(event) => setValue("amount", event.target.value)} required />
               </div>
               <div className="space-y-2">
-                <Label>Categoria (ID)</Label>
-                <Input value={values.categoryId} onChange={(event) => setValue("categoryId", event.target.value)} required />
+                <Label>Categoria</Label>
+                <CategorySelect
+                  value={values.categoryId}
+                  onValueChange={(value) => setValue("categoryId", value ?? "")}
+                />
               </div>
               <div className="space-y-2">
                 <Label>Frequência</Label>

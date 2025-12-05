@@ -1,5 +1,6 @@
 "use client";
 
+import { CategorySelect } from "@/components/category-select";
 import { DatePicker } from "@/components/date-picker";
 import { NewTransactionDialog } from "@/components/new-transaction-sheet";
 import { PageHeader } from "@/components/page-header";
@@ -49,7 +50,7 @@ export default function ExtratoPage() {
   const [editDate, setEditDate] = useState<Date | undefined>();
   const [editAmount, setEditAmount] = useState("");
   const [editDescription, setEditDescription] = useState("");
-  const [editCategory, setEditCategory] = useState("");
+  const [editCategoryId, setEditCategoryId] = useState<string | null>(null);
   const [editType, setEditType] = useState("expense");
   const [editStatus, setEditStatus] = useState("paid");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -84,7 +85,7 @@ export default function ExtratoPage() {
     setEditing({ open: true, transaction });
     setEditDescription(transaction.description);
     setEditAmount(String(transaction.amount));
-    setEditCategory(transaction.category);
+    setEditCategoryId(transaction.categoryId ?? null);
     setEditType(transaction.type);
     setEditStatus(transaction.status);
     setEditDate(transaction.paymentDate ? new Date(transaction.paymentDate) : undefined);
@@ -103,6 +104,7 @@ export default function ExtratoPage() {
         type: editType as Transaction["type"],
         status: editStatus as Transaction["status"],
         paymentDate: editDate ? editDate.toISOString() : null,
+        categoryId: editCategoryId,
       });
       setEditing({ open: false });
     } finally {
@@ -358,7 +360,7 @@ export default function ExtratoPage() {
               </div>
               <div className="space-y-2">
                 <Label>Categoria</Label>
-                <Input value={editCategory} onChange={(event) => setEditCategory(event.target.value)} required />
+                <CategorySelect value={editCategoryId} onValueChange={setEditCategoryId} />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">

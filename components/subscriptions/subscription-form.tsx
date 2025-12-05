@@ -1,3 +1,6 @@
+"use client";
+
+import { CategorySelect } from "@/components/category-select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -39,15 +42,12 @@ export function SubscriptionForm({ form }: SubscriptionFormProps) {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="categoryId">Categoria (ID)</Label>
-        <Input
-          id="categoryId"
+        <Label>Categoria</Label>
+        <CategorySelect
           value={values.categoryId}
-          onChange={(event) => setValue("categoryId", event.target.value)}
-          placeholder="Informe o UUID da categoria"
-          required
+          onValueChange={(value) => setValue("categoryId", value ?? "")}
+          placeholder="Selecione uma categoria"
         />
-        <p className="text-xs text-muted-foreground">Use o ID exibido no painel de categorias da API.</p>
       </div>
       <div className="space-y-2">
         <Label>Frequência</Label>

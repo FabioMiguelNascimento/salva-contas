@@ -14,6 +14,7 @@ import {
   ChevronRight,
   LayoutDashboard,
   Menu,
+  PiggyBank,
   ReceiptText,
   RefreshCcw,
   Repeat,
@@ -50,6 +51,12 @@ const baseNavItems: NavItem[] = [
     href: "/assinaturas",
     icon: Repeat,
     description: "Compras recorrentes automatizadas",
+  },
+  {
+    label: "Orçamentos",
+    href: "/orcamentos",
+    icon: PiggyBank,
+    description: "Limites por categoria",
   },
   {
     label: "Extrato / Transações",

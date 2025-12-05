@@ -1,5 +1,13 @@
 "use client";
 
+import {
+  createBudget,
+  deleteBudget,
+  fetchBudgetProgress,
+  fetchBudgets,
+  updateBudget,
+} from "@/services/budgets";
+import { fetchCategories } from "@/services/categories";
 import { fetchDashboardMetrics } from "@/services/dashboard";
 import { createSubscription, deleteSubscription, fetchSubscriptions, updateSubscription } from "@/services/subscriptions";
 import {
@@ -10,13 +18,18 @@ import {
   updateTransaction,
 } from "@/services/transactions";
 import type {
+  Budget,
+  BudgetProgress,
+  CreateBudgetPayload,
   CreateSubscriptionPayload,
   DashboardMetrics,
   ManualTransactionPayload,
   ProcessTransactionClientPayload,
   Subscription,
   Transaction,
+  TransactionCategory,
   TransactionFilters,
+  UpdateBudgetPayload,
   UpdateSubscriptionPayload,
   UpdateTransactionPayload,
 } from "@/types/finance";
@@ -39,6 +52,9 @@ interface FinanceContextValue {
   pendingBills: Transaction[];
   metrics: DashboardMetrics | null;
   subscriptions: Subscription[];
+  budgets: Budget[];
+  budgetProgress: BudgetProgress[];
+  categories: TransactionCategory[];
   refresh: () => Promise<void>;
   processUnstructuredTransaction: (payload: ProcessTransactionClientPayload) => Promise<Transaction | void>;
   createManualTransaction: (payload: ManualTransactionPayload) => Promise<Transaction | void>;
@@ -48,6 +64,9 @@ interface FinanceContextValue {
   createSubscriptionRule: (payload: CreateSubscriptionPayload) => Promise<Subscription | void>;
   updateSubscriptionRule: (id: string, payload: UpdateSubscriptionPayload) => Promise<Subscription | void>;
   deleteSubscriptionRule: (id: string) => Promise<void>;
+  createBudgetRule: (payload: CreateBudgetPayload) => Promise<Budget | void>;
+  updateBudgetRule: (id: string, payload: UpdateBudgetPayload) => Promise<Budget | void>;
+  deleteBudgetRule: (id: string) => Promise<void>;
 }
 
 const FinanceContext = createContext<FinanceContextValue | null>(null);
@@ -63,6 +82,9 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [budgetProgress, setBudgetProgress] = useState<BudgetProgress[]>([]);
+  const [categories, setCategories] = useState<TransactionCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -71,15 +93,21 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const loadData = useCallback(async () => {
     setIsSyncing(true);
     try {
-      const [transactionsResponse, metricsResponse, subscriptionsResponse] = await Promise.all([
+      const [transactionsResponse, metricsResponse, subscriptionsResponse, budgetsResponse, budgetProgressResponse, categoriesResponse] = await Promise.all([
         fetchTransactions(filters),
         fetchDashboardMetrics(filters),
         fetchSubscriptions(),
+        fetchBudgets({ month: filters.month, year: filters.year }),
+        fetchBudgetProgress(filters.month, filters.year),
+        fetchCategories(),
       ]);
 
       setTransactions(transactionsResponse);
       setMetrics(metricsResponse);
       setSubscriptions(subscriptionsResponse);
+      setBudgets(budgetsResponse);
+      setBudgetProgress(budgetProgressResponse);
+      setCategories(categoriesResponse);
       setLastSync(new Date().toISOString());
       setError(null);
     } catch (err) {
@@ -206,7 +234,42 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-    const value: FinanceContextValue = {
+  const createBudgetRule = async (payload: CreateBudgetPayload) => {
+    try {
+      const budget = await createBudget(payload);
+      setBudgets((prev) => [budget, ...prev]);
+      await loadData();
+      return budget;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao criar orçamento");
+      throw err;
+    }
+  };
+
+  const updateBudgetRule = async (id: string, payload: UpdateBudgetPayload) => {
+    try {
+      const budget = await updateBudget(id, payload);
+      setBudgets((prev) => prev.map((item) => (item.id === id ? budget : item)));
+      await loadData();
+      return budget;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao atualizar orçamento");
+      throw err;
+    }
+  };
+
+  const deleteBudgetRule = async (id: string) => {
+    try {
+      await deleteBudget(id);
+      setBudgets((prev) => prev.filter((item) => item.id !== id));
+      await loadData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao remover orçamento");
+      throw err;
+    }
+  };
+
+  const value: FinanceContextValue = {
     filters,
     setFilters,
     isLoading,
@@ -217,6 +280,9 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     pendingBills,
     metrics,
     subscriptions,
+    budgets,
+    budgetProgress,
+    categories,
     refresh: loadData,
     processUnstructuredTransaction,
     createManualTransaction,
@@ -226,6 +292,9 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     createSubscriptionRule,
     updateSubscriptionRule,
     deleteSubscriptionRule,
+    createBudgetRule,
+    updateBudgetRule,
+    deleteBudgetRule,
   };
 
   return <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>;

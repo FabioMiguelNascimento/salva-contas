@@ -179,7 +179,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
                   </p>
                 </div>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-1">
                 <div className="space-y-2">
                   <Label>{isScheduled ? "Data de vencimento" : "Data da compra"}</Label>
                   <DatePicker
@@ -187,11 +187,6 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
                     onChange={setSelectedDate}
                     placeholder={isScheduled ? "Quando vence?" : "Quando aconteceu?"}
                   />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="notes">Anotações (opcional)</Label>
-                  <Input id="notes" placeholder="Centro de custo, tags..." disabled />
-                  <p className="text-xs text-muted-foreground">Em breve você poderá enriquecer o lançamento com tags.</p>
                 </div>
               </div>
             </div>

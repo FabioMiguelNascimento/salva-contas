@@ -129,3 +129,39 @@ export interface ProcessTransactionClientPayload {
   isScheduled?: boolean;
   date?: string | null;
 }
+
+// Budget types
+export interface Budget {
+  id: string;
+  userId?: string;
+  categoryId: string;
+  category?: TransactionCategory | null;
+  amount: number;
+  month: number;
+  year: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface BudgetProgress {
+  budget: Budget;
+  spent: number;
+  remaining: number;
+  percentage: number;
+}
+
+export interface BudgetFilters {
+  month?: number;
+  year?: number;
+}
+
+export interface CreateBudgetPayload {
+  categoryId: string;
+  amount: number;
+  month: number;
+  year: number;
+}
+
+export interface UpdateBudgetPayload {
+  amount?: number;
+}

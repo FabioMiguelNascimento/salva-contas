@@ -1,5 +1,6 @@
 "use client";
 
+import { CategorySelect } from "@/components/category-select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -81,16 +82,12 @@ export function SubscriptionCreateSheet({ form, trigger }: SubscriptionCreateShe
               />
             </div>
             <div className="space-y-2">
-              <Label>Categoria (ID)</Label>
-              <Input
-                placeholder="Informe o UUID da categoria"
+              <Label>Categoria</Label>
+              <CategorySelect
                 value={values.categoryId}
-                onChange={(e) => setValue("categoryId", e.target.value)}
-                required
+                onValueChange={(value) => setValue("categoryId", value ?? "")}
+                placeholder="Selecione uma categoria"
               />
-              <p className="text-xs text-muted-foreground">
-                Use o ID exibido no painel de categorias da API.
-              </p>
             </div>
             <div className="space-y-2">
               <Label>Frequência</Label>

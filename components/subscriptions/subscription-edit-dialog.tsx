@@ -1,12 +1,15 @@
+"use client";
+
+import { CategorySelect } from "@/components/category-select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,8 +45,11 @@ export function SubscriptionEditDialog({ editor }: SubscriptionEditDialogProps) 
               <Input value={values.amount} onChange={(event) => setValue("amount", event.target.value)} required />
             </div>
             <div className="space-y-2">
-              <Label>Categoria (ID)</Label>
-              <Input value={values.categoryId} onChange={(event) => setValue("categoryId", event.target.value)} required />
+              <Label>Categoria</Label>
+              <CategorySelect
+                value={values.categoryId}
+                onValueChange={(value) => setValue("categoryId", value ?? "")}
+              />
             </div>
             <div className="space-y-2">
               <Label>Frequência</Label>
