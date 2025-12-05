@@ -213,3 +213,32 @@ export interface CreditCardFilters {
   page?: number;
   limit?: number;
 }
+
+// Notification types
+export type NotificationType =
+  | "due_date"
+  | "budget_limit"
+  | "payment_reminder"
+  | "subscription_renewal"
+  | "general";
+
+export type NotificationStatus = "unread" | "read";
+
+export interface Notification {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  status: NotificationStatus;
+  relatedId: string | null;
+  createdAt: string;
+  readAt: string | null;
+}
+
+export interface CreateNotificationPayload {
+  title: string;
+  message: string;
+  type: NotificationType;
+  relatedId?: string;
+}

@@ -26,6 +26,7 @@ import { usePathname } from "next/navigation";
 import type { ComponentType, SVGProps } from "react";
 import { useMemo, useState } from "react";
 import { NewTransactionDialog } from "./new-transaction-sheet";
+import { NotificationsDropdown } from "./notifications-dropdown";
 
 interface NavItem {
   label: string;
@@ -202,6 +203,7 @@ function AppShellContent({
   return (
     <div className="min-h-screen bg-muted/30">
       <header className="hidden lg:flex fixed top-0 left-0 right-0 z-50 h-14 items-center justify-end gap-3 border-b bg-card px-6 shadow-sm">
+        <NotificationsDropdown />
         <Button variant="outline" onClick={refresh} disabled={isSyncing} className="gap-2">
           <RefreshCcw className={cn("h-4 w-4", isSyncing && "animate-spin")} />
           Atualizar
@@ -235,7 +237,8 @@ function AppShellContent({
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Salva Contas</p>
             </div>
-            <div className="ml-auto">
+            <div className="ml-auto flex items-center gap-2">
+              <NotificationsDropdown />
               {actionNode ?? (
                 <NewTransactionDialog
                   trigger={<Button size="sm">Nova Transação</Button>}
