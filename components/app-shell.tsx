@@ -23,6 +23,7 @@ import {
   Repeat,
   Settings,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType, SVGProps } from "react";
@@ -114,8 +115,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const SidebarContent = () => (
     <div className="flex h-full flex-col gap-6">
       <div className="flex items-center gap-2">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-emerald-500 to-emerald-600 text-white font-semibold">
-          AI
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-emerald-500 to-emerald-600 text-white overflow-hidden">
+          <Image
+            src="/app-icon.svg"
+            alt="Salva Contas"
+            width={24}
+            height={24}
+            className="h-6 w-6"
+          />
         </div>
         <div>
           <p className="text-sm uppercase tracking-widest text-muted-foreground">Salva Contas</p>
