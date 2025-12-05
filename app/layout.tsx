@@ -57,7 +57,7 @@ export default function RootLayout({
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={cn("min-h-screen bg-background font-sans antialiased", fontSans.className)}>
+      <body className={cn("min-h-screen bg-background font-sans antialiased overflow-x-hidden", fontSans.className)}>
         <Providers>
           <AuthGuard>
             <AppShell>{children}</AppShell>

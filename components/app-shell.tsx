@@ -20,8 +20,7 @@ import {
   PiggyBank,
   ReceiptText,
   RefreshCcw,
-  Repeat,
-  Settings,
+  Repeat
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -226,7 +225,7 @@ function AppShellContent({
   const { actionNode } = useTopbarAction();
 
   return (
-    <div className="min-h-screen bg-muted/30">
+    <div className="min-h-screen bg-muted/30 overflow-x-hidden">
       <header className="hidden lg:flex fixed top-0 left-0 right-0 z-50 h-14 items-center justify-end gap-3 border-b bg-card px-6 shadow-sm">
         <NotificationsDropdown />
         <Button variant="outline" onClick={refresh} disabled={isSyncing} className="gap-2">
@@ -240,12 +239,12 @@ function AppShellContent({
         )}
       </header>
 
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen overflow-x-hidden">
         <aside className="hidden lg:flex fixed top-14 left-0 bottom-0 w-72 flex-col border-r bg-sidebar px-5 py-6 shadow-sm z-40">
           <SidebarContent />
         </aside>
 
-        <div className="flex-1 lg:ml-72 lg:pt-14">
+        <div className="flex-1 lg:ml-72 lg:pt-14 overflow-x-hidden max-w-full">
           <header className="flex items-center gap-3 border-b bg-card px-4 py-3 shadow-sm lg:hidden">
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
@@ -272,7 +271,7 @@ function AppShellContent({
             </div>
           </header>
 
-          <main className="relative px-4 py-6 lg:px-8 lg:py-8">
+          <main className="relative px-2 py-4 sm:px-4 sm:py-6 lg:px-8 lg:py-8 overflow-x-hidden max-w-full">
             {children}
           </main>
         </div>
