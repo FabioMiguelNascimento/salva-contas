@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAuth } from "@/contexts/auth-context";
 import { TopbarActionProvider, useTopbarAction } from "@/contexts/topbar-action-context";
 import { useFinance } from "@/hooks/use-finance";
 import { cn } from "@/lib/utils";
@@ -14,6 +15,7 @@ import {
   ChevronRight,
   CreditCard,
   LayoutDashboard,
+  LogOut,
   Menu,
   PiggyBank,
   ReceiptText,
@@ -24,7 +26,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType, SVGProps } from "react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { NewTransactionDialog } from "./new-transaction-sheet";
 import { NotificationsDropdown } from "./notifications-dropdown";
 
@@ -82,20 +84,32 @@ const baseNavItems: NavItem[] = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const { user, logout, isAuthenticated } = useAuth();
   const { pendingBills, refresh, isSyncing } = useFinance();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
 
-  const navItems = useMemo(
-    () =>
-      baseNavItems.map((item) => ({
-        ...item,
-        badge:
-          item.href === "/contas" && pendingBills.length > 0
-            ? `${pendingBills.length}`
-            : undefined,
-      })),
-    [pendingBills]
-  );
+  // Não renderiza o shell nas páginas de auth
+  const isAuthPage = pathname === "/login" || pathname === "/register";
+  if (isAuthPage || !isAuthenticated) {
+    return <>{children}</>;
+  }
+
+  const userInitials = user?.name
+    ? user.name
+        .split(" ")
+        .map((n) => n[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
+    : "??";
+
+  const navItems = baseNavItems.map((item) => ({
+    ...item,
+    badge:
+      item.href === "/contas" && pendingBills.length > 0
+        ? `${pendingBills.length}`
+        : undefined,
+  }));
 
   const SidebarContent = () => (
     <div className="flex h-full flex-col gap-6">
@@ -115,6 +129,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setIsSheetOpen(false)}
               className={cn(
                 "group flex items-center justify-between rounded-xl border border-transparent px-3 py-2 text-sm transition-colors",
                 isActive
@@ -154,14 +169,14 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Separator />
         <div className="flex items-center gap-3">
           <Avatar className="h-12 w-12">
-            <AvatarFallback className="bg-emerald-500/15 text-emerald-600">LC</AvatarFallback>
+            <AvatarFallback className="bg-emerald-500/15 text-emerald-600">{userInitials}</AvatarFallback>
           </Avatar>
-          <div>
-            <p className="text-sm font-semibold">Letícia Carvalho</p>
-            <p className="text-xs text-muted-foreground">CFO • Squad Finance</p>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-semibold">{user?.name ?? "Usuário"}</p>
+            <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
           </div>
-          <Button variant="ghost" size="sm" className="ml-auto text-xs">
-            Sair
+          <Button variant="ghost" size="icon" onClick={logout} title="Sair">
+            <LogOut className="h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -176,6 +191,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         isSheetOpen={isSheetOpen}
         setIsSheetOpen={setIsSheetOpen}
         SidebarContent={SidebarContent}
+        logout={logout}
       >
         {children}
       </AppShellContent>
@@ -189,7 +205,8 @@ function AppShellContent({
   isSyncing,
   isSheetOpen,
   setIsSheetOpen,
-  SidebarContent
+  SidebarContent,
+  logout,
 }: { 
   children: React.ReactNode;
   refresh: () => void;
@@ -197,6 +214,7 @@ function AppShellContent({
   isSheetOpen: boolean;
   setIsSheetOpen: (open: boolean) => void;
   SidebarContent: React.ComponentType;
+  logout: () => void;
 }) {
   const { actionNode } = useTopbarAction();
 
