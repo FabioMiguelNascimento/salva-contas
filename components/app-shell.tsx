@@ -75,12 +75,12 @@ const baseNavItems: NavItem[] = [
     icon: ReceiptText,
     description: "Histórico completo e filtros",
   },
-  {
-    label: "Configurações",
-    href: "/configuracoes",
-    icon: Settings,
-    description: "Preferências do workspace",
-  },
+  // {
+  //   label: "Configurações",
+  //   href: "/configuracoes",
+  //   icon: Settings,
+  //   description: "Preferências do workspace",
+  // },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
