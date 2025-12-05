@@ -1,5 +1,6 @@
 "use client";
 
+import { useAuth } from "@/contexts/auth-context";
 import {
   createBudget,
   deleteBudget,
@@ -91,6 +92,7 @@ const initialFilters: TransactionFilters = {
 };
 
 export function FinanceProvider({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [filters, setFilters] = useState<TransactionFilters>(initialFilters);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
@@ -136,8 +138,22 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   }, [filters]);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (isAuthenticated && !authLoading) {
+      loadData();
+    } else if (!authLoading && !isAuthenticated) {
+      // Usuário não autenticado, limpar dados
+      setTransactions([]);
+      setMetrics(null);
+      setSubscriptions([]);
+      setBudgets([]);
+      setBudgetProgress([]);
+      setCategories([]);
+      setCreditCards([]);
+      setIsLoading(false);
+      setError(null);
+      setLastSync(null);
+    }
+  }, [loadData, isAuthenticated, authLoading]);
 
   const pendingBills = useMemo(
     () => transactions.filter((transaction) => transaction.status === "pending"),

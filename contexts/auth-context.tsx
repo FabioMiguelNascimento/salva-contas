@@ -20,7 +20,6 @@ const REFRESH_TOKEN_KEY = "salva_contas_refresh_token";
 const USER_KEY = "salva_contas_user";
 const EXPIRES_AT_KEY = "salva_contas_expires_at";
 
-// Margem de 5 minutos para renovar o token antes de expirar
 const TOKEN_REFRESH_MARGIN = 5 * 60 * 1000;
 
 interface AuthContextValue extends AuthState {
@@ -33,6 +32,8 @@ interface AuthContextValue extends AuthState {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+export { AuthContext };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -48,7 +49,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     isLoading: true,
   });
 
-  // Função para salvar os tokens no localStorage
   const saveTokens = useCallback((accessToken: string, refreshToken: string, expiresAt: number, user: User) => {
     localStorage.setItem(TOKEN_KEY, accessToken);
     localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
@@ -56,7 +56,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(USER_KEY, JSON.stringify(user));
   }, []);
 
-  // Função para limpar os tokens
   const clearTokens = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem(REFRESH_TOKEN_KEY);
@@ -68,19 +67,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Função para renovar o token
   const doRefreshToken = useCallback(async () => {
-    if (isRefreshingRef.current) return;
+    if (isRefreshingRef.current) {
+      console.log('Refresh already in progress, skipping...');
+      return;
+    }
     
     const storedRefreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-    if (!storedRefreshToken) return;
+    if (!storedRefreshToken) {
+      console.log('No refresh token found, cannot refresh');
+      return;
+    }
 
+    console.log('Starting token refresh...');
     isRefreshingRef.current = true;
     
     try {
       const response = await authService.refreshToken({ refreshToken: storedRefreshToken });
       
-      // Buscar dados do usuário atualizados
       const user = await authService.getMe();
       
       saveTokens(response.accessToken, response.refreshToken, response.expiresAt, user);
@@ -94,10 +98,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: true,
       }));
 
-      // Agendar próxima renovação
       scheduleTokenRefresh(response.expiresAt);
-    } catch {
-      // Refresh falhou, desloga o usuário
+      console.log('Token refresh completed successfully');
+    } catch (error) {
+      console.error('Token refresh failed:', error);
       clearTokens();
       setState({
         user: null,
@@ -113,14 +117,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [clearTokens, router, saveTokens]);
 
-  // Função para agendar a renovação do token
   const scheduleTokenRefresh = useCallback((expiresAt: number) => {
     if (refreshTimeoutRef.current) {
       clearTimeout(refreshTimeoutRef.current);
     }
 
     const now = Date.now();
-    const expiresAtMs = expiresAt * 1000; // Converter de segundos para ms
+    const expiresAtMs = expiresAt * 1000;
     const refreshAt = expiresAtMs - TOKEN_REFRESH_MARGIN;
     const delay = Math.max(refreshAt - now, 0);
 
@@ -129,12 +132,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         doRefreshToken();
       }, delay);
     } else {
-      // Token já expirou ou está prestes a expirar, renova imediatamente
       doRefreshToken();
     }
   }, [doRefreshToken]);
 
-  // Configura o interceptor do axios para incluir o token e tratar 401
   useEffect(() => {
     const requestInterceptor = apiClient.interceptors.request.use(
       (config) => {
@@ -152,7 +153,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       async (error) => {
         const originalRequest = error.config;
         
-        // Se receber 401 e não é uma requisição de refresh, tenta renovar
         if (error?.response?.status === 401 && !originalRequest._retry) {
           originalRequest._retry = true;
           
@@ -166,20 +166,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
               localStorage.setItem(EXPIRES_AT_KEY, response.expiresAt.toString());
               
-              // Atualiza o header e retenta a requisição
+              const user = await authService.getMe();
+              localStorage.setItem(USER_KEY, JSON.stringify(user));
+              
+              setState((prev) => ({
+                ...prev,
+                user,
+                token: response.accessToken,
+                refreshToken: response.refreshToken,
+                expiresAt: response.expiresAt,
+                isAuthenticated: true,
+              }));
+              
+              scheduleTokenRefresh(response.expiresAt);
+              
               originalRequest.headers.Authorization = `Bearer ${response.accessToken}`;
               isRefreshingRef.current = false;
               
-              // Agendar próxima renovação
-              scheduleTokenRefresh(response.expiresAt);
-              
               return apiClient(originalRequest);
-            } catch {
+            } catch (refreshError) {
+              console.error('Refresh token failed:', refreshError);
               isRefreshingRef.current = false;
+              
+              clearTokens();
+              setState({
+                user: null,
+                token: null,
+                refreshToken: null,
+                expiresAt: null,
+                isAuthenticated: false,
+                isLoading: false,
+              });
+              router.push("/login");
+              return Promise.reject(error);
             }
           }
           
-          // Refresh falhou ou não há refresh token, desloga
           clearTokens();
           setState({
             user: null,
@@ -201,7 +223,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [clearTokens, router, scheduleTokenRefresh]);
 
-  // Carrega o token do localStorage na inicialização
   useEffect(() => {
     const loadStoredAuth = async () => {
       try {
@@ -215,8 +236,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const now = Date.now();
           const expiresAtMs = expiresAt * 1000;
           
-          // Se o token expirou, tenta renovar
-          if (expiresAtMs <= now) {
+          if (expiresAtMs - TOKEN_REFRESH_MARGIN <= now) {
+            console.log('Token expired or expiring soon, attempting refresh...');
             try {
               const response = await authService.refreshToken({ refreshToken: storedRefreshToken });
               const user = await authService.getMe();
@@ -233,7 +254,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               });
               
               scheduleTokenRefresh(response.expiresAt);
-            } catch {
+              console.log('Token refreshed successfully');
+            } catch (refreshError) {
+              console.error('Failed to refresh token on app load:', refreshError);
               clearTokens();
               setState({
                 user: null,
@@ -245,10 +268,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               });
             }
           } else {
-            // Token ainda válido, valida com /me
+            console.log('Token still valid, validating with /me...');
             try {
-              const user = await authService.getMe();
-              localStorage.setItem(USER_KEY, JSON.stringify(user));
+              const user = JSON.parse(storedUser);
               
               setState({
                 user,
@@ -260,7 +282,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               });
               
               scheduleTokenRefresh(expiresAt);
-            } catch {
+              console.log('Token validated successfully');
+            } catch (meError) {
+              console.error('Failed to validate token with /me:', meError);
               clearTokens();
               setState({
                 user: null,
@@ -273,9 +297,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
           }
         } else {
+          console.log('No stored auth data found');
           setState((prev) => ({ ...prev, isLoading: false }));
         }
-      } catch {
+      } catch (error) {
+        console.error('Error loading stored auth:', error);
         setState((prev) => ({ ...prev, isLoading: false }));
       }
     };
@@ -315,12 +341,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const register = useCallback(async (payload: RegisterPayload): Promise<{ needsEmailConfirmation: boolean }> => {
     const response = await authService.signup(payload);
     
-    // Se session é null, precisa confirmar email
     if (response.session === null) {
       return { needsEmailConfirmation: true };
     }
     
-    // Se tiver session (raro, mas pode acontecer se confirmação estiver desabilitada)
     return { needsEmailConfirmation: false };
   }, []);
 
