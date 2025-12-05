@@ -76,6 +76,14 @@ export interface DashboardFinancialSummary {
   income: number;
   expenses: number;
   balance: number;
+  incomeChangePercent?: number;
+  expensesChangePercent?: number;
+  balanceChangePercent?: number;
+  previousMonth?: {
+    income: number;
+    expenses: number;
+    balance: number;
+  };
 }
 
 export interface DashboardPendingBillsSummary {

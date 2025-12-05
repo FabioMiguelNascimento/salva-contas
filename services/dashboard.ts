@@ -5,6 +5,14 @@ type ApiDashboardData = {
   totalIncome?: number | string;
   totalExpenses?: number | string;
   netBalance?: number | string;
+  incomeChangePercent?: number | string;
+  expensesChangePercent?: number | string;
+  balanceChangePercent?: number | string;
+  previousMonth?: {
+    income?: number | string;
+    expenses?: number | string;
+    balance?: number | string;
+  };
   categoryBreakdown?: Array<{
     category: string;
     income?: number | string;
@@ -38,6 +46,14 @@ const normalizeMetrics = (metrics: ApiDashboardData): DashboardMetrics => ({
     income: toNumber(metrics.totalIncome ?? 0),
     expenses: toNumber(metrics.totalExpenses ?? 0),
     balance: toNumber(metrics.netBalance ?? 0),
+    incomeChangePercent: metrics.incomeChangePercent ? toNumber(metrics.incomeChangePercent) : undefined,
+    expensesChangePercent: metrics.expensesChangePercent ? toNumber(metrics.expensesChangePercent) : undefined,
+    balanceChangePercent: metrics.balanceChangePercent ? toNumber(metrics.balanceChangePercent) : undefined,
+    previousMonth: metrics.previousMonth ? {
+      income: toNumber(metrics.previousMonth.income ?? 0),
+      expenses: toNumber(metrics.previousMonth.expenses ?? 0),
+      balance: toNumber(metrics.previousMonth.balance ?? 0),
+    } : undefined,
   },
   pendingBills: {
     count: Number(metrics.pendingBills?.count ?? 0),
