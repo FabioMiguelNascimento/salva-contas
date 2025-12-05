@@ -196,7 +196,7 @@ export default function DashboardPage() {
               {categoryBreakdown.slice(0, 4).map((item, index) => (
                 <div key={item.category} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <span className="h-3 w-3 rounded-full" style={{ backgroundColor: chartColors[index % chartColors.length] }} />
+                    <span className="h-3 w-3 " style={{ backgroundColor: chartColors[index % chartColors.length] }} />
                     <span className="text-sm font-medium">{item.category}</span>
                   </div>
                   <span className="text-sm text-muted-foreground">{currencyFormatter.format(item.total)}</span>
@@ -286,7 +286,7 @@ function SpendingBarChart({ data }: { data: { day: string; amount: number }[] })
               <div className="flex w-10 items-end">
                 <div className="w-full rounded-full bg-muted/40">
                   <div
-                    className="rounded-full bg-emerald-500"
+                    className="rounded-sm bg-emerald-500"
                     style={{ height, transition: "height 0.3s ease" }}
                   />
                 </div>
