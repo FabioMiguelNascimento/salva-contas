@@ -1,10 +1,10 @@
 import { apiClient } from "@/lib/api-client";
 import type {
-    ManualTransactionPayload,
-    ProcessTransactionPayload,
-    Transaction,
-    TransactionFilters,
-    UpdateTransactionPayload,
+  ManualTransactionPayload,
+  ProcessTransactionClientPayload,
+  Transaction,
+  TransactionFilters,
+  UpdateTransactionPayload,
 } from "@/types/finance";
 
 type ApiTransaction = Omit<Transaction, "amount" | "category"> & {
@@ -30,6 +30,8 @@ const normalizeTransaction = (transaction: ApiTransaction): Transaction => {
     categoryName: categoryLabel,
     categoryId: transaction.categoryId ?? transaction.categoryRel?.id ?? null,
     categoryRel: transaction.categoryRel ?? null,
+    creditCard: transaction.creditCard ?? null,
+    creditCardId: transaction.creditCardId ?? transaction.creditCard?.id ?? null,
   };
 };
 
@@ -38,24 +40,6 @@ const unwrapData = <T>(payload: ApiResponse<T>): T => {
     return (payload as { data: T }).data;
   }
   return payload as T;
-};
-
-const buildFormData = (payload: ProcessTransactionPayload) => {
-  const formData = new FormData();
-
-  if (payload.file) {
-    formData.append("file", payload.file);
-  }
-
-  if (payload.text) {
-    formData.append("text", payload.text);
-  }
-
-  if (payload.date) {
-    formData.append(payload.isScheduled ? "dueDate" : "paymentDate", payload.date);
-  }
-
-  return formData;
 };
 
 export async function fetchTransactions(filters: TransactionFilters) {
@@ -72,14 +56,26 @@ export async function createTransaction(payload: ManualTransactionPayload) {
   return normalizeTransaction(unwrapData(response.data));
 }
 
-export async function processTransaction(payload: ProcessTransactionPayload) {
-  const formData = buildFormData(payload);
-
-  if (!formData.has("file") && !formData.has("text")) {
+export async function processTransaction(payload: ProcessTransactionClientPayload) {
+  if (!payload.file && !payload.text) {
     throw new Error("Envie um arquivo ou informe um texto para processar a transação.");
   }
 
-  const response = await apiClient.post<ApiResponse<ApiTransaction>>("/transactions/", formData, {
+  const formData = new FormData();
+
+  if (payload.file) {
+    formData.append("file", payload.file);
+  }
+
+  if (payload.text) {
+    formData.append("text", payload.text);
+  }
+
+  if (payload.date) {
+    formData.append(payload.isScheduled ? "dueDate" : "paymentDate", payload.date);
+  }
+
+  const response = await apiClient.post<ApiResponse<ApiTransaction>>("/transactions", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 
@@ -87,7 +83,7 @@ export async function processTransaction(payload: ProcessTransactionPayload) {
 }
 
 export async function updateTransaction(id: string, payload: UpdateTransactionPayload) {
-  const response = await apiClient.patch<ApiResponse<ApiTransaction>>(`/transactions/${id}`, payload);
+  const response = await apiClient.put<ApiResponse<ApiTransaction>>(`/transactions/${id}`, payload);
   return normalizeTransaction(unwrapData(response.data));
 }
 

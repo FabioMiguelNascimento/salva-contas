@@ -9,6 +9,13 @@ export interface TransactionCategory {
   userId?: string;
 }
 
+export interface CreditCard {
+  id: string;
+  name: string;
+  lastFourDigits?: string;
+  flag?: string;
+}
+
 export interface Transaction {
   id: string;
   userId?: string | null;
@@ -18,6 +25,8 @@ export interface Transaction {
   categoryId?: string | null;
   categoryName?: string | null;
   categoryRel?: TransactionCategory | null;
+  creditCard?: CreditCard | null;
+  creditCardId?: string | null;
   status: TransactionStatus;
   type: TransactionType;
   dueDate: string | null;
@@ -77,23 +86,23 @@ export interface TransactionFilters {
 export interface ManualTransactionPayload {
   amount: number;
   description: string;
-  category: string;
-  categoryId?: string | null;
+  categoryId: string;
   type: TransactionType;
   status: TransactionStatus;
   dueDate?: string | null;
   paymentDate?: string | null;
+  creditCardId?: string | null;
 }
 
 export interface UpdateTransactionPayload {
-  status?: TransactionStatus;
-  description?: string;
-  category?: string;
-  categoryId?: string | null;
   amount?: number;
+  description?: string;
+  categoryId?: string | null;
   type?: TransactionType;
+  status?: TransactionStatus;
   dueDate?: string | null;
   paymentDate?: string | null;
+  creditCardId?: string | null;
 }
 
 export interface CreateSubscriptionPayload {
@@ -110,6 +119,11 @@ export interface CreateSubscriptionPayload {
 export interface UpdateSubscriptionPayload extends Partial<CreateSubscriptionPayload> {}
 
 export interface ProcessTransactionPayload {
+  imageBase64?: string;
+  description?: string;
+}
+
+export interface ProcessTransactionClientPayload {
   file?: File | null;
   text?: string;
   isScheduled?: boolean;

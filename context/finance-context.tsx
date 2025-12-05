@@ -13,7 +13,7 @@ import type {
   CreateSubscriptionPayload,
   DashboardMetrics,
   ManualTransactionPayload,
-  ProcessTransactionPayload,
+  ProcessTransactionClientPayload,
   Subscription,
   Transaction,
   TransactionFilters,
@@ -40,7 +40,7 @@ interface FinanceContextValue {
   metrics: DashboardMetrics | null;
   subscriptions: Subscription[];
   refresh: () => Promise<void>;
-  processUnstructuredTransaction: (payload: ProcessTransactionPayload) => Promise<Transaction | void>;
+  processUnstructuredTransaction: (payload: ProcessTransactionClientPayload) => Promise<Transaction | void>;
   createManualTransaction: (payload: ManualTransactionPayload) => Promise<Transaction | void>;
   updateExistingTransaction: (id: string, payload: UpdateTransactionPayload) => Promise<Transaction | void>;
   markAsPaid: (id: string) => Promise<Transaction | void>;
@@ -109,7 +109,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
-  const processUnstructuredTransaction = async (payload: ProcessTransactionPayload) => {
+  const processUnstructuredTransaction = async (payload: ProcessTransactionClientPayload) => {
     try {
       const transaction = await processTransaction(payload);
       upsertTransaction(transaction);

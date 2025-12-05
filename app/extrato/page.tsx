@@ -99,7 +99,6 @@ export default function ExtratoPage() {
     try {
       await updateExistingTransaction(editing.transaction.id, {
         description: editDescription,
-        category: editCategory,
         amount: parsedAmount,
         type: editType as Transaction["type"],
         status: editStatus as Transaction["status"],
