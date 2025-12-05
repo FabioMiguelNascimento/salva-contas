@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -16,7 +17,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useFinance } from "@/hooks/use-finance";
 import type { Subscription, SubscriptionFrequency } from "@/types/finance";
-import { Loader2, PlusCircle, Shield, Zap } from "lucide-react";
+import { Loader2, PlusCircle, Shield, Trash2, Zap } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 import { useMemo, useState } from "react";
 
@@ -57,7 +58,13 @@ const months = [
 ];
 
 export default function SubscriptionsPage() {
-  const { subscriptions, isLoading, createSubscriptionRule } = useFinance();
+  const {
+    subscriptions,
+    isLoading,
+    createSubscriptionRule,
+    updateSubscriptionRule,
+    deleteSubscriptionRule,
+  } = useFinance();
   const [activeFilter, setActiveFilter] = useState<"all" | SubscriptionFrequency>("all");
   const [description, setDescription] = useState("");
   const [amount, setAmount] = useState("");
@@ -70,6 +77,18 @@ export default function SubscriptionsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [editing, setEditing] = useState<Subscription | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Subscription | null>(null);
+  const [editDescription, setEditDescription] = useState("");
+  const [editAmount, setEditAmount] = useState("");
+  const [editCategoryId, setEditCategoryId] = useState("");
+  const [editFrequency, setEditFrequency] = useState<SubscriptionFrequency>("monthly");
+  const [editDayOfMonth, setEditDayOfMonth] = useState(15);
+  const [editDayOfWeek, setEditDayOfWeek] = useState(1);
+  const [editMonth, setEditMonth] = useState(1);
+  const [editIsActive, setEditIsActive] = useState(true);
+  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
 
   const filteredSubscriptions = useMemo(() => {
     if (activeFilter === "all") {
@@ -143,6 +162,70 @@ export default function SubscriptionsPage() {
       setFormError(err instanceof Error ? err.message : "Não foi possível criar a assinatura agora.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const openEdit = (subscription: Subscription) => {
+    setEditing(subscription);
+    setEditDescription(subscription.description);
+    setEditAmount(String(subscription.amount));
+    setEditCategoryId(subscription.categoryId);
+    setEditFrequency(subscription.frequency);
+    setEditDayOfMonth(subscription.dayOfMonth ?? 15);
+    setEditDayOfWeek(subscription.dayOfWeek ?? 1);
+    setEditMonth(subscription.month ?? 1);
+    setEditIsActive(subscription.isActive);
+    setEditError(null);
+    setIsEditSubmitting(false);
+  };
+
+  const handleEditSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!editing) return;
+    setEditError(null);
+
+    if (!editDescription.trim() || !editAmount.trim() || !editCategoryId.trim()) {
+      setEditError("Preencha descrição, valor e categoria.");
+      return;
+    }
+
+    const parsedAmount = Number(editAmount.replace(/,/g, "."));
+    if (Number.isNaN(parsedAmount)) {
+      setEditError("Informe um valor válido.");
+      return;
+    }
+
+    setIsEditSubmitting(true);
+    try {
+      await updateSubscriptionRule(editing.id, {
+        description: editDescription.trim(),
+        amount: parsedAmount,
+        categoryId: editCategoryId.trim(),
+        frequency: editFrequency,
+        dayOfMonth: editFrequency === "weekly" ? null : editDayOfMonth,
+        dayOfWeek: editFrequency === "weekly" ? editDayOfWeek : null,
+        month: editFrequency === "yearly" ? editMonth : null,
+        isActive: editIsActive,
+      });
+      setEditing(null);
+    } catch (err) {
+      setEditError(err instanceof Error ? err.message : "Não foi possível atualizar agora.");
+    } finally {
+      setIsEditSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setEditError(null);
+    setIsEditSubmitting(true);
+    try {
+      await deleteSubscriptionRule(deleteTarget.id);
+      setDeleteTarget(null);
+    } catch (err) {
+      setEditError(err instanceof Error ? err.message : "Falha ao excluir assinatura.");
+    } finally {
+      setIsEditSubmitting(false);
     }
   };
 
@@ -229,18 +312,29 @@ export default function SubscriptionsPage() {
                         <TableHead>Categoria</TableHead>
                         <TableHead>Frequência</TableHead>
                         <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Ações</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredSubscriptions.map((subscription) => (
-                        <SubscriptionRow key={subscription.id} subscription={subscription} />
+                        <SubscriptionRow
+                          key={subscription.id}
+                          subscription={subscription}
+                          onEdit={openEdit}
+                          onDelete={setDeleteTarget}
+                        />
                       ))}
                     </TableBody>
                   </Table>
                 </div>
                 <div className="grid gap-3 md:hidden">
                   {filteredSubscriptions.map((subscription) => (
-                    <SubscriptionCard key={subscription.id} subscription={subscription} />
+                    <SubscriptionCard
+                      key={subscription.id}
+                      subscription={subscription}
+                      onEdit={openEdit}
+                      onDelete={setDeleteTarget}
+                    />
                   ))}
                 </div>
               </div>
@@ -345,11 +439,141 @@ export default function SubscriptionsPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar assinatura</DialogTitle>
+            <DialogDescription>Ajuste valores ou frequência desta recorrência.</DialogDescription>
+          </DialogHeader>
+          {editing && (
+            <form className="space-y-4" onSubmit={handleEditSubmit}>
+              <div className="space-y-2">
+                <Label>Descrição</Label>
+                <Input value={editDescription} onChange={(e) => setEditDescription(e.target.value)} required />
+              </div>
+              <div className="space-y-2">
+                <Label>Valor</Label>
+                <Input value={editAmount} onChange={(e) => setEditAmount(e.target.value)} required />
+              </div>
+              <div className="space-y-2">
+                <Label>Categoria (ID)</Label>
+                <Input value={editCategoryId} onChange={(e) => setEditCategoryId(e.target.value)} required />
+              </div>
+              <div className="space-y-2">
+                <Label>Frequência</Label>
+                <Select value={editFrequency} onValueChange={(value: SubscriptionFrequency) => setEditFrequency(value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {frequencyOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {(editFrequency === "monthly" || editFrequency === "yearly") && (
+                <div className="space-y-2">
+                  <Label>Dia do mês</Label>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={31}
+                    value={editDayOfMonth}
+                    onChange={(event) => setEditDayOfMonth(Number(event.target.value))}
+                  />
+                </div>
+              )}
+              {editFrequency === "weekly" && (
+                <div className="space-y-2">
+                  <Label>Dia da semana</Label>
+                  <Select value={String(editDayOfWeek)} onValueChange={(value) => setEditDayOfWeek(Number(value))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {weekDays.map((day) => (
+                        <SelectItem key={day.value} value={String(day.value)}>
+                          {day.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              {editFrequency === "yearly" && (
+                <div className="space-y-2">
+                  <Label>Mês</Label>
+                  <Select value={String(editMonth)} onValueChange={(value) => setEditMonth(Number(value))}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {months.map((item) => (
+                        <SelectItem key={item.value} value={String(item.value)}>
+                          {item.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              <label className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
+                <Checkbox checked={editIsActive} onCheckedChange={(checked) => setEditIsActive(Boolean(checked))} />
+                <div>
+                  <p className="font-medium">Assinatura ativa</p>
+                  <p className="text-sm text-muted-foreground">Inativa não gera novos lançamentos.</p>
+                </div>
+              </label>
+              {editError && <p className="text-sm font-medium text-destructive">{editError}</p>}
+              <DialogFooter>
+                <Button type="button" variant="ghost" onClick={() => setEditing(null)}>
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={isEditSubmitting}>
+                  {isEditSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Salvar alterações
+                </Button>
+              </DialogFooter>
+            </form>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancelar assinatura</DialogTitle>
+            <DialogDescription>
+              {deleteTarget ? `Desativar e remover "${deleteTarget.description}"?` : ""}
+            </DialogDescription>
+          </DialogHeader>
+          {editError && <p className="text-sm font-medium text-destructive">{editError}</p>}
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setDeleteTarget(null)} disabled={isEditSubmitting}>
+              Voltar
+            </Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={isEditSubmitting}>
+              {isEditSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Cancelar assinatura
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
-function SubscriptionRow({ subscription }: { subscription: Subscription }) {
+function SubscriptionRow({
+  subscription,
+  onEdit,
+  onDelete,
+}: {
+  subscription: Subscription;
+  onEdit: (subscription: Subscription) => void;
+  onDelete: (subscription: Subscription) => void;
+}) {
   return (
     <TableRow>
       <TableCell>
@@ -368,11 +592,29 @@ function SubscriptionRow({ subscription }: { subscription: Subscription }) {
           {subscription.isActive ? "Ativa" : "Inativa"}
         </Badge>
       </TableCell>
+      <TableCell className="text-right">
+        <div className="flex justify-end gap-2">
+          <Button size="sm" variant="outline" onClick={() => onEdit(subscription)}>
+            Editar
+          </Button>
+          <Button size="sm" variant="destructive" onClick={() => onDelete(subscription)}>
+            <Trash2 className="mr-1 h-4 w-4" />Cancelar
+          </Button>
+        </div>
+      </TableCell>
     </TableRow>
   );
 }
 
-function SubscriptionCard({ subscription }: { subscription: Subscription }) {
+function SubscriptionCard({
+  subscription,
+  onEdit,
+  onDelete,
+}: {
+  subscription: Subscription;
+  onEdit: (subscription: Subscription) => void;
+  onDelete: (subscription: Subscription) => void;
+}) {
   return (
     <div className="rounded-2xl border border-border/60 p-4">
       <div className="flex items-center justify-between">
@@ -391,6 +633,14 @@ function SubscriptionCard({ subscription }: { subscription: Subscription }) {
       <p className="mt-2 text-xs text-muted-foreground">
         Dia programado: {getScheduleLabel(subscription)}
       </p>
+      <div className="mt-4 flex gap-2">
+        <Button size="sm" className="flex-1" variant="outline" onClick={() => onEdit(subscription)}>
+          Editar
+        </Button>
+        <Button size="sm" className="flex-1" variant="destructive" onClick={() => onDelete(subscription)}>
+          Cancelar
+        </Button>
+      </div>
     </div>
   );
 }

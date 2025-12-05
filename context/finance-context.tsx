@@ -1,7 +1,7 @@
 "use client";
 
 import { fetchDashboardMetrics } from "@/services/dashboard";
-import { createSubscription, fetchSubscriptions } from "@/services/subscriptions";
+import { createSubscription, deleteSubscription, fetchSubscriptions, updateSubscription } from "@/services/subscriptions";
 import {
   createTransaction,
   deleteTransaction,
@@ -17,6 +17,7 @@ import type {
   Subscription,
   Transaction,
   TransactionFilters,
+  UpdateSubscriptionPayload,
   UpdateTransactionPayload,
 } from "@/types/finance";
 import {
@@ -45,6 +46,8 @@ interface FinanceContextValue {
   markAsPaid: (id: string) => Promise<Transaction | void>;
   removeTransaction: (id: string) => Promise<void>;
   createSubscriptionRule: (payload: CreateSubscriptionPayload) => Promise<Subscription | void>;
+  updateSubscriptionRule: (id: string, payload: UpdateSubscriptionPayload) => Promise<Subscription | void>;
+  deleteSubscriptionRule: (id: string) => Promise<void>;
 }
 
 const FinanceContext = createContext<FinanceContextValue | null>(null);
@@ -182,6 +185,27 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateSubscriptionRule = async (id: string, payload: UpdateSubscriptionPayload) => {
+    try {
+      const subscription = await updateSubscription(id, payload);
+      setSubscriptions((prev) => prev.map((item) => (item.id === id ? subscription : item)));
+      return subscription;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao atualizar assinatura");
+      throw err;
+    }
+  };
+
+  const deleteSubscriptionRule = async (id: string) => {
+    try {
+      await deleteSubscription(id);
+      setSubscriptions((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao remover assinatura");
+      throw err;
+    }
+  };
+
     const value: FinanceContextValue = {
     filters,
     setFilters,
@@ -200,6 +224,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     markAsPaid,
     removeTransaction,
     createSubscriptionRule,
+    updateSubscriptionRule,
+    deleteSubscriptionRule,
   };
 
   return <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>;

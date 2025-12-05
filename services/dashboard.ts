@@ -11,6 +11,11 @@ type ApiDashboardData = {
     expenses?: number | string;
     net?: number | string;
   }>;
+  pendingBills?: {
+    count?: number | string;
+    totalAmount?: number | string;
+    overdue?: number | string;
+  };
   lastUpdated?: string;
 };
 
@@ -35,9 +40,9 @@ const normalizeMetrics = (metrics: ApiDashboardData): DashboardMetrics => ({
     balance: toNumber(metrics.netBalance ?? 0),
   },
   pendingBills: {
-    count: 0,
-    totalAmount: 0,
-    overdue: 0,
+    count: Number(metrics.pendingBills?.count ?? 0),
+    totalAmount: toNumber(metrics.pendingBills?.totalAmount ?? 0),
+    overdue: Number(metrics.pendingBills?.overdue ?? 0),
   },
   categoryBreakdown: (metrics.categoryBreakdown ?? []).map((item) => ({
     category: item.category,

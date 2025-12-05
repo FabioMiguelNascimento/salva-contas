@@ -107,6 +107,8 @@ export interface CreateSubscriptionPayload {
   isActive?: boolean;
 }
 
+export interface UpdateSubscriptionPayload extends Partial<CreateSubscriptionPayload> {}
+
 export interface ProcessTransactionPayload {
   file?: File | null;
   text?: string;
