@@ -29,11 +29,11 @@ import {
   ArrowUpRight,
   Bell,
   CreditCard,
+  Link,
   Repeat,
   TrendingUp,
   Wallet2
 } from "lucide-react";
-import Link from "next/link";
 import { useMemo } from "react";
 
 export default function DashboardPage() {
@@ -176,7 +176,7 @@ export default function DashboardPage() {
         description={lastSync ? `Atualizado ${format(new Date(lastSync), "dd 'de' MMMM, HH:mm", { locale: ptBR })}` : "Sincronizando dados..."}
       >
         <Select value={String(filters.month)} onValueChange={handleMonthChange}>
-          <SelectTrigger className="w-[110px]">
+          <SelectTrigger className="w-full sm:w-[110px]">
             <SelectValue placeholder="Mês" />
           </SelectTrigger>
           <SelectContent>
@@ -188,7 +188,7 @@ export default function DashboardPage() {
           </SelectContent>
         </Select>
         <Select value={String(filters.year)} onValueChange={handleYearChange}>
-          <SelectTrigger className="w-[110px]">
+          <SelectTrigger className="w-full sm:w-[110px]">
             <SelectValue placeholder="Ano" />
           </SelectTrigger>
           <SelectContent>
@@ -280,12 +280,12 @@ export default function DashboardPage() {
           <CardContent className="space-y-4">
             {(urgentBills.length > 0 ? urgentBills : nextBills).map((bill) => (
               <div key={bill.id} className="rounded-xl border border-border/60 p-3">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-semibold">{bill.description}</p>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold truncate">{bill.description}</p>
                     <p className="text-xs text-muted-foreground">{currencyFormatter.format(bill.amount)}</p>
                   </div>
-                  <Badge variant={isPast(new Date(bill.dueDate ?? 0)) ? "destructive" : "secondary"}>
+                  <Badge variant={isPast(new Date(bill.dueDate ?? 0)) ? "destructive" : "secondary"} className="shrink-0">
                     {bill.dueDate ? format(new Date(bill.dueDate), "dd/MM") : "—"}
                   </Badge>
                 </div>
@@ -349,7 +349,7 @@ export default function DashboardPage() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between">
                             <p className="truncate text-sm font-medium">{card.name}</p>
-                            <span className="text-xs text-muted-foreground">{cardPercent.toFixed(0)}%</span>
+                            <span className="text-xs text-muted-foreground shrink-0">{cardPercent.toFixed(0)}%</span>
                           </div>
                           <Progress value={cardPercent} className="mt-1 h-1.5" />
                         </div>
@@ -393,12 +393,12 @@ export default function DashboardPage() {
                 </div>
                 <div className="space-y-2">
                   {activeSubscriptions.slice(0, 4).map((sub) => (
-                    <div key={sub.id} className="flex items-center justify-between rounded-lg border p-2">
+                    <div key={sub.id} className="flex items-center justify-between rounded-lg border p-2 gap-3">
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">{sub.description}</p>
                         <p className="text-xs text-muted-foreground capitalize">{sub.frequency === "monthly" ? "Mensal" : sub.frequency === "yearly" ? "Anual" : "Semanal"}</p>
                       </div>
-                      <p className="text-sm font-semibold">{currencyFormatter.format(sub.amount)}</p>
+                      <p className="text-sm font-semibold shrink-0">{currencyFormatter.format(sub.amount)}</p>
                     </div>
                   ))}
                 </div>
@@ -433,14 +433,14 @@ export default function DashboardPage() {
               <div className="space-y-4">
                 {budgetsWithUsage.slice(0, 5).map((budget) => (
                   <div key={budget.id} className="space-y-1">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">{budget.category?.name ?? "Categoria"}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 min-w-0 flex-1">
+                        <span className="text-sm font-medium truncate">{budget.category?.name ?? "Categoria"}</span>
                         {budget.isOverBudget && (
-                          <Badge variant="destructive" className="text-xs">Excedido</Badge>
+                          <Badge variant="destructive" className="text-xs shrink-0">Excedido</Badge>
                         )}
                       </div>
-                      <span className="text-xs text-muted-foreground">
+                      <span className="text-xs text-muted-foreground shrink-0">
                         {currencyFormatter.format(budget.spent)} / {currencyFormatter.format(budget.amount)}
                       </span>
                     </div>
@@ -491,7 +491,7 @@ export default function DashboardPage() {
                         "text-muted-foreground"
                       )} />
                       <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium">{notification.title}</p>
+                        <p className="text-sm font-medium truncate">{notification.title}</p>
                         <p className="truncate text-xs text-muted-foreground">{notification.message}</p>
                       </div>
                     </div>
@@ -519,13 +519,13 @@ function SpendingBarChart({ data }: { data: { day: string; amount: number }[] })
   const maxHeight = 180;
 
   return (
-    <div className="flex h-56 items-end gap-3">
+    <div className="flex h-56 items-end gap-2 sm:gap-3">
       {data.map((item) => {
         const height = Math.max((item.amount / max) * maxHeight, 6);
         return (
-          <div key={item.day} className="flex flex-1 flex-col items-center gap-2">
+          <div key={item.day} className="flex flex-1 flex-col items-center gap-2 min-w-0">
             <div className="flex h-full w-full items-end justify-center">
-              <div className="flex w-10 items-end">
+              <div className="flex w-8 sm:w-10 items-end">
                 <div className="w-full rounded-full bg-muted/40">
                   <div
                     className="rounded-sm bg-emerald-500"
@@ -535,7 +535,7 @@ function SpendingBarChart({ data }: { data: { day: string; amount: number }[] })
               </div>
             </div>
             <div className="text-center">
-              <p className="text-sm font-semibold">{currencyFormatter.format(item.amount)}</p>
+              <p className="text-xs sm:text-sm font-semibold truncate max-w-12 sm:max-w-none">{currencyFormatter.format(item.amount)}</p>
               <p className="text-xs text-muted-foreground">{item.day}</p>
             </div>
           </div>
@@ -576,14 +576,14 @@ function TransactionRow({ transaction }: { transaction: Transaction }) {
   const isIncome = transaction.type === "income";
   const categoryLabel = getTransactionCategoryLabel(transaction);
   return (
-    <div className="flex items-center justify-between rounded-2xl border border-border/60 p-3">
-      <div>
-        <p className="text-sm font-semibold">{transaction.description}</p>
-        <p className="text-xs text-muted-foreground">
+    <div className="flex items-center justify-between rounded-2xl border border-border/60 p-3 gap-3">
+      <div className="min-w-0 flex-1">
+        <p className="text-sm font-semibold truncate">{transaction.description}</p>
+        <p className="text-xs text-muted-foreground truncate">
           {categoryLabel} • {transaction.paymentDate ? format(new Date(transaction.paymentDate), "dd MMM, HH:mm", { locale: ptBR }) : "pendente"}
         </p>
       </div>
-      <div className="text-right">
+      <div className="text-right shrink-0">
         <p className={cn("text-sm font-semibold", isIncome ? "text-emerald-600" : "text-destructive")}>
           {isIncome ? "+" : "-"}
           {currencyFormatter.format(transaction.amount)}

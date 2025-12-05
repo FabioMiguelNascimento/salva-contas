@@ -118,3 +118,20 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Prevenir scroll horizontal no mobile */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
+
+#root, #__next {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+}
