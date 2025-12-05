@@ -1,233 +1,31 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+import { SubscriptionDeleteDialog } from "@/components/subscriptions/subscription-delete-dialog";
+import { SubscriptionEditDialog } from "@/components/subscriptions/subscription-edit-dialog";
+import { SubscriptionForm } from "@/components/subscriptions/subscription-form";
+import { SubscriptionListCard } from "@/components/subscriptions/subscription-list-card";
+import { SubscriptionSummaryCard } from "@/components/subscriptions/subscription-summary-card";
+import { SubscriptionTable } from "@/components/subscriptions/subscription-table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useFinance } from "@/hooks/use-finance";
-import type { Subscription, SubscriptionFrequency } from "@/types/finance";
-import { Loader2, PlusCircle, Shield, Trash2, Zap } from "lucide-react";
-import type { ComponentType, SVGProps } from "react";
-import { useMemo, useState } from "react";
-
-const currency = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
-
-const frequencyOptions: Array<{ value: SubscriptionFrequency; label: string; helper: string }> = [
-  { value: "monthly", label: "Mensal", helper: "Repete em um dia específico todo mês" },
-  { value: "weekly", label: "Semanal", helper: "Repete em um dia fixo da semana" },
-  { value: "yearly", label: "Anual", helper: "Repete em um dia e mês específicos" },
-];
-
-const weekDays = [
-  { value: 0, label: "Domingo" },
-  { value: 1, label: "Segunda" },
-  { value: 2, label: "Terça" },
-  { value: 3, label: "Quarta" },
-  { value: 4, label: "Quinta" },
-  { value: 5, label: "Sexta" },
-  { value: 6, label: "Sábado" },
-];
-
-const months = [
-  { value: 1, label: "Janeiro" },
-  { value: 2, label: "Fevereiro" },
-  { value: 3, label: "Março" },
-  { value: 4, label: "Abril" },
-  { value: 5, label: "Maio" },
-  { value: 6, label: "Junho" },
-  { value: 7, label: "Julho" },
-  { value: 8, label: "Agosto" },
-  { value: 9, label: "Setembro" },
-  { value: 10, label: "Outubro" },
-  { value: 11, label: "Novembro" },
-  { value: 12, label: "Dezembro" },
-];
+import { useSubscriptionEditor } from "@/hooks/use-subscription-editor";
+import { useSubscriptionFilters } from "@/hooks/use-subscription-filters";
+import { useSubscriptionForm } from "@/hooks/use-subscription-form";
+import { useSubscriptionStats } from "@/hooks/use-subscription-stats";
+import { currencyFormatter, frequencyOptions } from "@/lib/subscriptions/constants";
+import { PlusCircle, Shield, Zap } from "lucide-react";
 
 export default function SubscriptionsPage() {
-  const {
-    subscriptions,
-    isLoading,
-    createSubscriptionRule,
-    updateSubscriptionRule,
-    deleteSubscriptionRule,
-  } = useFinance();
-  const [activeFilter, setActiveFilter] = useState<"all" | SubscriptionFrequency>("all");
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [categoryId, setCategoryId] = useState("");
-  const [frequency, setFrequency] = useState<SubscriptionFrequency>("monthly");
-  const [dayOfMonth, setDayOfMonth] = useState(15);
-  const [dayOfWeek, setDayOfWeek] = useState(1);
-  const [month, setMonth] = useState(1);
-  const [isActive, setIsActive] = useState(true);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [editing, setEditing] = useState<Subscription | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<Subscription | null>(null);
-  const [editDescription, setEditDescription] = useState("");
-  const [editAmount, setEditAmount] = useState("");
-  const [editCategoryId, setEditCategoryId] = useState("");
-  const [editFrequency, setEditFrequency] = useState<SubscriptionFrequency>("monthly");
-  const [editDayOfMonth, setEditDayOfMonth] = useState(15);
-  const [editDayOfWeek, setEditDayOfWeek] = useState(1);
-  const [editMonth, setEditMonth] = useState(1);
-  const [editIsActive, setEditIsActive] = useState(true);
-  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
-  const [editError, setEditError] = useState<string | null>(null);
+  const { subscriptions, isLoading, createSubscriptionRule, updateSubscriptionRule, deleteSubscriptionRule } = useFinance();
 
-  const filteredSubscriptions = useMemo(() => {
-    if (activeFilter === "all") {
-      return subscriptions;
-    }
-    return subscriptions.filter((item) => item.frequency === activeFilter);
-  }, [subscriptions, activeFilter]);
+  const filters = useSubscriptionFilters(subscriptions);
+  const stats = useSubscriptionStats(subscriptions);
+  const form = useSubscriptionForm({ onCreate: createSubscriptionRule });
+  const editor = useSubscriptionEditor({ onUpdate: updateSubscriptionRule, onDelete: deleteSubscriptionRule });
 
-  const stats = useMemo(() => {
-    const totalActive = subscriptions.filter((item) => item.isActive).length;
-    const totalAmount = subscriptions.reduce((sum, item) => sum + item.amount, 0);
-    const byFrequency = subscriptions.reduce<Record<string, number>>((acc, item) => {
-      acc[item.frequency] = (acc[item.frequency] ?? 0) + 1;
-      return acc;
-    }, {});
-    return { totalActive, totalAmount, byFrequency };
-  }, [subscriptions]);
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setFormError(null);
-    setSuccessMessage(null);
-
-    if (!description.trim() || !amount.trim() || !categoryId.trim()) {
-      setFormError("Preencha descrição, valor e categoria.");
-      return;
-    }
-
-    const parsedAmount = Number(amount.replace(/,/g, "."));
-    if (Number.isNaN(parsedAmount)) {
-      setFormError("Informe um valor válido.");
-      return;
-    }
-
-    if ((frequency === "monthly" || frequency === "yearly") && (!dayOfMonth || dayOfMonth < 1 || dayOfMonth > 31)) {
-      setFormError("O dia do mês precisa estar entre 1 e 31.");
-      return;
-    }
-
-    if (frequency === "weekly" && (dayOfWeek < 0 || dayOfWeek > 6)) {
-      setFormError("Selecione um dia da semana válido.");
-      return;
-    }
-
-    if (frequency === "yearly" && (month < 1 || month > 12)) {
-      setFormError("Selecione um mês válido.");
-      return;
-    }
-
-    setIsSubmitting(true);
-    try {
-      await createSubscriptionRule({
-        description: description.trim(),
-        amount: parsedAmount,
-        categoryId: categoryId.trim(),
-        frequency,
-        dayOfMonth: frequency === "weekly" ? null : dayOfMonth,
-        dayOfWeek: frequency === "weekly" ? dayOfWeek : null,
-        month: frequency === "yearly" ? month : null,
-        isActive,
-      });
-      setDescription("");
-      setAmount("");
-      setCategoryId("");
-      setDayOfMonth(15);
-      setDayOfWeek(1);
-      setMonth(1);
-      setIsActive(true);
-      setSuccessMessage("Assinatura criada com sucesso!");
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Não foi possível criar a assinatura agora.");
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const openEdit = (subscription: Subscription) => {
-    setEditing(subscription);
-    setEditDescription(subscription.description);
-    setEditAmount(String(subscription.amount));
-    setEditCategoryId(subscription.categoryId);
-    setEditFrequency(subscription.frequency);
-    setEditDayOfMonth(subscription.dayOfMonth ?? 15);
-    setEditDayOfWeek(subscription.dayOfWeek ?? 1);
-    setEditMonth(subscription.month ?? 1);
-    setEditIsActive(subscription.isActive);
-    setEditError(null);
-    setIsEditSubmitting(false);
-  };
-
-  const handleEditSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!editing) return;
-    setEditError(null);
-
-    if (!editDescription.trim() || !editAmount.trim() || !editCategoryId.trim()) {
-      setEditError("Preencha descrição, valor e categoria.");
-      return;
-    }
-
-    const parsedAmount = Number(editAmount.replace(/,/g, "."));
-    if (Number.isNaN(parsedAmount)) {
-      setEditError("Informe um valor válido.");
-      return;
-    }
-
-    setIsEditSubmitting(true);
-    try {
-      await updateSubscriptionRule(editing.id, {
-        description: editDescription.trim(),
-        amount: parsedAmount,
-        categoryId: editCategoryId.trim(),
-        frequency: editFrequency,
-        dayOfMonth: editFrequency === "weekly" ? null : editDayOfMonth,
-        dayOfWeek: editFrequency === "weekly" ? editDayOfWeek : null,
-        month: editFrequency === "yearly" ? editMonth : null,
-        isActive: editIsActive,
-      });
-      setEditing(null);
-    } catch (err) {
-      setEditError(err instanceof Error ? err.message : "Não foi possível atualizar agora.");
-    } finally {
-      setIsEditSubmitting(false);
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!deleteTarget) return;
-    setEditError(null);
-    setIsEditSubmitting(true);
-    try {
-      await deleteSubscriptionRule(deleteTarget.id);
-      setDeleteTarget(null);
-    } catch (err) {
-      setEditError(err instanceof Error ? err.message : "Falha ao excluir assinatura.");
-    } finally {
-      setIsEditSubmitting(false);
-    }
-  };
+  const { filteredSubscriptions, activeFilter, setActiveFilter } = filters;
+  const { actions: editorActions } = editor;
 
   return (
     <div className="space-y-8">
@@ -240,20 +38,20 @@ export default function SubscriptionsPage() {
       </div>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <SummaryCard
+        <SubscriptionSummaryCard
           icon={Zap}
           label="Assinaturas ativas"
           value={stats.totalActive}
           helper="Regras prontas para gerar lançamentos"
         />
-        <SummaryCard
+        <SubscriptionSummaryCard
           icon={Shield}
           label="Comprometido/mês"
-          value={currency.format(stats.totalAmount)}
+          value={currencyFormatter.format(stats.totalAmount)}
           helper="Soma considerando valores atuais"
         />
         {frequencyOptions.slice(0, 2).map((option) => (
-          <SummaryCard
+          <SubscriptionSummaryCard
             key={option.value}
             icon={PlusCircle}
             label={`Frequência ${option.label}`}
@@ -270,12 +68,8 @@ export default function SubscriptionsPage() {
               <CardTitle>Assinaturas configuradas</CardTitle>
               <CardDescription>Gerencie e acompanhe todas as recorrências automatizadas.</CardDescription>
             </div>
-            <div className="flex gap-2">
-              <Button
-                variant={activeFilter === "all" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setActiveFilter("all")}
-              >
+            <div className="flex flex-wrap gap-2">
+              <Button variant={activeFilter === "all" ? "default" : "outline"} size="sm" onClick={() => setActiveFilter("all")}>
                 Todas
               </Button>
               {frequencyOptions.map((option) => (
@@ -304,36 +98,19 @@ export default function SubscriptionsPage() {
             ) : (
               <div className="space-y-4">
                 <div className="hidden md:block">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Descrição</TableHead>
-                        <TableHead>Valor</TableHead>
-                        <TableHead>Categoria</TableHead>
-                        <TableHead>Frequência</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Ações</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredSubscriptions.map((subscription) => (
-                        <SubscriptionRow
-                          key={subscription.id}
-                          subscription={subscription}
-                          onEdit={openEdit}
-                          onDelete={setDeleteTarget}
-                        />
-                      ))}
-                    </TableBody>
-                  </Table>
+                  <SubscriptionTable
+                    subscriptions={filteredSubscriptions}
+                    onEdit={editorActions.openEdit}
+                    onDelete={editorActions.requestDelete}
+                  />
                 </div>
                 <div className="grid gap-3 md:hidden">
                   {filteredSubscriptions.map((subscription) => (
-                    <SubscriptionCard
+                    <SubscriptionListCard
                       key={subscription.id}
                       subscription={subscription}
-                      onEdit={openEdit}
-                      onDelete={setDeleteTarget}
+                      onEdit={editorActions.openEdit}
+                      onDelete={editorActions.requestDelete}
                     />
                   ))}
                 </div>
@@ -348,358 +125,13 @@ export default function SubscriptionsPage() {
             <CardDescription>Informe os parâmetros para gerar o lançamento automaticamente.</CardDescription>
           </CardHeader>
           <CardContent>
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div className="space-y-2">
-                <Label htmlFor="description">Descrição</Label>
-                <Input id="description" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Ex.: Netflix" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="amount">Valor</Label>
-                <Input id="amount" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="120,00" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="categoryId">Categoria (ID)</Label>
-                <Input id="categoryId" value={categoryId} onChange={(e) => setCategoryId(e.target.value)} placeholder="Informe o UUID da categoria" required />
-                <p className="text-xs text-muted-foreground">Use o ID exibido no painel de categorias da API.</p>
-              </div>
-              <div className="space-y-2">
-                <Label>Frequência</Label>
-                <Select value={frequency} onValueChange={(value: SubscriptionFrequency) => setFrequency(value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {frequencyOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              {(frequency === "monthly" || frequency === "yearly") && (
-                <div className="space-y-2">
-                  <Label>Dia do mês</Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={31}
-                    value={dayOfMonth}
-                    onChange={(event) => setDayOfMonth(Number(event.target.value))}
-                  />
-                </div>
-              )}
-              {frequency === "weekly" && (
-                <div className="space-y-2">
-                  <Label>Dia da semana</Label>
-                  <Select value={String(dayOfWeek)} onValueChange={(value) => setDayOfWeek(Number(value))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {weekDays.map((day) => (
-                        <SelectItem key={day.value} value={String(day.value)}>
-                          {day.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              {frequency === "yearly" && (
-                <div className="space-y-2">
-                  <Label>Mês</Label>
-                  <Select value={String(month)} onValueChange={(value) => setMonth(Number(value))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {months.map((item) => (
-                        <SelectItem key={item.value} value={String(item.value)}>
-                          {item.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              <label className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
-                <Checkbox checked={isActive} onCheckedChange={(checked) => setIsActive(Boolean(checked))} />
-                <div>
-                  <p className="font-medium">Ativar assinatura</p>
-                  <p className="text-sm text-muted-foreground">Desmarque para guardar a regra sem gerar faturas.</p>
-                </div>
-              </label>
-              {formError && <p className="text-sm font-medium text-destructive">{formError}</p>}
-              {successMessage && <p className="text-sm font-medium text-emerald-600">{successMessage}</p>}
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Cadastrar assinatura
-              </Button>
-            </form>
+            <SubscriptionForm form={form} />
           </CardContent>
         </Card>
       </div>
 
-      <Dialog open={!!editing} onOpenChange={(open) => !open && setEditing(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Editar assinatura</DialogTitle>
-            <DialogDescription>Ajuste valores ou frequência desta recorrência.</DialogDescription>
-          </DialogHeader>
-          {editing && (
-            <form className="space-y-4" onSubmit={handleEditSubmit}>
-              <div className="space-y-2">
-                <Label>Descrição</Label>
-                <Input value={editDescription} onChange={(e) => setEditDescription(e.target.value)} required />
-              </div>
-              <div className="space-y-2">
-                <Label>Valor</Label>
-                <Input value={editAmount} onChange={(e) => setEditAmount(e.target.value)} required />
-              </div>
-              <div className="space-y-2">
-                <Label>Categoria (ID)</Label>
-                <Input value={editCategoryId} onChange={(e) => setEditCategoryId(e.target.value)} required />
-              </div>
-              <div className="space-y-2">
-                <Label>Frequência</Label>
-                <Select value={editFrequency} onValueChange={(value: SubscriptionFrequency) => setEditFrequency(value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {frequencyOptions.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              {(editFrequency === "monthly" || editFrequency === "yearly") && (
-                <div className="space-y-2">
-                  <Label>Dia do mês</Label>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={31}
-                    value={editDayOfMonth}
-                    onChange={(event) => setEditDayOfMonth(Number(event.target.value))}
-                  />
-                </div>
-              )}
-              {editFrequency === "weekly" && (
-                <div className="space-y-2">
-                  <Label>Dia da semana</Label>
-                  <Select value={String(editDayOfWeek)} onValueChange={(value) => setEditDayOfWeek(Number(value))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {weekDays.map((day) => (
-                        <SelectItem key={day.value} value={String(day.value)}>
-                          {day.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              {editFrequency === "yearly" && (
-                <div className="space-y-2">
-                  <Label>Mês</Label>
-                  <Select value={String(editMonth)} onValueChange={(value) => setEditMonth(Number(value))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {months.map((item) => (
-                        <SelectItem key={item.value} value={String(item.value)}>
-                          {item.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              <label className="flex items-start gap-3 rounded-xl border border-border/60 p-3">
-                <Checkbox checked={editIsActive} onCheckedChange={(checked) => setEditIsActive(Boolean(checked))} />
-                <div>
-                  <p className="font-medium">Assinatura ativa</p>
-                  <p className="text-sm text-muted-foreground">Inativa não gera novos lançamentos.</p>
-                </div>
-              </label>
-              {editError && <p className="text-sm font-medium text-destructive">{editError}</p>}
-              <DialogFooter>
-                <Button type="button" variant="ghost" onClick={() => setEditing(null)}>
-                  Cancelar
-                </Button>
-                <Button type="submit" disabled={isEditSubmitting}>
-                  {isEditSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Salvar alterações
-                </Button>
-              </DialogFooter>
-            </form>
-          )}
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Cancelar assinatura</DialogTitle>
-            <DialogDescription>
-              {deleteTarget ? `Desativar e remover "${deleteTarget.description}"?` : ""}
-            </DialogDescription>
-          </DialogHeader>
-          {editError && <p className="text-sm font-medium text-destructive">{editError}</p>}
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setDeleteTarget(null)} disabled={isEditSubmitting}>
-              Voltar
-            </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isEditSubmitting}>
-              {isEditSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Cancelar assinatura
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <SubscriptionEditDialog editor={editor} />
+      <SubscriptionDeleteDialog editor={editor} />
     </div>
   );
-}
-
-function SubscriptionRow({
-  subscription,
-  onEdit,
-  onDelete,
-}: {
-  subscription: Subscription;
-  onEdit: (subscription: Subscription) => void;
-  onDelete: (subscription: Subscription) => void;
-}) {
-  return (
-    <TableRow>
-      <TableCell>
-        <div>
-          <p className="font-semibold">{subscription.description}</p>
-          <p className="text-xs text-muted-foreground">Criado em {subscription.createdAt ? new Intl.DateTimeFormat("pt-BR").format(new Date(subscription.createdAt)) : "—"}</p>
-        </div>
-      </TableCell>
-      <TableCell>{currency.format(subscription.amount)}</TableCell>
-      <TableCell>{subscription.category?.name ?? "–"}</TableCell>
-      <TableCell>
-        <Badge variant="outline" className="text-xs">{getFrequencyLabel(subscription.frequency)}</Badge>
-      </TableCell>
-      <TableCell>
-        <Badge className={subscription.isActive ? "bg-emerald-100 text-emerald-800" : "bg-muted text-muted-foreground"}>
-          {subscription.isActive ? "Ativa" : "Inativa"}
-        </Badge>
-      </TableCell>
-      <TableCell className="text-right">
-        <div className="flex justify-end gap-2">
-          <Button size="sm" variant="outline" onClick={() => onEdit(subscription)}>
-            Editar
-          </Button>
-          <Button size="sm" variant="destructive" onClick={() => onDelete(subscription)}>
-            <Trash2 className="mr-1 h-4 w-4" />Cancelar
-          </Button>
-        </div>
-      </TableCell>
-    </TableRow>
-  );
-}
-
-function SubscriptionCard({
-  subscription,
-  onEdit,
-  onDelete,
-}: {
-  subscription: Subscription;
-  onEdit: (subscription: Subscription) => void;
-  onDelete: (subscription: Subscription) => void;
-}) {
-  return (
-    <div className="rounded-2xl border border-border/60 p-4">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="font-semibold">{subscription.description}</p>
-          <p className="text-xs text-muted-foreground">{subscription.category?.name ?? "Sem categoria"}</p>
-        </div>
-        <Badge variant="outline" className="text-xs">{getFrequencyLabel(subscription.frequency)}</Badge>
-      </div>
-      <div className="mt-3 flex items-center justify-between">
-        <strong>{currency.format(subscription.amount)}</strong>
-        <Badge className={subscription.isActive ? "bg-emerald-100 text-emerald-800" : "bg-muted text-muted-foreground"}>
-          {subscription.isActive ? "Ativa" : "Inativa"}
-        </Badge>
-      </div>
-      <p className="mt-2 text-xs text-muted-foreground">
-        Dia programado: {getScheduleLabel(subscription)}
-      </p>
-      <div className="mt-4 flex gap-2">
-        <Button size="sm" className="flex-1" variant="outline" onClick={() => onEdit(subscription)}>
-          Editar
-        </Button>
-        <Button size="sm" className="flex-1" variant="destructive" onClick={() => onDelete(subscription)}>
-          Cancelar
-        </Button>
-      </div>
-    </div>
-  );
-}
-
-function SummaryCard({
-  icon: Icon,
-  label,
-  value,
-  helper,
-}: {
-  icon: ComponentType<SVGProps<SVGSVGElement>>;
-  label: string;
-  value: number | string;
-  helper: string;
-}) {
-  return (
-    <Card>
-      <CardContent className="flex items-center gap-4 py-6">
-        <div className="rounded-2xl bg-emerald-500/10 p-3 text-emerald-600">
-          <Icon className="h-5 w-5" />
-        </div>
-        <div>
-          <p className="text-sm text-muted-foreground">{label}</p>
-          <p className="text-xl font-semibold">{value}</p>
-          <p className="text-xs text-muted-foreground">{helper}</p>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function getFrequencyLabel(frequency: SubscriptionFrequency) {
-  switch (frequency) {
-    case "weekly":
-      return "Semanal";
-    case "monthly":
-      return "Mensal";
-    case "yearly":
-      return "Anual";
-    default:
-      return frequency;
-  }
-}
-
-function getScheduleLabel(subscription: Subscription) {
-  if (subscription.frequency === "weekly" && subscription.dayOfWeek !== null && subscription.dayOfWeek !== undefined) {
-    return weekDays.find((day) => day.value === subscription.dayOfWeek)?.label ?? "Dia não definido";
-  }
-
-  if (subscription.frequency === "yearly") {
-    const monthLabel = subscription.month ? months.find((item) => item.value === subscription.month)?.label : null;
-    return subscription.dayOfMonth && monthLabel
-      ? `${subscription.dayOfMonth} de ${monthLabel}`
-      : "Periodicidade incompleta";
-  }
-
-  if (subscription.frequency === "monthly" && subscription.dayOfMonth) {
-    return `Todo dia ${subscription.dayOfMonth}`;
-  }
-
-  return "Periodicidade não configurada";
 }
