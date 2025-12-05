@@ -1,10 +1,12 @@
 "use client";
 
+import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { PageHeader } from "@/components/page-header";
 import { SummaryCard } from "@/components/summary-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -13,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useNotifications } from "@/contexts/notifications-context";
 import { useFinance } from "@/hooks/use-finance";
 import { currencyFormatter, getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
 import { cn, getTransactionCategoryLabel } from "@/lib/utils";
@@ -20,9 +23,13 @@ import type { Transaction } from "@/types/finance";
 import { differenceInCalendarDays, format, isPast, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
+  AlertCircle,
   AlertTriangle,
   ArrowDownRight,
   ArrowUpRight,
+  Bell,
+  CreditCard,
+  Repeat,
   TrendingUp,
   Wallet2
 } from "lucide-react";
@@ -30,8 +37,9 @@ import Link from "next/link";
 import { useMemo } from "react";
 
 export default function DashboardPage() {
-  const { metrics, transactions, pendingBills, filters, setFilters, isLoading, lastSync } =
+  const { metrics, transactions, pendingBills, subscriptions, creditCards, budgets, filters, setFilters, isLoading, lastSync } =
     useFinance();
+  const { notifications, unreadCount } = useNotifications();
 
   const years = getAvailableYears();
 
@@ -113,6 +121,42 @@ export default function DashboardPage() {
 
   const categoryBreakdown = metrics?.categoryBreakdown ?? [];
   const donutTotal = categoryBreakdown.reduce((sum, item) => sum + item.total, 0);
+
+  // Subscriptions summary
+  const activeSubscriptions = subscriptions.filter((s) => s.isActive);
+  const monthlySubscriptionTotal = useMemo(() => {
+    return activeSubscriptions.reduce((sum, sub) => {
+      if (sub.frequency === "monthly") return sum + sub.amount;
+      if (sub.frequency === "weekly") return sum + sub.amount * 4;
+      if (sub.frequency === "yearly") return sum + sub.amount / 12;
+      return sum;
+    }, 0);
+  }, [activeSubscriptions]);
+
+  // Credit cards summary
+  const activeCards = creditCards.filter((c) => c.status === "active");
+  const totalCreditLimit = activeCards.reduce((sum, c) => sum + c.limit, 0);
+  const totalCreditUsed = activeCards.reduce((sum, c) => sum + (c.limit - c.availableLimit), 0);
+  const creditUsagePercent = totalCreditLimit > 0 ? (totalCreditUsed / totalCreditLimit) * 100 : 0;
+
+  // Budgets summary
+  const budgetsWithUsage = useMemo(() => {
+    return budgets.map((budget) => {
+      const categoryExpenses = transactions
+        .filter((t) => t.type === "expense" && t.categoryId === budget.categoryId)
+        .reduce((sum, t) => sum + t.amount, 0);
+      const usagePercent = budget.amount > 0 ? (categoryExpenses / budget.amount) * 100 : 0;
+      return {
+        ...budget,
+        spent: categoryExpenses,
+        usagePercent: Math.min(usagePercent, 100),
+        isOverBudget: categoryExpenses > budget.amount,
+      };
+    });
+  }, [budgets, transactions]);
+
+  // Recent notifications
+  const recentNotifications = notifications.slice(0, 3);
 
   const formatValue = (value: number | string) => (typeof value === "number" ? currencyFormatter.format(value) : value);
 
@@ -257,6 +301,204 @@ export default function DashboardPage() {
                 </p>
               </div>
             ))}
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Credit Cards & Subscriptions Section */}
+      <section className="grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-base">Cartões de Crédito</CardTitle>
+            </div>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/cartoes">Ver todos</Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <Skeleton className="h-32 w-full" />
+            ) : activeCards.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-6 text-center">
+                <CreditCard className="mb-2 h-10 w-10 text-muted-foreground/50" />
+                <p className="text-sm text-muted-foreground">Nenhum cartão cadastrado</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between rounded-lg bg-muted/50 p-3">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Limite utilizado</p>
+                    <p className="text-lg font-semibold">{currencyFormatter.format(totalCreditUsed)}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">de {currencyFormatter.format(totalCreditLimit)}</p>
+                    <p className={cn("text-sm font-medium", creditUsagePercent > 80 ? "text-destructive" : creditUsagePercent > 50 ? "text-yellow-600" : "text-emerald-600")}>
+                      {creditUsagePercent.toFixed(0)}% usado
+                    </p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  {activeCards.slice(0, 3).map((card) => {
+                    const cardUsed = card.limit - card.availableLimit;
+                    const cardPercent = card.limit > 0 ? (cardUsed / card.limit) * 100 : 0;
+                    return (
+                      <div key={card.id} className="flex items-center gap-3">
+                        <CardFlagIcon flag={card.flag} className="h-6 w-6 shrink-0" />
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center justify-between">
+                            <p className="truncate text-sm font-medium">{card.name}</p>
+                            <span className="text-xs text-muted-foreground">{cardPercent.toFixed(0)}%</span>
+                          </div>
+                          <Progress value={cardPercent} className="mt-1 h-1.5" />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Repeat className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-base">Assinaturas Ativas</CardTitle>
+            </div>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/assinaturas">Ver todas</Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <Skeleton className="h-32 w-full" />
+            ) : activeSubscriptions.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-6 text-center">
+                <Repeat className="mb-2 h-10 w-10 text-muted-foreground/50" />
+                <p className="text-sm text-muted-foreground">Nenhuma assinatura ativa</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between rounded-lg bg-muted/50 p-3">
+                  <div>
+                    <p className="text-xs text-muted-foreground">Custo mensal estimado</p>
+                    <p className="text-lg font-semibold">{currencyFormatter.format(monthlySubscriptionTotal)}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-muted-foreground">{activeSubscriptions.length} assinatura{activeSubscriptions.length !== 1 ? "s" : ""}</p>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  {activeSubscriptions.slice(0, 4).map((sub) => (
+                    <div key={sub.id} className="flex items-center justify-between rounded-lg border p-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">{sub.description}</p>
+                        <p className="text-xs text-muted-foreground capitalize">{sub.frequency === "monthly" ? "Mensal" : sub.frequency === "yearly" ? "Anual" : "Semanal"}</p>
+                      </div>
+                      <p className="text-sm font-semibold">{currencyFormatter.format(sub.amount)}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Budgets & Notifications Section */}
+      <section className="grid gap-6 lg:grid-cols-3">
+        <Card className="lg:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-base">Orçamentos do Mês</CardTitle>
+              <p className="text-sm text-muted-foreground">Acompanhe seus limites por categoria</p>
+            </div>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/orcamentos">Gerenciar</Link>
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <Skeleton className="h-32 w-full" />
+            ) : budgetsWithUsage.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-6 text-center">
+                <Wallet2 className="mb-2 h-10 w-10 text-muted-foreground/50" />
+                <p className="text-sm text-muted-foreground">Nenhum orçamento definido</p>
+                <p className="text-xs text-muted-foreground">Defina limites para controlar seus gastos</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {budgetsWithUsage.slice(0, 5).map((budget) => (
+                  <div key={budget.id} className="space-y-1">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">{budget.category?.name ?? "Categoria"}</span>
+                        {budget.isOverBudget && (
+                          <Badge variant="destructive" className="text-xs">Excedido</Badge>
+                        )}
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        {currencyFormatter.format(budget.spent)} / {currencyFormatter.format(budget.amount)}
+                      </span>
+                    </div>
+                    <Progress
+                      value={budget.usagePercent}
+                      className={cn("h-2", budget.isOverBudget && "[&>div]:bg-destructive")}
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card className={cn(unreadCount > 0 && "border-l-4 border-amber-500")}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Bell className={cn("h-5 w-5", unreadCount > 0 ? "text-amber-500" : "text-muted-foreground")} />
+              Notificações
+              {unreadCount > 0 && (
+                <Badge variant="secondary" className="ml-auto">
+                  {unreadCount} nova{unreadCount !== 1 ? "s" : ""}
+                </Badge>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {recentNotifications.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-6 text-center">
+                <Bell className="mb-2 h-10 w-10 text-muted-foreground/50" />
+                <p className="text-sm text-muted-foreground">Nenhuma notificação</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {recentNotifications.map((notification) => (
+                  <div
+                    key={notification.id}
+                    className={cn(
+                      "rounded-lg border p-3",
+                      notification.status === "unread" && "bg-muted/50"
+                    )}
+                  >
+                    <div className="flex items-start gap-2">
+                      <AlertCircle className={cn(
+                        "mt-0.5 h-4 w-4 shrink-0",
+                        notification.type === "budget_limit" ? "text-destructive" :
+                        notification.type === "due_date" ? "text-amber-500" :
+                        "text-muted-foreground"
+                      )} />
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium">{notification.title}</p>
+                        <p className="truncate text-xs text-muted-foreground">{notification.message}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </section>
