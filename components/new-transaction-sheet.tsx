@@ -1,5 +1,6 @@
 "use client";
 
+import { CreditCardSelect } from "@/components/credit-card-select";
 import { DatePicker } from "@/components/date-picker";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -36,6 +37,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
   const [textInput, setTextInput] = useState("");
   const [isScheduled, setIsScheduled] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
+  const [selectedCreditCardId, setSelectedCreditCardId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -46,6 +48,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
     setTextInput("");
     setIsScheduled(false);
     setSelectedDate(undefined);
+    setSelectedCreditCardId(null);
     setIsSubmitting(false);
     setError(null);
     setSuccessMessage(null);
@@ -78,6 +81,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
         text: activeTab === "text" ? textInput.trim() : undefined,
         isScheduled,
         date: formatISO(selectedDate),
+        creditCardId: selectedCreditCardId ?? undefined,
       });
 
       setSuccessMessage("Transação enviada! A IA já está organizando tudo por aqui.");
@@ -188,6 +192,17 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
                     placeholder={isScheduled ? "Quando vence?" : "Quando aconteceu?"}
                   />
                 </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Cartão de crédito (opcional)</Label>
+                <CreditCardSelect
+                  value={selectedCreditCardId}
+                  onValueChange={setSelectedCreditCardId}
+                  placeholder="Nenhum"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Se for uma compra no cartão, selecione para vincular automaticamente.
+                </p>
               </div>
             </div>
 

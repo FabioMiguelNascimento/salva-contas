@@ -17,6 +17,7 @@ export interface SubscriptionEditorValues {
   description: string;
   amount: string;
   categoryId: string;
+  creditCardId: string | null;
   frequency: SubscriptionFrequency;
   dayOfMonth: number;
   dayOfWeek: number;
@@ -52,6 +53,7 @@ export function useSubscriptionEditor({ onUpdate, onDelete, defaults }: UseSubsc
       description: "",
       amount: "",
       categoryId: "",
+      creditCardId: null,
       frequency: "monthly",
       dayOfMonth: defaults?.dayOfMonth ?? 15,
       dayOfWeek: defaults?.dayOfWeek ?? 1,
@@ -80,6 +82,7 @@ export function useSubscriptionEditor({ onUpdate, onDelete, defaults }: UseSubsc
       description: subscription.description,
       amount: String(subscription.amount),
       categoryId: subscription.categoryId,
+      creditCardId: subscription.creditCardId ?? null,
       frequency: subscription.frequency,
       dayOfMonth: subscription.dayOfMonth ?? (defaults?.dayOfMonth ?? 15),
       dayOfWeek: subscription.dayOfWeek ?? (defaults?.dayOfWeek ?? 1),
@@ -137,6 +140,7 @@ export function useSubscriptionEditor({ onUpdate, onDelete, defaults }: UseSubsc
           description: values.description.trim(),
           amount: parsedAmount,
           categoryId: values.categoryId.trim(),
+          creditCardId: values.creditCardId || undefined,
           frequency: values.frequency,
           dayOfMonth: values.frequency === "weekly" ? undefined : values.dayOfMonth,
           dayOfWeek: values.frequency === "weekly" ? values.dayOfWeek : undefined,

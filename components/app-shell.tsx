@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import {
   CalendarClock,
   ChevronRight,
+  CreditCard,
   LayoutDashboard,
   Menu,
   PiggyBank,
@@ -51,6 +52,12 @@ const baseNavItems: NavItem[] = [
     href: "/assinaturas",
     icon: Repeat,
     description: "Compras recorrentes automatizadas",
+  },
+  {
+    label: "Cartões",
+    href: "/cartoes",
+    icon: CreditCard,
+    description: "Gerencie seus cartões de crédito",
   },
   {
     label: "Orçamentos",
@@ -96,8 +103,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           AI
         </div>
         <div>
-          <p className="text-sm uppercase tracking-widest text-muted-foreground">AI Finance</p>
-          <h1 className="text-lg font-semibold leading-tight">Tracker</h1>
+          <p className="text-sm uppercase tracking-widest text-muted-foreground">Salva Contas</p>
         </div>
       </div>
       <div className="space-y-1">
@@ -227,8 +233,7 @@ function AppShellContent({
               </SheetContent>
             </Sheet>
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">AI Finance</p>
-              <p className="text-lg font-semibold">Tracker</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Salva Contas</p>
             </div>
             <div className="ml-auto">
               {actionNode ?? (

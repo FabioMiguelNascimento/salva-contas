@@ -1,6 +1,8 @@
 "use client";
 
 import { CategorySelect } from "@/components/category-select";
+import { CreditCardSelect } from "@/components/credit-card-select";
+import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { DatePicker } from "@/components/date-picker";
 import { NewTransactionDialog } from "@/components/new-transaction-sheet";
 import { PageHeader } from "@/components/page-header";
@@ -57,6 +59,7 @@ export default function ExtratoPage() {
   const [editAmount, setEditAmount] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editCategoryId, setEditCategoryId] = useState<string | null>(null);
+  const [editCreditCardId, setEditCreditCardId] = useState<string | null>(null);
   const [editType, setEditType] = useState("expense");
   const [editStatus, setEditStatus] = useState("paid");
   const [isProcessing, setIsProcessing] = useState(false);
@@ -92,6 +95,7 @@ export default function ExtratoPage() {
     setEditDescription(transaction.description);
     setEditAmount(String(transaction.amount));
     setEditCategoryId(transaction.categoryId ?? null);
+    setEditCreditCardId(transaction.creditCardId ?? null);
     setEditType(transaction.type);
     setEditStatus(transaction.status);
     setEditDate(transaction.paymentDate ? new Date(transaction.paymentDate) : undefined);
@@ -111,6 +115,7 @@ export default function ExtratoPage() {
         status: editStatus as Transaction["status"],
         paymentDate: editDate ? editDate.toISOString() : null,
         categoryId: editCategoryId,
+        creditCardId: editCreditCardId,
       });
       setEditing({ open: false });
     } finally {
@@ -202,6 +207,7 @@ export default function ExtratoPage() {
                   <TableHead>Data</TableHead>
                   <TableHead>Descrição</TableHead>
                   <TableHead>Categoria</TableHead>
+                  <TableHead>Cartão</TableHead>
                   <TableHead>Tipo</TableHead>
                   <TableHead>Valor</TableHead>
                   <TableHead className="w-12" />
@@ -211,7 +217,7 @@ export default function ExtratoPage() {
                 {isLoading ? (
                   Array.from({ length: pageSize }).map((_, index) => (
                     <TableRow key={`skeleton-${index}`}>
-                      <TableCell colSpan={6}>
+                      <TableCell colSpan={7}>
                         <Skeleton className="h-12 w-full" />
                       </TableCell>
                     </TableRow>
@@ -230,6 +236,16 @@ export default function ExtratoPage() {
                         <Badge variant="outline" className="text-xs">
                           {getTransactionCategoryLabel(transaction)}
                         </Badge>
+                      </TableCell>
+                      <TableCell>
+                        {transaction.creditCard ? (
+                          <div className="flex items-center gap-2">
+                            <CardFlagIcon flag={transaction.creditCard.flag} className="h-5 w-auto" />
+                            <span className="text-xs text-muted-foreground">{transaction.creditCard.name}</span>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
                       </TableCell>
                       <TableCell>
                         <Badge className={cn("text-xs", transaction.type === "income" ? "bg-emerald-100 text-emerald-800" : "bg-destructive/15 text-destructive") }>
@@ -267,7 +283,7 @@ export default function ExtratoPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-sm text-muted-foreground">
+                    <TableCell colSpan={7} className="text-center text-sm text-muted-foreground">
                       Nenhuma transação encontrada.
                     </TableCell>
                   </TableRow>
@@ -285,7 +301,18 @@ export default function ExtratoPage() {
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
                         <p className="font-semibold">{transaction.description}</p>
-                        <p className="text-xs text-muted-foreground">{formatTransactionDate(transaction)}</p>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span>{formatTransactionDate(transaction)}</span>
+                          {transaction.creditCard && (
+                            <>
+                              <span>•</span>
+                              <div className="flex items-center gap-1">
+                                <CardFlagIcon flag={transaction.creditCard.flag} className="h-3.5 w-auto" />
+                                <span>{transaction.creditCard.name}</span>
+                              </div>
+                            </>
+                          )}
+                        </div>
                       </div>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -396,6 +423,10 @@ export default function ExtratoPage() {
               <div className="space-y-2">
                 <Label>Categoria</Label>
                 <CategorySelect value={editCategoryId} onValueChange={setEditCategoryId} />
+              </div>
+              <div className="space-y-2">
+                <Label>Cartão de crédito</Label>
+                <CreditCardSelect value={editCreditCardId} onValueChange={setEditCreditCardId} placeholder="Nenhum (opcional)" />
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">

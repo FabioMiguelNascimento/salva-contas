@@ -8,6 +8,12 @@ import {
   updateBudget,
 } from "@/services/budgets";
 import { fetchCategories } from "@/services/categories";
+import {
+  createCreditCard,
+  deleteCreditCard,
+  fetchCreditCards,
+  updateCreditCard,
+} from "@/services/credit-cards";
 import { fetchDashboardMetrics } from "@/services/dashboard";
 import { createSubscription, deleteSubscription, fetchSubscriptions, updateSubscription } from "@/services/subscriptions";
 import {
@@ -21,7 +27,9 @@ import type {
   Budget,
   BudgetProgress,
   CreateBudgetPayload,
+  CreateCreditCardPayload,
   CreateSubscriptionPayload,
+  CreditCard,
   DashboardMetrics,
   ManualTransactionPayload,
   ProcessTransactionClientPayload,
@@ -30,6 +38,7 @@ import type {
   TransactionCategory,
   TransactionFilters,
   UpdateBudgetPayload,
+  UpdateCreditCardPayload,
   UpdateSubscriptionPayload,
   UpdateTransactionPayload,
 } from "@/types/finance";
@@ -55,6 +64,7 @@ interface FinanceContextValue {
   budgets: Budget[];
   budgetProgress: BudgetProgress[];
   categories: TransactionCategory[];
+  creditCards: CreditCard[];
   refresh: () => Promise<void>;
   processUnstructuredTransaction: (payload: ProcessTransactionClientPayload) => Promise<Transaction | void>;
   createManualTransaction: (payload: ManualTransactionPayload) => Promise<Transaction | void>;
@@ -67,6 +77,9 @@ interface FinanceContextValue {
   createBudgetRule: (payload: CreateBudgetPayload) => Promise<Budget | void>;
   updateBudgetRule: (id: string, payload: UpdateBudgetPayload) => Promise<Budget | void>;
   deleteBudgetRule: (id: string) => Promise<void>;
+  createCreditCardEntry: (payload: CreateCreditCardPayload) => Promise<CreditCard | void>;
+  updateCreditCardEntry: (id: string, payload: UpdateCreditCardPayload) => Promise<CreditCard | void>;
+  deleteCreditCardEntry: (id: string) => Promise<void>;
 }
 
 const FinanceContext = createContext<FinanceContextValue | null>(null);
@@ -85,6 +98,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [budgetProgress, setBudgetProgress] = useState<BudgetProgress[]>([]);
   const [categories, setCategories] = useState<TransactionCategory[]>([]);
+  const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -93,13 +107,14 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const loadData = useCallback(async () => {
     setIsSyncing(true);
     try {
-      const [transactionsResponse, metricsResponse, subscriptionsResponse, budgetsResponse, budgetProgressResponse, categoriesResponse] = await Promise.all([
+      const [transactionsResponse, metricsResponse, subscriptionsResponse, budgetsResponse, budgetProgressResponse, categoriesResponse, creditCardsResponse] = await Promise.all([
         fetchTransactions(filters),
         fetchDashboardMetrics(filters),
         fetchSubscriptions(),
         fetchBudgets({ month: filters.month, year: filters.year }),
         fetchBudgetProgress(filters.month, filters.year),
         fetchCategories(),
+        fetchCreditCards(),
       ]);
 
       setTransactions(transactionsResponse);
@@ -108,6 +123,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setBudgets(budgetsResponse);
       setBudgetProgress(budgetProgressResponse);
       setCategories(categoriesResponse);
+      setCreditCards(creditCardsResponse);
       setLastSync(new Date().toISOString());
       setError(null);
     } catch (err) {
@@ -269,6 +285,38 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const createCreditCardEntry = async (payload: CreateCreditCardPayload) => {
+    try {
+      const card = await createCreditCard(payload);
+      setCreditCards((prev) => [card, ...prev]);
+      return card;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao criar cartão");
+      throw err;
+    }
+  };
+
+  const updateCreditCardEntry = async (id: string, payload: UpdateCreditCardPayload) => {
+    try {
+      const card = await updateCreditCard(id, payload);
+      setCreditCards((prev) => prev.map((item) => (item.id === id ? card : item)));
+      return card;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao atualizar cartão");
+      throw err;
+    }
+  };
+
+  const deleteCreditCardEntry = async (id: string) => {
+    try {
+      await deleteCreditCard(id);
+      setCreditCards((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao remover cartão");
+      throw err;
+    }
+  };
+
   const value: FinanceContextValue = {
     filters,
     setFilters,
@@ -283,6 +331,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     budgets,
     budgetProgress,
     categories,
+    creditCards,
     refresh: loadData,
     processUnstructuredTransaction,
     createManualTransaction,
@@ -295,6 +344,9 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     createBudgetRule,
     updateBudgetRule,
     deleteBudgetRule,
+    createCreditCardEntry,
+    updateCreditCardEntry,
+    deleteCreditCardEntry,
   };
 
   return <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>;

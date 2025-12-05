@@ -1,4 +1,5 @@
 import { CategorySelect } from "@/components/category-select";
+import { CreditCardSelect } from "@/components/credit-card-select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -49,6 +50,14 @@ export function SubscriptionEditSheet({ editor }: SubscriptionEditSheetProps) {
                 <CategorySelect
                   value={values.categoryId}
                   onValueChange={(value) => setValue("categoryId", value ?? "")}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Cartão de crédito</Label>
+                <CreditCardSelect
+                  value={values.creditCardId}
+                  onValueChange={(value) => setValue("creditCardId", value)}
+                  placeholder="Nenhum (opcional)"
                 />
               </div>
               <div className="space-y-2">

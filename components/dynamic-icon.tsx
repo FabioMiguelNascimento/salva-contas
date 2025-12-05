@@ -8,7 +8,6 @@ interface DynamicIconProps extends LucideProps {
   fallback?: keyof typeof LucideIcons;
 }
 
-// Converte nome do ícone para PascalCase (ex: "shopping-cart" -> "ShoppingCart")
 function toPascalCase(str: string): string {
   return str
     .split(/[-_\s]+/)
@@ -16,25 +15,25 @@ function toPascalCase(str: string): string {
     .join("");
 }
 
+const iconMap = LucideIcons as unknown as Record<string, React.ComponentType<LucideProps>>;
+
 export function DynamicIcon({
   name,
   fallback = "Tag",
   ...props
 }: DynamicIconProps) {
   const pascalName = toPascalCase(name);
-  const IconComponent = (LucideIcons as Record<string, React.ComponentType<LucideProps>>)[pascalName];
+  const IconComponent = iconMap[pascalName];
 
   if (IconComponent) {
     return <IconComponent {...props} />;
   }
 
-  // Tenta o nome original (caso já esteja em PascalCase)
-  const DirectIcon = (LucideIcons as Record<string, React.ComponentType<LucideProps>>)[name];
+  const DirectIcon = iconMap[name];
   if (DirectIcon) {
     return <DirectIcon {...props} />;
   }
 
-  // Fallback
-  const FallbackIcon = (LucideIcons as Record<string, React.ComponentType<LucideProps>>)[fallback];
+  const FallbackIcon = iconMap[fallback];
   return FallbackIcon ? <FallbackIcon {...props} /> : null;
 }

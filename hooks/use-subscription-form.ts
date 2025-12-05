@@ -16,6 +16,7 @@ export interface SubscriptionFormValues {
   description: string;
   amount: string;
   categoryId: string;
+  creditCardId: string | null;
   frequency: SubscriptionFrequency;
   dayOfMonth: number;
   dayOfWeek: number;
@@ -51,6 +52,7 @@ export function useSubscriptionForm({
       description: "",
       amount: "",
       categoryId: "",
+      creditCardId: null,
       frequency: "monthly",
       dayOfMonth: defaults.dayOfMonth ?? 15,
       dayOfWeek: defaults.dayOfWeek ?? 1,
@@ -125,6 +127,7 @@ export function useSubscriptionForm({
           description: values.description.trim(),
           amount: parsedAmount,
           categoryId: values.categoryId.trim(),
+          creditCardId: values.creditCardId || undefined,
           frequency: values.frequency,
           dayOfMonth: values.frequency === "weekly" ? undefined : values.dayOfMonth,
           dayOfWeek: values.frequency === "weekly" ? values.dayOfWeek : undefined,

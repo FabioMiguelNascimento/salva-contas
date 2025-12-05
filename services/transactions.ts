@@ -75,6 +75,10 @@ export async function processTransaction(payload: ProcessTransactionClientPayloa
     formData.append(payload.isScheduled ? "dueDate" : "paymentDate", payload.date);
   }
 
+  if (payload.creditCardId) {
+    formData.append("creditCardId", payload.creditCardId);
+  }
+
   const response = await apiClient.post<ApiResponse<ApiTransaction>>("/transactions", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });

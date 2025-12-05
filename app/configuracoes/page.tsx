@@ -17,7 +17,7 @@ export default function ConfiguracoesPage() {
         <p className="text-xs uppercase tracking-[0.4em] text-muted-foreground">Workspace</p>
         <h1 className="text-3xl font-semibold">Configurações</h1>
         <p className="text-sm text-muted-foreground">
-          Personalize a experiência visual, alertas e credenciais utilizadas pelo AI Finance Tracker.
+          Personalize a experiência visual, alertas e credenciais utilizadas pelo Salva Contas.
         </p>
       </div>
 

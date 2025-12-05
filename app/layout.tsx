@@ -8,7 +8,7 @@ import "./globals.css";
 const fontSans = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "AI Finance Tracker",
+  title: "Salva Contas",
   description: "Dashboard inteligente para organizar recibos, contas e transações com IA",
 };
 

@@ -1,6 +1,8 @@
 export type TransactionType = "expense" | "income";
 export type TransactionStatus = "paid" | "pending";
 export type SubscriptionFrequency = "weekly" | "monthly" | "yearly";
+export type CreditCardFlag = "visa" | "mastercard" | "american_express" | "elo" | "hipercard" | "other";
+export type CreditCardStatus = "active" | "blocked" | "expired" | "cancelled";
 
 export interface TransactionCategory {
   id: string;
@@ -11,9 +13,25 @@ export interface TransactionCategory {
 
 export interface CreditCard {
   id: string;
+  userId?: string | null;
   name: string;
-  lastFourDigits?: string;
-  flag?: string;
+  flag: CreditCardFlag;
+  lastFourDigits?: string | null;
+  limit: number;
+  availableLimit: number;
+  closingDay: number;
+  dueDay: number;
+  status: CreditCardStatus;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreditCardSummary {
+  creditCard: CreditCard;
+  currentDebt: number;
+  availableLimit: number;
+  nextClosingDate: string;
+  nextDueDate: string;
 }
 
 export interface Transaction {
@@ -43,6 +61,8 @@ export interface Subscription {
   amount: number;
   categoryId: string;
   category?: TransactionCategory | null;
+  creditCardId?: string | null;
+  creditCard?: CreditCard | null;
   frequency: SubscriptionFrequency;
   dayOfMonth?: number | null;
   dayOfWeek?: number | null;
@@ -109,6 +129,7 @@ export interface CreateSubscriptionPayload {
   description: string;
   amount: number;
   categoryId: string;
+  creditCardId?: string;
   frequency: SubscriptionFrequency;
   dayOfMonth?: number | null;
   dayOfWeek?: number | null;
@@ -128,6 +149,7 @@ export interface ProcessTransactionClientPayload {
   text?: string;
   isScheduled?: boolean;
   date?: string | null;
+  creditCardId?: string;
 }
 
 // Budget types
@@ -164,4 +186,30 @@ export interface CreateBudgetPayload {
 
 export interface UpdateBudgetPayload {
   amount?: number;
+}
+
+// Credit Card types
+export interface CreateCreditCardPayload {
+  name: string;
+  flag: CreditCardFlag;
+  lastFourDigits?: string;
+  limit: number;
+  closingDay: number;
+  dueDay: number;
+}
+
+export interface UpdateCreditCardPayload {
+  name?: string;
+  flag?: CreditCardFlag;
+  lastFourDigits?: string;
+  limit?: number;
+  closingDay?: number;
+  dueDay?: number;
+  status?: CreditCardStatus;
+}
+
+export interface CreditCardFilters {
+  status?: CreditCardStatus;
+  page?: number;
+  limit?: number;
 }

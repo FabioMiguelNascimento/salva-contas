@@ -1,3 +1,4 @@
+import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -29,6 +30,7 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
           <TableHead>Valor</TableHead>
           <TableHead>Vencimento</TableHead>
           <TableHead>Categoria</TableHead>
+          <TableHead>Cartão</TableHead>
           <TableHead>Frequência</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="w-12" />
@@ -48,6 +50,16 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
             <TableCell>{currencyFormatter.format(subscription.amount)}</TableCell>
             <TableCell className="text-muted-foreground">{getScheduleLabel(subscription)}</TableCell>
             <TableCell>{subscription.category?.name ?? "–"}</TableCell>
+            <TableCell>
+              {subscription.creditCard ? (
+                <div className="flex items-center gap-2">
+                  <CardFlagIcon flag={subscription.creditCard.flag} className="h-5 w-auto" />
+                  <span className="text-xs text-muted-foreground">{subscription.creditCard.name}</span>
+                </div>
+              ) : (
+                <span className="text-xs text-muted-foreground">—</span>
+              )}
+            </TableCell>
             <TableCell>
               <Badge variant="outline" className="text-xs">
                 {getFrequencyLabel(subscription.frequency)}

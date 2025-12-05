@@ -1,3 +1,4 @@
+import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -58,7 +59,18 @@ export function SubscriptionListCard({ subscription, onEdit, onDelete }: Subscri
           </Badge>
         </div>
       </div>
-      <p className="mt-2 text-xs text-muted-foreground">Dia programado: {getScheduleLabel(subscription)}</p>
+      <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+        <span>Dia programado: {getScheduleLabel(subscription)}</span>
+        {subscription.creditCard && (
+          <>
+            <span>•</span>
+            <div className="flex items-center gap-1">
+              <CardFlagIcon flag={subscription.creditCard.flag} className="h-3.5 w-auto" />
+              <span>{subscription.creditCard.name}</span>
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }

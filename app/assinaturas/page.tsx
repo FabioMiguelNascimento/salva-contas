@@ -38,7 +38,7 @@ export default function SubscriptionsPage() {
       <PageHeader
         tag="Recorrências"
         title="Assinaturas e débitos automáticos"
-        description="Configure regras para Netflix, aluguel e outros serviços para que o AI Finance gere as transações sem digitação."
+        description="Configure regras para Netflix, aluguel e outros serviços para que o Salva Contas gere as transações sem digitação."
       />
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
