@@ -83,7 +83,7 @@ export async function processTransaction(payload: ProcessTransactionClientPayloa
 }
 
 export async function updateTransaction(id: string, payload: UpdateTransactionPayload) {
-  const response = await apiClient.put<ApiResponse<ApiTransaction>>(`/transactions/${id}`, payload);
+  const response = await apiClient.patch<ApiResponse<ApiTransaction>>(`/transactions/${id}`, payload);
   return normalizeTransaction(unwrapData(response.data));
 }
 
