@@ -1,14 +1,14 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
-import { getFrequencyLabel } from "@/lib/subscriptions/utils";
+import { getFrequencyLabel, getScheduleLabel } from "@/lib/subscriptions/utils";
 import type { Subscription } from "@/types/finance";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
@@ -27,6 +27,7 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
         <TableRow>
           <TableHead>Descrição</TableHead>
           <TableHead>Valor</TableHead>
+          <TableHead>Vencimento</TableHead>
           <TableHead>Categoria</TableHead>
           <TableHead>Frequência</TableHead>
           <TableHead>Status</TableHead>
@@ -45,6 +46,7 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
               </div>
             </TableCell>
             <TableCell>{currencyFormatter.format(subscription.amount)}</TableCell>
+            <TableCell className="text-muted-foreground">{getScheduleLabel(subscription)}</TableCell>
             <TableCell>{subscription.category?.name ?? "–"}</TableCell>
             <TableCell>
               <Badge variant="outline" className="text-xs">
