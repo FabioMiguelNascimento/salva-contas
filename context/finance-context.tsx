@@ -1,27 +1,30 @@
 "use client";
 
 import { fetchDashboardMetrics } from "@/services/dashboard";
+import { createSubscription, fetchSubscriptions } from "@/services/subscriptions";
 import {
-    createTransaction,
-    deleteTransaction,
-    fetchTransactions,
-    processTransaction,
-    updateTransaction,
+  createTransaction,
+  deleteTransaction,
+  fetchTransactions,
+  processTransaction,
+  updateTransaction,
 } from "@/services/transactions";
 import type {
-    DashboardMetrics,
-    ManualTransactionPayload,
-    ProcessTransactionPayload,
-    Transaction,
-    TransactionFilters,
-    UpdateTransactionPayload,
+  CreateSubscriptionPayload,
+  DashboardMetrics,
+  ManualTransactionPayload,
+  ProcessTransactionPayload,
+  Subscription,
+  Transaction,
+  TransactionFilters,
+  UpdateTransactionPayload,
 } from "@/types/finance";
 import {
-    createContext,
-    useCallback,
-    useEffect,
-    useMemo,
-    useState,
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
 } from "react";
 
 interface FinanceContextValue {
@@ -34,12 +37,14 @@ interface FinanceContextValue {
   transactions: Transaction[];
   pendingBills: Transaction[];
   metrics: DashboardMetrics | null;
+  subscriptions: Subscription[];
   refresh: () => Promise<void>;
   processUnstructuredTransaction: (payload: ProcessTransactionPayload) => Promise<Transaction | void>;
   createManualTransaction: (payload: ManualTransactionPayload) => Promise<Transaction | void>;
   updateExistingTransaction: (id: string, payload: UpdateTransactionPayload) => Promise<Transaction | void>;
   markAsPaid: (id: string) => Promise<Transaction | void>;
   removeTransaction: (id: string) => Promise<void>;
+  createSubscriptionRule: (payload: CreateSubscriptionPayload) => Promise<Subscription | void>;
 }
 
 const FinanceContext = createContext<FinanceContextValue | null>(null);
@@ -54,6 +59,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [filters, setFilters] = useState<TransactionFilters>(initialFilters);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,13 +68,15 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const loadData = useCallback(async () => {
     setIsSyncing(true);
     try {
-      const [transactionsResponse, metricsResponse] = await Promise.all([
+      const [transactionsResponse, metricsResponse, subscriptionsResponse] = await Promise.all([
         fetchTransactions(filters),
         fetchDashboardMetrics(filters),
+        fetchSubscriptions(),
       ]);
 
       setTransactions(transactionsResponse);
       setMetrics(metricsResponse);
+      setSubscriptions(subscriptionsResponse);
       setLastSync(new Date().toISOString());
       setError(null);
     } catch (err) {
@@ -163,6 +171,17 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const createSubscriptionRule = async (payload: CreateSubscriptionPayload) => {
+    try {
+      const subscription = await createSubscription(payload);
+      setSubscriptions((prev) => [subscription, ...prev]);
+      return subscription;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao criar assinatura");
+      throw err;
+    }
+  };
+
     const value: FinanceContextValue = {
     filters,
     setFilters,
@@ -173,12 +192,14 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     transactions,
     pendingBills,
     metrics,
+    subscriptions,
     refresh: loadData,
     processUnstructuredTransaction,
     createManualTransaction,
     updateExistingTransaction,
     markAsPaid,
     removeTransaction,
+    createSubscriptionRule,
   };
 
   return <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>;

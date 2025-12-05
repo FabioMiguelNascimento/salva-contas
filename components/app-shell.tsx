@@ -1,6 +1,5 @@
 "use client";
 
-import { NewTransactionDialog } from "@/components/new-transaction-dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,12 +14,14 @@ import {
     LayoutDashboard,
     Menu,
     ReceiptText,
+    Repeat,
     Settings,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType, SVGProps } from "react";
 import { useMemo, useState } from "react";
+import { NewTransactionDialog } from "./new-transaction-dialog";
 
 interface NavItem {
   label: string;
@@ -41,6 +42,12 @@ const baseNavItems: NavItem[] = [
     href: "/contas",
     icon: CalendarClock,
     description: "Boletos, obrigações e agendamentos",
+  },
+  {
+    label: "Assinaturas",
+    href: "/assinaturas",
+    icon: Repeat,
+    description: "Compras recorrentes automatizadas",
   },
   {
     label: "Extrato / Transações",

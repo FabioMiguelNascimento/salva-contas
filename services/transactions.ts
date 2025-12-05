@@ -12,6 +12,8 @@ type ApiTransaction = Omit<Transaction, "amount" | "category"> & {
   category?: string | null;
 };
 
+type ApiResponse<T> = T | { data: T };
+
 const toNumber = (value: string | number): number => {
   const parsed = typeof value === "string" ? Number(value) : value;
   return Number.isFinite(parsed) ? parsed : 0;
@@ -29,6 +31,13 @@ const normalizeTransaction = (transaction: ApiTransaction): Transaction => {
     categoryId: transaction.categoryId ?? transaction.categoryRel?.id ?? null,
     categoryRel: transaction.categoryRel ?? null,
   };
+};
+
+const unwrapData = <T>(payload: ApiResponse<T>): T => {
+  if (payload && typeof payload === "object" && "data" in payload) {
+    return (payload as { data: T }).data;
+  }
+  return payload as T;
 };
 
 const buildFormData = (payload: ProcessTransactionPayload) => {
@@ -50,16 +59,17 @@ const buildFormData = (payload: ProcessTransactionPayload) => {
 };
 
 export async function fetchTransactions(filters: TransactionFilters) {
-  const response = await apiClient.get<ApiTransaction[]>("/transactions", {
+  const response = await apiClient.get<ApiResponse<ApiTransaction[]>>("/transactions", {
     params: filters,
   });
 
-  return response.data.map(normalizeTransaction);
+  const transactions = unwrapData(response.data);
+  return (transactions ?? []).map(normalizeTransaction);
 }
 
 export async function createTransaction(payload: ManualTransactionPayload) {
-  const response = await apiClient.post<ApiTransaction>("/transactions", payload);
-  return normalizeTransaction(response.data);
+  const response = await apiClient.post<ApiResponse<ApiTransaction>>("/transactions", payload);
+  return normalizeTransaction(unwrapData(response.data));
 }
 
 export async function processTransaction(payload: ProcessTransactionPayload) {
@@ -69,16 +79,16 @@ export async function processTransaction(payload: ProcessTransactionPayload) {
     throw new Error("Envie um arquivo ou informe um texto para processar a transação.");
   }
 
-  const response = await apiClient.post<ApiTransaction>("/transactions/process", formData, {
+  const response = await apiClient.post<ApiResponse<ApiTransaction>>("/transactions/process", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 
-  return normalizeTransaction(response.data);
+  return normalizeTransaction(unwrapData(response.data));
 }
 
 export async function updateTransaction(id: string, payload: UpdateTransactionPayload) {
-  const response = await apiClient.patch<ApiTransaction>(`/transactions/${id}`, payload);
-  return normalizeTransaction(response.data);
+  const response = await apiClient.patch<ApiResponse<ApiTransaction>>(`/transactions/${id}`, payload);
+  return normalizeTransaction(unwrapData(response.data));
 }
 
 export async function deleteTransaction(id: string) {

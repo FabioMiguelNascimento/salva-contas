@@ -1,5 +1,6 @@
 export type TransactionType = "expense" | "income";
 export type TransactionStatus = "paid" | "pending";
+export type SubscriptionFrequency = "weekly" | "monthly" | "yearly";
 
 export interface TransactionCategory {
   id: string;
@@ -22,6 +23,22 @@ export interface Transaction {
   dueDate: string | null;
   paymentDate: string | null;
   rawText?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface Subscription {
+  id: string;
+  userId?: string | null;
+  description: string;
+  amount: number;
+  categoryId: string;
+  category?: TransactionCategory | null;
+  frequency: SubscriptionFrequency;
+  dayOfMonth?: number | null;
+  dayOfWeek?: number | null;
+  month?: number | null;
+  isActive: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -77,6 +94,17 @@ export interface UpdateTransactionPayload {
   type?: TransactionType;
   dueDate?: string | null;
   paymentDate?: string | null;
+}
+
+export interface CreateSubscriptionPayload {
+  description: string;
+  amount: number;
+  categoryId: string;
+  frequency: SubscriptionFrequency;
+  dayOfMonth?: number | null;
+  dayOfWeek?: number | null;
+  month?: number | null;
+  isActive?: boolean;
 }
 
 export interface ProcessTransactionPayload {
