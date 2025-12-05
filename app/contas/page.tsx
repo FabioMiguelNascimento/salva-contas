@@ -2,14 +2,14 @@
 
 import { DatePicker } from "@/components/date-picker";
 import { PageHeader } from "@/components/page-header";
+import { SummaryCard } from "@/components/summary-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useFinance } from "@/hooks/use-finance";
@@ -20,7 +20,6 @@ import { differenceInCalendarDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { AlertTriangle, Calendar, CheckCircle2, PencilLine, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import type { ComponentType, SVGProps } from "react";
 import { useMemo, useState } from "react";
 
 const filterTabs = [
@@ -120,28 +119,30 @@ export default function ContasPage() {
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <SummaryCard
           icon={Calendar}
-          label="Total pendente"
+          title="Total pendente"
           value={currencyFormatter.format(summary.total)}
-          highlight="Inclui todos os lançamentos aguardando pagamento"
+          helper="Inclui todos os lançamentos aguardando pagamento"
         />
         <SummaryCard
           icon={AlertTriangle}
-          label="Atrasados"
+          title="Atrasados"
           value={`${summary.overdueCount} boletos`}
-          highlight={currencyFormatter.format(summary.overdueAmount)}
+          helper={currencyFormatter.format(summary.overdueAmount)}
           variant="danger"
         />
         <SummaryCard
           icon={ShieldCheck}
-          label="Vence hoje"
+          title="Vence hoje"
           value={`${summary.todayCount}`}
-          highlight="Priorize estes pagamentos"
+          helper="Priorize estes pagamentos"
+          variant="warning"
         />
         <SummaryCard
           icon={CheckCircle2}
-          label="Próximos 3 dias"
+          title="Próximos 3 dias"
           value={`${summary.upcomingCount}`}
-          highlight="Organize o caixa com antecedência"
+          helper="Organize o caixa com antecedência"
+          variant="success"
         />
       </section>
 
@@ -276,89 +277,68 @@ export default function ContasPage() {
         </CardContent>
       </Card>
 
-      <Dialog open={payDialog.open} onOpenChange={(open) => setPayDialog({ open })}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirmar pagamento</DialogTitle>
-            <DialogDescription>
-              {payDialog.bill ? `Marcar "${payDialog.bill.description}" como pago?` : ""}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setPayDialog({ open: false })} disabled={isProcessing}>
+      {/* Sheet de confirmar pagamento */}
+      <Sheet open={payDialog.open} onOpenChange={(open) => setPayDialog({ open })}>
+        <SheetContent className="flex flex-col">
+          <SheetHeader>
+            <SheetTitle>Confirmar pagamento</SheetTitle>
+            <SheetDescription>
+              Esta ação irá marcar a conta como paga.
+            </SheetDescription>
+          </SheetHeader>
+
+          <SheetBody>
+            <p className="text-sm text-muted-foreground">
+              {payDialog.bill ? `Deseja marcar "${payDialog.bill.description}" como pago?` : ""}
+            </p>
+          </SheetBody>
+
+          <SheetFooter className="flex-row gap-2">
+            <Button variant="ghost" onClick={() => setPayDialog({ open: false })} disabled={isProcessing} className="flex-1">
               Cancelar
             </Button>
-            <Button onClick={handleMarkAsPaid} disabled={isProcessing}>
+            <Button onClick={handleMarkAsPaid} disabled={isProcessing} className="flex-1">
               {isProcessing ? "Processando..." : "Confirmar"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
+      {/* Sheet de editar conta */}
       <Sheet open={editSheet.open} onOpenChange={(open) => setEditSheet({ open })}>
-        <SheetContent className="w-full sm:max-w-lg">
+        <SheetContent className="flex flex-col">
           <SheetHeader>
             <SheetTitle>Editar conta</SheetTitle>
           </SheetHeader>
-          <form onSubmit={handleEditSubmit} className="mt-6 space-y-4">
-            <div className="space-y-2">
-              <Label>Descrição</Label>
-              <Input value={descriptionInput} onChange={(event) => setDescriptionInput(event.target.value)} required />
-            </div>
-            <div className="space-y-2">
-              <Label>Valor</Label>
-              <Input value={amountInput} onChange={(event) => setAmountInput(event.target.value)} required />
-            </div>
-            <div className="space-y-2">
-              <Label>Data de vencimento</Label>
-              <DatePicker date={editDate} onChange={setEditDate} placeholder="Selecione a data" />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="ghost" onClick={() => setEditSheet({ open: false })}>
+
+          <form id="edit-bill-form" onSubmit={handleEditSubmit} className="flex flex-1 flex-col">
+            <SheetBody className="space-y-4">
+              <div className="space-y-2">
+                <Label>Descrição</Label>
+                <Input value={descriptionInput} onChange={(event) => setDescriptionInput(event.target.value)} required />
+              </div>
+              <div className="space-y-2">
+                <Label>Valor</Label>
+                <Input value={amountInput} onChange={(event) => setAmountInput(event.target.value)} required />
+              </div>
+              <div className="space-y-2">
+                <Label>Data de vencimento</Label>
+                <DatePicker date={editDate} onChange={setEditDate} placeholder="Selecione a data" />
+              </div>
+            </SheetBody>
+
+            <SheetFooter className="flex-row gap-2">
+              <Button type="button" variant="ghost" onClick={() => setEditSheet({ open: false })} className="flex-1">
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isProcessing}>
+              <Button type="submit" disabled={isProcessing} className="flex-1">
                 {isProcessing ? "Salvando..." : "Salvar"}
               </Button>
-            </div>
+            </SheetFooter>
           </form>
         </SheetContent>
       </Sheet>
     </div>
-  );
-}
-
-function SummaryCard({
-  icon: Icon,
-  label,
-  value,
-  highlight,
-  variant = "default",
-}: {
-  icon: ComponentType<SVGProps<SVGSVGElement>>;
-  label: string;
-  value: string;
-  highlight: string;
-  variant?: "default" | "danger";
-}) {
-  return (
-    <Card className={cn(variant === "danger" && "border-destructive/30 bg-destructive/5") }>
-      <CardContent className="flex items-center gap-4 py-6">
-        <div
-          className={cn(
-            "rounded-2xl p-3",
-            variant === "danger" ? "bg-destructive/15 text-destructive" : "bg-emerald-500/10 text-emerald-600"
-          )}
-        >
-          <Icon className="h-5 w-5" />
-        </div>
-        <div>
-          <p className="text-sm text-muted-foreground">{label}</p>
-          <p className="text-xl font-semibold">{value}</p>
-          <p className="text-xs text-muted-foreground">{highlight}</p>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
 

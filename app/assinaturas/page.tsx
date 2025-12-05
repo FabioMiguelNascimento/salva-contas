@@ -5,10 +5,11 @@ import { SubscriptionCreateSheet } from "@/components/subscriptions/subscription
 import { SubscriptionDeleteSheet } from "@/components/subscriptions/subscription-delete-sheet";
 import { SubscriptionEditSheet } from "@/components/subscriptions/subscription-edit-sheet";
 import { SubscriptionListCard } from "@/components/subscriptions/subscription-list-card";
-import { SubscriptionSummaryCard } from "@/components/subscriptions/subscription-summary-card";
 import { SubscriptionTable } from "@/components/subscriptions/subscription-table";
+import { SummaryCard } from "@/components/summary-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useFinance } from "@/hooks/use-finance";
 import { useSubscriptionEditor } from "@/hooks/use-subscription-editor";
 import { useSubscriptionFilters } from "@/hooks/use-subscription-filters";
@@ -30,32 +31,34 @@ export default function SubscriptionsPage() {
 
   return (
     <div className="space-y-8">
+      <TopbarAction>
+        <SubscriptionCreateSheet form={form} />
+      </TopbarAction>
+
       <PageHeader
         tag="Recorrências"
         title="Assinaturas e débitos automáticos"
         description="Configure regras para Netflix, aluguel e outros serviços para que o AI Finance gere as transações sem digitação."
-      >
-        <SubscriptionCreateSheet form={form} />
-      </PageHeader>
+      />
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <SubscriptionSummaryCard
+        <SummaryCard
           icon={Zap}
-          label="Assinaturas ativas"
+          title="Assinaturas ativas"
           value={stats.totalActive}
           helper="Regras prontas para gerar lançamentos"
         />
-        <SubscriptionSummaryCard
+        <SummaryCard
           icon={Shield}
-          label="Comprometido/mês"
+          title="Comprometido/mês"
           value={currencyFormatter.format(stats.totalAmount)}
           helper="Soma considerando valores atuais"
         />
         {frequencyOptions.slice(0, 2).map((option) => (
-          <SubscriptionSummaryCard
+          <SummaryCard
             key={option.value}
             icon={PlusCircle}
-            label={`Frequência ${option.label}`}
+            title={`Frequência ${option.label}`}
             value={stats.byFrequency[option.value] ?? 0}
             helper={option.helper}
           />

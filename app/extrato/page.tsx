@@ -1,12 +1,11 @@
 "use client";
 
 import { DatePicker } from "@/components/date-picker";
-import { NewTransactionDialog } from "@/components/new-transaction-dialog";
+import { NewTransactionDialog } from "@/components/new-transaction-sheet";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -17,17 +16,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
+import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useFinance } from "@/hooks/use-finance";
 import { currencyFormatter, getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
 import { cn, getTransactionCategoryLabel } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Filter, RefreshCcw, Trash2 } from "lucide-react";
+import { Filter, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 export default function ExtratoPage() {
@@ -36,8 +36,6 @@ export default function ExtratoPage() {
     filters,
     setFilters,
     isLoading,
-    isSyncing,
-    refresh,
     updateExistingTransaction,
     removeTransaction,
   } = useFinance();
@@ -126,6 +124,10 @@ export default function ExtratoPage() {
 
   return (
     <div className="space-y-8">
+      <TopbarAction>
+        <NewTransactionDialog trigger={<Button>Nova Transação</Button>} />
+      </TopbarAction>
+
       <PageHeader
         tag="Histórico"
         title="Extrato e transações"
@@ -183,12 +185,6 @@ export default function ExtratoPage() {
                 <SelectItem value="pending">Pendentes</SelectItem>
               </SelectContent>
             </Select>
-            <div className="ml-auto flex gap-2">
-              <Button variant="outline" onClick={refresh} disabled={isSyncing}>
-                <RefreshCcw className={cn("mr-2 h-4 w-4", isSyncing && "animate-spin")} /> Atualizar
-              </Button>
-              <NewTransactionDialog trigger={<Button>Nova transação</Button>} />
-            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -319,87 +315,102 @@ export default function ExtratoPage() {
         </div>
       </div>
 
-      <Dialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ open })}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Remover transação</DialogTitle>
-            <DialogDescription>
-              {deleteDialog.transaction ? `Deseja excluir "${deleteDialog.transaction.description}"?` : ""}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setDeleteDialog({ open: false })} disabled={isProcessing}>
+      {/* Sheet de deletar transação */}
+      <Sheet open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ open })}>
+        <SheetContent className="flex flex-col">
+          <SheetHeader>
+            <SheetTitle>Remover transação</SheetTitle>
+            <SheetDescription>
+              Esta ação não pode ser desfeita.
+            </SheetDescription>
+          </SheetHeader>
+
+          <SheetBody>
+            <p className="text-sm text-muted-foreground">
+              {deleteDialog.transaction
+                ? `Deseja excluir a transação "${deleteDialog.transaction.description}"?`
+                : ""}
+            </p>
+          </SheetBody>
+
+          <SheetFooter className="flex-row gap-2">
+            <Button variant="ghost" onClick={() => setDeleteDialog({ open: false })} disabled={isProcessing} className="flex-1">
               Cancelar
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isProcessing}>
+            <Button variant="destructive" onClick={handleDelete} disabled={isProcessing} className="flex-1">
               {isProcessing ? "Removendo..." : "Excluir"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
 
+      {/* Sheet de editar transação */}
       <Sheet open={editing.open} onOpenChange={(open) => setEditing({ open })}>
-        <SheetContent className="w-full sm:max-w-lg">
+        <SheetContent className="flex flex-col">
           <SheetHeader>
             <SheetTitle>Editar transação</SheetTitle>
           </SheetHeader>
-          <form onSubmit={handleEditSubmit} className="mt-6 space-y-4">
-            <div className="space-y-2">
-              <Label>Descrição</Label>
-              <Input value={editDescription} onChange={(event) => setEditDescription(event.target.value)} required />
-            </div>
-            <div className="space-y-2">
-              <Label>Categoria</Label>
-              <Input value={editCategory} onChange={(event) => setEditCategory(event.target.value)} required />
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+
+          <form id="edit-transaction-form" onSubmit={handleEditSubmit} className="flex flex-1 flex-col">
+            <SheetBody className="space-y-4">
               <div className="space-y-2">
-                <Label>Valor</Label>
-                <Input value={editAmount} onChange={(event) => setEditAmount(event.target.value)} required />
+                <Label>Descrição</Label>
+                <Input value={editDescription} onChange={(event) => setEditDescription(event.target.value)} required />
               </div>
               <div className="space-y-2">
-                <Label>Tipo</Label>
-                <Select value={editType} onValueChange={setEditType}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="expense">Despesa</SelectItem>
-                    <SelectItem value="income">Receita</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>Categoria</Label>
+                <Input value={editCategory} onChange={(event) => setEditCategory(event.target.value)} required />
               </div>
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Valor</Label>
+                  <Input value={editAmount} onChange={(event) => setEditAmount(event.target.value)} required />
+                </div>
+                <div className="space-y-2">
+                  <Label>Tipo</Label>
+                  <Select value={editType} onValueChange={setEditType}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="expense">Despesa</SelectItem>
+                      <SelectItem value="income">Receita</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label>Status</Label>
+                  <Select value={editStatus} onValueChange={setEditStatus}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="paid">Pago</SelectItem>
+                      <SelectItem value="pending">Pendente</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>{editStatus === "paid" ? "Data do pagamento" : "Data prevista"}</Label>
+                  <DatePicker date={editDate} onChange={setEditDate} placeholder="Selecione" />
+                </div>
+              </div>
               <div className="space-y-2">
-                <Label>Status</Label>
-                <Select value={editStatus} onValueChange={setEditStatus}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="paid">Pago</SelectItem>
-                    <SelectItem value="pending">Pendente</SelectItem>
-                  </SelectContent>
-                </Select>
+                <Label>Notas internas</Label>
+                <Textarea placeholder="Adicione um contexto adicional" disabled />
               </div>
-              <div className="space-y-2">
-                <Label>{editStatus === "paid" ? "Data do pagamento" : "Data prevista"}</Label>
-                <DatePicker date={editDate} onChange={setEditDate} placeholder="Selecione" />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label>Notas internas</Label>
-              <Textarea placeholder="Adicione um contexto adicional" disabled />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="ghost" onClick={() => setEditing({ open: false })}>
+            </SheetBody>
+
+            <SheetFooter className="flex-row gap-2">
+              <Button type="button" variant="ghost" onClick={() => setEditing({ open: false })} className="flex-1">
                 Cancelar
               </Button>
-              <Button type="submit" disabled={isProcessing}>
+              <Button type="submit" disabled={isProcessing} className="flex-1">
                 {isProcessing ? "Salvando..." : "Salvar alterações"}
               </Button>
-            </div>
+            </SheetFooter>
           </form>
         </SheetContent>
       </Sheet>

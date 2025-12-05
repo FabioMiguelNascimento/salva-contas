@@ -6,23 +6,24 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { TopbarActionProvider, useTopbarAction } from "@/contexts/topbar-action-context";
 import { useFinance } from "@/hooks/use-finance";
 import { cn } from "@/lib/utils";
 import {
-    CalendarClock,
-    ChevronRight,
-    LayoutDashboard,
-    Menu,
-    ReceiptText,
-    RefreshCcw,
-    Repeat,
-    Settings,
+  CalendarClock,
+  ChevronRight,
+  LayoutDashboard,
+  Menu,
+  ReceiptText,
+  RefreshCcw,
+  Repeat,
+  Settings,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ComponentType, SVGProps } from "react";
 import { useMemo, useState } from "react";
-import { NewTransactionDialog } from "./new-transaction-dialog";
+import { NewTransactionDialog } from "./new-transaction-sheet";
 
 interface NavItem {
   label: string;
@@ -154,27 +155,57 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
 
   return (
+    <TopbarActionProvider>
+      <AppShellContent 
+        refresh={refresh} 
+        isSyncing={isSyncing} 
+        isSheetOpen={isSheetOpen}
+        setIsSheetOpen={setIsSheetOpen}
+        SidebarContent={SidebarContent}
+      >
+        {children}
+      </AppShellContent>
+    </TopbarActionProvider>
+  );
+}
+
+function AppShellContent({ 
+  children, 
+  refresh, 
+  isSyncing,
+  isSheetOpen,
+  setIsSheetOpen,
+  SidebarContent
+}: { 
+  children: React.ReactNode;
+  refresh: () => void;
+  isSyncing: boolean;
+  isSheetOpen: boolean;
+  setIsSheetOpen: (open: boolean) => void;
+  SidebarContent: React.ComponentType;
+}) {
+  const { actionNode } = useTopbarAction();
+
+  return (
     <div className="min-h-screen bg-muted/30">
-      {/* Desktop Topbar - Fixed at top */}
       <header className="hidden lg:flex fixed top-0 left-0 right-0 z-50 h-14 items-center justify-end gap-3 border-b bg-card px-6 shadow-sm">
         <Button variant="outline" onClick={refresh} disabled={isSyncing} className="gap-2">
           <RefreshCcw className={cn("h-4 w-4", isSyncing && "animate-spin")} />
           Atualizar
         </Button>
-        <NewTransactionDialog
-          trigger={<Button>Nova Transação</Button>}
-        />
+        {actionNode ?? (
+          <NewTransactionDialog
+            trigger={<Button>Nova Transação</Button>}
+          />
+        )}
       </header>
 
       <div className="flex min-h-screen">
-        {/* Desktop Sidebar - Fixed at left */}
         <aside className="hidden lg:flex fixed top-14 left-0 bottom-0 w-72 flex-col border-r bg-sidebar px-5 py-6 shadow-sm z-40">
           <SidebarContent />
         </aside>
 
-        {/* Main content area */}
         <div className="flex-1 lg:ml-72 lg:pt-14">
-          {/* Mobile Header */}
           <header className="flex items-center gap-3 border-b bg-card px-4 py-3 shadow-sm lg:hidden">
             <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
               <SheetTrigger asChild>
@@ -193,9 +224,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <p className="text-lg font-semibold">Tracker</p>
             </div>
             <div className="ml-auto">
-              <NewTransactionDialog
-                trigger={<Button size="sm">Nova Transação</Button>}
-              />
+              {actionNode ?? (
+                <NewTransactionDialog
+                  trigger={<Button size="sm">Nova Transação</Button>}
+                />
+              )}
             </div>
           </header>
 
@@ -203,17 +236,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             {children}
           </main>
         </div>
-      </div>
-
-      {/* Mobile FAB */}
-      <div className="fixed bottom-6 right-6 lg:hidden">
-        <NewTransactionDialog
-          trigger={
-            <Button size="lg" className="h-14 w-14 rounded-full shadow-lg shadow-emerald-500/30">
-              +
-            </Button>
-          }
-        />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import {
     Sheet,
+    SheetBody,
     SheetContent,
     SheetDescription,
     SheetFooter,
@@ -30,21 +31,21 @@ export function SubscriptionDeleteSheet({ editor }: SubscriptionDeleteSheetProps
             {deleteTarget ? `Tem certeza que deseja desativar e remover "${deleteTarget.description}"?` : ""}
           </SheetDescription>
         </SheetHeader>
-        <div className="mt-6 space-y-4">
+        <SheetBody>
           <p className="text-sm text-muted-foreground">
             Esta ação irá remover a regra de recorrência. Lançamentos já gerados não serão afetados.
           </p>
-          {error && <p className="text-sm font-medium text-destructive">{error}</p>}
-          <SheetFooter className="flex-row gap-2 pt-4">
-            <Button variant="outline" onClick={cancelDelete} disabled={isSubmitting} className="flex-1">
-              Voltar
-            </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isSubmitting} className="flex-1">
-              {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Cancelar assinatura
-            </Button>
-          </SheetFooter>
-        </div>
+          {error && <p className="mt-4 text-sm font-medium text-destructive">{error}</p>}
+        </SheetBody>
+        <SheetFooter className="flex-row gap-2">
+          <Button variant="outline" onClick={cancelDelete} disabled={isSubmitting} className="flex-1">
+            Voltar
+          </Button>
+          <Button variant="destructive" onClick={handleDelete} disabled={isSubmitting} className="flex-1">
+            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Cancelar assinatura
+          </Button>
+        </SheetFooter>
       </SheetContent>
     </Sheet>
   );

@@ -79,7 +79,7 @@ export async function processTransaction(payload: ProcessTransactionPayload) {
     throw new Error("Envie um arquivo ou informe um texto para processar a transação.");
   }
 
-  const response = await apiClient.post<ApiResponse<ApiTransaction>>("/transactions/process", formData, {
+  const response = await apiClient.post<ApiResponse<ApiTransaction>>("/transactions/", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 
