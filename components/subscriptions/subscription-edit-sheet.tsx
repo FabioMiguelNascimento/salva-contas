@@ -29,7 +29,7 @@ export function SubscriptionEditSheet({ editor }: SubscriptionEditSheetProps) {
 
   return (
     <Sheet open={!!editing} onOpenChange={(open) => (!open ? closeEdit() : undefined)}>
-      <SheetContent className="flex flex-col">
+      <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Editar assinatura</SheetTitle>
           <SheetDescription>Ajuste valores ou frequência desta recorrência.</SheetDescription>

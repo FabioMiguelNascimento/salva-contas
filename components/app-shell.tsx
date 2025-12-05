@@ -246,7 +246,7 @@ function AppShellContent({
                   <Menu className="h-4 w-4" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-80 border-r p-0">
+              <SheetContent side="left" className="w-80 border-r p-0 overflow-y-auto">
                 <ScrollArea className="h-full px-5 py-6">
                   <SidebarContent />
                 </ScrollArea>

@@ -54,7 +54,7 @@ export function SubscriptionCreateSheet({ form, trigger }: SubscriptionCreateShe
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent className="flex flex-col">
+      <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Nova assinatura</SheetTitle>
           <SheetDescription>

@@ -169,7 +169,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <PageHeader
         tag="Visão geral"
         title="Dashboard Financeiro"
@@ -201,7 +201,7 @@ export default function DashboardPage() {
         </Select>
       </PageHeader>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {kpis.map((item) => (
           <SummaryCard
             key={item.title}
@@ -214,11 +214,11 @@ export default function DashboardPage() {
         ))}
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-3">
+      <section className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle>Gastos dos últimos 7 dias</CardTitle>
+            <div className="min-w-0 flex-1">
+              <CardTitle className="text-base">Gastos dos últimos 7 dias</CardTitle>
               <p className="text-sm text-muted-foreground">Somente despesas pagas</p>
             </div>
           </CardHeader>
@@ -228,22 +228,22 @@ export default function DashboardPage() {
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle>Gastos por categoria</CardTitle>
+            <CardTitle className="text-base">Gastos por categoria</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col items-center gap-6">
+          <CardContent className="flex flex-col items-center gap-4 sm:gap-6 p-4 sm:p-6">
             {isLoading ? (
-              <Skeleton className="h-44 w-44 rounded-full" />
+              <Skeleton className="h-32 w-32 sm:h-44 sm:w-44 rounded-full" />
             ) : (
               <CategoryDonut data={categoryBreakdown} total={donutTotal} />
             )}
-            <div className="w-full space-y-3">
+            <div className="w-full space-y-2 sm:space-y-3">
               {categoryBreakdown.slice(0, 4).map((item, index) => (
-                <div key={item.category} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="h-3 w-3 " style={{ backgroundColor: chartColors[index % chartColors.length] }} />
-                    <span className="text-sm font-medium">{item.category}</span>
+                <div key={item.category} className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                    <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: chartColors[index % chartColors.length] }} />
+                    <span className="text-sm font-medium truncate">{item.category}</span>
                   </div>
-                  <span className="text-sm text-muted-foreground">{currencyFormatter.format(item.total)}</span>
+                  <span className="text-sm text-muted-foreground shrink-0">{currencyFormatter.format(item.total)}</span>
                 </div>
               ))}
             </div>
@@ -251,15 +251,15 @@ export default function DashboardPage() {
         </Card>
       </section>
 
-      <section className="grid gap-6 lg:grid-cols-3">
+      <section className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Últimas transações</CardTitle>
-            <Button variant="ghost" className="text-sm" asChild>
+          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <CardTitle className="text-base">Últimas transações</CardTitle>
+            <Button variant="ghost" size="sm" className="self-start sm:self-auto" asChild>
               <Link href="/extrato">Ver extrato completo</Link>
             </Button>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
             {isLoading
               ? Array.from({ length: 5 }).map((_, index) => <Skeleton key={index} className="h-12 w-full" />)
               : recentTransactions.map((transaction) => <TransactionRow key={transaction.id} transaction={transaction} />)}
@@ -268,8 +268,8 @@ export default function DashboardPage() {
         <Card className={cn("border-l-4", urgentBills.length > 0 ? "border-destructive" : "border-emerald-500/70") }>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <AlertTriangle className={cn("h-5 w-5", urgentBills.length > 0 ? "text-destructive" : "text-emerald-500") } />
-              {urgentBills.length > 0 ? "Contas vencendo" : "Tudo em dia"}
+              <AlertTriangle className={cn("h-5 w-5 shrink-0", urgentBills.length > 0 ? "text-destructive" : "text-emerald-500") } />
+              <span className="truncate">{urgentBills.length > 0 ? "Contas vencendo" : "Tudo em dia"}</span>
             </CardTitle>
             <p className="text-sm text-muted-foreground">
               {urgentBills.length > 0
@@ -277,7 +277,7 @@ export default function DashboardPage() {
                 : "Nenhuma conta vencendo hoje. Ótima organização!"}
             </p>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6">
             {(urgentBills.length > 0 ? urgentBills : nextBills).map((bill) => (
               <div key={bill.id} className="rounded-xl border border-border/60 p-3">
                 <div className="flex items-center justify-between gap-3">
@@ -306,14 +306,14 @@ export default function DashboardPage() {
       </section>
 
       {/* Credit Cards & Subscriptions Section */}
-      <section className="grid gap-6 lg:grid-cols-2">
+      <section className="grid gap-4 lg:grid-cols-2">
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-muted-foreground" />
+              <CreditCard className="h-5 w-5 text-muted-foreground shrink-0" />
               <CardTitle className="text-base">Cartões de Crédito</CardTitle>
             </div>
-            <Button variant="ghost" size="sm" asChild>
+            <Button variant="ghost" size="sm" className="self-start sm:self-auto" asChild>
               <Link href="/cartoes">Ver todos</Link>
             </Button>
           </CardHeader>
@@ -326,13 +326,13 @@ export default function DashboardPage() {
                 <p className="text-sm text-muted-foreground">Nenhum cartão cadastrado</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between rounded-lg bg-muted/50 p-3">
+              <div className="space-y-4 p-4 sm:p-6">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-lg bg-muted/50 p-3">
                   <div>
                     <p className="text-xs text-muted-foreground">Limite utilizado</p>
                     <p className="text-lg font-semibold">{currencyFormatter.format(totalCreditUsed)}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-left sm:text-right">
                     <p className="text-xs text-muted-foreground">de {currencyFormatter.format(totalCreditLimit)}</p>
                     <p className={cn("text-sm font-medium", creditUsagePercent > 80 ? "text-destructive" : creditUsagePercent > 50 ? "text-yellow-600" : "text-emerald-600")}>
                       {creditUsagePercent.toFixed(0)}% usado
@@ -363,12 +363,12 @@ export default function DashboardPage() {
         </Card>
 
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
+          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-2">
-              <Repeat className="h-5 w-5 text-muted-foreground" />
+              <Repeat className="h-5 w-5 text-muted-foreground shrink-0" />
               <CardTitle className="text-base">Assinaturas Ativas</CardTitle>
             </div>
-            <Button variant="ghost" size="sm" asChild>
+            <Button variant="ghost" size="sm" className="self-start sm:self-auto" asChild>
               <Link href="/assinaturas">Ver todas</Link>
             </Button>
           </CardHeader>
@@ -381,13 +381,13 @@ export default function DashboardPage() {
                 <p className="text-sm text-muted-foreground">Nenhuma assinatura ativa</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between rounded-lg bg-muted/50 p-3">
+              <div className="space-y-4 p-4 sm:p-6">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-lg bg-muted/50 p-3">
                   <div>
                     <p className="text-xs text-muted-foreground">Custo mensal estimado</p>
                     <p className="text-lg font-semibold">{currencyFormatter.format(monthlySubscriptionTotal)}</p>
                   </div>
-                  <div className="text-right">
+                  <div className="text-left sm:text-right">
                     <p className="text-xs text-muted-foreground">{activeSubscriptions.length} assinatura{activeSubscriptions.length !== 1 ? "s" : ""}</p>
                   </div>
                 </div>
@@ -409,14 +409,14 @@ export default function DashboardPage() {
       </section>
 
       {/* Budgets & Notifications Section */}
-      <section className="grid gap-6 lg:grid-cols-3">
+      <section className="grid gap-4 lg:grid-cols-3">
         <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
+          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0 flex-1">
               <CardTitle className="text-base">Orçamentos do Mês</CardTitle>
               <p className="text-sm text-muted-foreground">Acompanhe seus limites por categoria</p>
             </div>
-            <Button variant="ghost" size="sm" asChild>
+            <Button variant="ghost" size="sm" className="self-start sm:self-auto shrink-0" asChild>
               <Link href="/orcamentos">Gerenciar</Link>
             </Button>
           </CardHeader>
@@ -430,7 +430,7 @@ export default function DashboardPage() {
                 <p className="text-xs text-muted-foreground">Defina limites para controlar seus gastos</p>
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-4 p-4 sm:p-6">
                 {budgetsWithUsage.slice(0, 5).map((budget) => (
                   <div key={budget.id} className="space-y-1">
                     <div className="flex items-center justify-between gap-2">
@@ -458,10 +458,10 @@ export default function DashboardPage() {
         <Card className={cn(unreadCount > 0 && "border-l-4 border-amber-500")}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Bell className={cn("h-5 w-5", unreadCount > 0 ? "text-amber-500" : "text-muted-foreground")} />
-              Notificações
+              <Bell className={cn("h-5 w-5 shrink-0", unreadCount > 0 ? "text-amber-500" : "text-muted-foreground")} />
+              <span className="truncate">Notificações</span>
               {unreadCount > 0 && (
-                <Badge variant="secondary" className="ml-auto">
+                <Badge variant="secondary" className="ml-auto shrink-0">
                   {unreadCount} nova{unreadCount !== 1 ? "s" : ""}
                 </Badge>
               )}
@@ -474,7 +474,7 @@ export default function DashboardPage() {
                 <p className="text-sm text-muted-foreground">Nenhuma notificação</p>
               </div>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-3 p-4 sm:p-6">
                 {recentNotifications.map((notification) => (
                   <div
                     key={notification.id}
@@ -519,13 +519,13 @@ function SpendingBarChart({ data }: { data: { day: string; amount: number }[] })
   const maxHeight = 180;
 
   return (
-    <div className="flex h-56 items-end gap-2 sm:gap-3">
+    <div className="flex h-48 sm:h-56 items-end gap-2 sm:gap-3">
       {data.map((item) => {
         const height = Math.max((item.amount / max) * maxHeight, 6);
         return (
           <div key={item.day} className="flex flex-1 flex-col items-center gap-2 min-w-0">
             <div className="flex h-full w-full items-end justify-center">
-              <div className="flex w-8 sm:w-10 items-end">
+              <div className="flex w-6 sm:w-8 items-end">
                 <div className="w-full rounded-full bg-muted/40">
                   <div
                     className="rounded-sm bg-emerald-500"
@@ -535,7 +535,7 @@ function SpendingBarChart({ data }: { data: { day: string; amount: number }[] })
               </div>
             </div>
             <div className="text-center">
-              <p className="text-xs sm:text-sm font-semibold truncate max-w-12 sm:max-w-none">{currencyFormatter.format(item.amount)}</p>
+              <p className="text-xs font-semibold truncate max-w-10 sm:max-w-none">{currencyFormatter.format(item.amount)}</p>
               <p className="text-xs text-muted-foreground">{item.day}</p>
             </div>
           </div>

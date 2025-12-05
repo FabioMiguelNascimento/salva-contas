@@ -54,7 +54,7 @@ export function BudgetCreateSheet({ form, trigger }: BudgetCreateSheetProps) {
           </Button>
         )}
       </SheetTrigger>
-      <SheetContent className="flex flex-col">
+      <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Novo orçamento</SheetTitle>
           <SheetDescription>

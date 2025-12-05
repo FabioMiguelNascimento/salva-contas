@@ -115,7 +115,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
       }}
     >
       <SheetTrigger asChild>{trigger}</SheetTrigger>
-      <SheetContent className="flex flex-col">
+      <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Nova Transação assistida por IA</SheetTitle>
           <SheetDescription>

@@ -35,7 +35,7 @@ export function BudgetEditSheet({ editor }: BudgetEditSheetProps) {
 
   return (
     <Sheet open={!!editing} onOpenChange={(open) => !open && closeEdit()}>
-      <SheetContent className="flex flex-col">
+      <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Editar orçamento</SheetTitle>
           <SheetDescription>

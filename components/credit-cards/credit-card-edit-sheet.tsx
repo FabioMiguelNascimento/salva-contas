@@ -79,7 +79,7 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex flex-col">
+      <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Editar cartão de crédito</SheetTitle>
           <SheetDescription>

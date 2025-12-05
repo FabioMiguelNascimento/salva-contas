@@ -28,7 +28,7 @@ export function BudgetDeleteSheet({ editor }: BudgetDeleteSheetProps) {
 
   return (
     <Sheet open={!!deleteTarget} onOpenChange={(open) => !open && cancelDelete()}>
-      <SheetContent className="flex flex-col">
+      <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Excluir orçamento</SheetTitle>
           <SheetDescription>

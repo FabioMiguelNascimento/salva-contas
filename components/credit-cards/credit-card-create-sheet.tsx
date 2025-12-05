@@ -78,7 +78,7 @@ export function CreditCardCreateSheet() {
           Novo Cartão
         </Button>
       </SheetTrigger>
-      <SheetContent className="flex flex-col">
+      <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Novo cartão de crédito</SheetTitle>
           <SheetDescription>

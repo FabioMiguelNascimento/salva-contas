@@ -42,7 +42,7 @@ export function CreditCardDeleteSheet({ card, open, onOpenChange }: CreditCardDe
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex flex-col">
+      <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Excluir cartão de crédito</SheetTitle>
           <SheetDescription>
