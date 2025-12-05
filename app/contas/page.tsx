@@ -3,6 +3,7 @@
 import { DatePicker } from "@/components/date-picker";
 import { PageHeader } from "@/components/page-header";
 import { SummaryCard } from "@/components/summary-card";
+import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -116,7 +117,7 @@ export default function ContasPage() {
         description="Monitore boletos, antecipações e despesas recorrentes. Integração com IA garante leitura precisa dos vencimentos."
       />
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <SummaryCardsGrid>
         <SummaryCard
           icon={Calendar}
           title="Total pendente"
@@ -144,7 +145,7 @@ export default function ContasPage() {
           helper="Organize o caixa com antecedência"
           variant="success"
         />
-      </section>
+      </SummaryCardsGrid>
 
       <div className="flex flex-wrap gap-3">
         {filterTabs.map((filter) => (

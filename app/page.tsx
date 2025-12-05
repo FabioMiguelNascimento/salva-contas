@@ -3,6 +3,7 @@
 import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { PageHeader } from "@/components/page-header";
 import { SummaryCard } from "@/components/summary-card";
+import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -201,7 +202,7 @@ export default function DashboardPage() {
         </Select>
       </PageHeader>
 
-      <section className="grid gap-2 sm:gap-3 grid-cols-2 lg:grid-cols-4">
+      <SummaryCardsGrid>
         {kpis.map((item) => (
           <SummaryCard
             key={item.title}
@@ -212,7 +213,7 @@ export default function DashboardPage() {
             isLoading={isLoading}
           />
         ))}
-      </section>
+      </SummaryCardsGrid>
 
       <section className="grid gap-4 lg:grid-cols-3 overflow-hidden">
         <Card className="lg:col-span-2 overflow-hidden">

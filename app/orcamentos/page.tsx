@@ -7,6 +7,7 @@ import { BudgetProgressCard } from "@/components/budgets/budget-progress-card";
 import { BudgetTable } from "@/components/budgets/budget-table";
 import { PageHeader } from "@/components/page-header";
 import { SummaryCard } from "@/components/summary-card";
+import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useBudgetEditor } from "@/hooks/use-budget-editor";
@@ -48,7 +49,7 @@ export default function BudgetsPage() {
         description="Defina limites de gastos por categoria e acompanhe o progresso durante o mês."
       />
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <SummaryCardsGrid>
         <SummaryCard
           icon={PiggyBank}
           title="Orçamentos ativos"
@@ -76,7 +77,7 @@ export default function BudgetsPage() {
           helper="Categorias acima do limite"
           variant={stats.overBudgetCount > 0 ? "danger" : "default"}
         />
-      </section>
+      </SummaryCardsGrid>
 
       <Card>
         <CardHeader>

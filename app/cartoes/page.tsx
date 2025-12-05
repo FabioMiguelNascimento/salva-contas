@@ -7,6 +7,7 @@ import { CreditCardListCard } from "@/components/credit-cards/credit-card-list-c
 import { CreditCardTable } from "@/components/credit-cards/credit-card-table";
 import { PageHeader } from "@/components/page-header";
 import { SummaryCard } from "@/components/summary-card";
+import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useFinance } from "@/hooks/use-finance";
@@ -67,7 +68,7 @@ export default function CartoesPage() {
         description="Gerencie seus cartões, limites e acompanhe os gastos de cada um."
       />
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <SummaryCardsGrid>
         <SummaryCard
           icon={CreditCardIcon}
           title="Cartões ativos"
@@ -94,7 +95,7 @@ export default function CartoesPage() {
           helper="Cartões com mais de 80% do limite usado"
           variant={stats.highUsageCards > 0 ? "warning" : "default"}
         />
-      </section>
+      </SummaryCardsGrid>
 
       <Card>
         <CardHeader>

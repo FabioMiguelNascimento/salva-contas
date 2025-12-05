@@ -7,6 +7,7 @@ import { SubscriptionEditSheet } from "@/components/subscriptions/subscription-e
 import { SubscriptionListCard } from "@/components/subscriptions/subscription-list-card";
 import { SubscriptionTable } from "@/components/subscriptions/subscription-table";
 import { SummaryCard } from "@/components/summary-card";
+import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TopbarAction } from "@/contexts/topbar-action-context";
@@ -41,7 +42,7 @@ export default function SubscriptionsPage() {
         description="Configure regras para Netflix, aluguel e outros serviços para que o Salva Contas gere as transações sem digitação."
       />
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <SummaryCardsGrid>
         <SummaryCard
           icon={Zap}
           title="Assinaturas ativas"
@@ -63,7 +64,7 @@ export default function SubscriptionsPage() {
             helper={option.helper}
           />
         ))}
-      </section>
+      </SummaryCardsGrid>
 
       <Card>
         <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
