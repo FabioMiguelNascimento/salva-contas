@@ -3,6 +3,7 @@ import { AuthGuard } from "@/components/auth-guard";
 import { InstallPrompt } from "@/components/install-prompt";
 import { Providers } from "@/components/providers";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
+import { Toaster } from "@/components/ui/sonner";
 import { cn } from "@/lib/utils";
 import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
@@ -65,6 +66,7 @@ export default function RootLayout({
         </Providers>
         <InstallPrompt />
         <ServiceWorkerRegister />
+        <Toaster />
       </body>
     </html>
   );

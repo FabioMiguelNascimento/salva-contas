@@ -1,5 +1,6 @@
 "use client";
 
+import { AttachmentViewerDialog } from "@/components/attachments/attachment-viewer-dialog";
 import { CategorySelect } from "@/components/category-select";
 import { CreditCardSelect } from "@/components/credit-card-select";
 import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
@@ -31,12 +32,13 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useFinance } from "@/hooks/use-finance";
+import { useTransactionAttachments } from "@/hooks/use-transaction-attachments";
 import { currencyFormatter, getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
 import { cn, getTransactionCategoryLabel } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Filter, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Filter, MoreHorizontal, Paperclip, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 export default function ExtratoPage() {
@@ -63,6 +65,8 @@ export default function ExtratoPage() {
   const [editType, setEditType] = useState("expense");
   const [editStatus, setEditStatus] = useState("paid");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [attachmentsDialog, setAttachmentsDialog] = useState<{ open: boolean; transactionId?: string }>({ open: false });
+  const { attachments, isLoading: isLoadingAttachments, loadAttachments, reset } = useTransactionAttachments();
 
   const years = getAvailableYears();
   const pageSize = 8;
@@ -132,6 +136,16 @@ export default function ExtratoPage() {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const openAttachments = async (transactionId: string) => {
+    setAttachmentsDialog({ open: true, transactionId });
+    await loadAttachments(transactionId);
+  };
+
+  const closeAttachments = () => {
+    setAttachmentsDialog({ open: false });
+    reset();
   };
 
   return (
@@ -265,6 +279,12 @@ export default function ExtratoPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
+                            {(transaction._count?.attachments ?? 0) > 0 && (
+                              <DropdownMenuItem onClick={() => openAttachments(transaction.id)}>
+                                <Paperclip className="mr-2 h-4 w-4" />
+                                Ver anexos ({transaction._count.attachments})
+                              </DropdownMenuItem>
+                            )}
                             <DropdownMenuItem onClick={() => openEdit(transaction)}>
                               <Pencil className="mr-2 h-4 w-4" />
                               Editar
@@ -322,6 +342,12 @@ export default function ExtratoPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
+                          {(transaction._count?.attachments ?? 0) > 0 && (
+                            <DropdownMenuItem onClick={() => openAttachments(transaction.id)}>
+                              <Paperclip className="mr-2 h-4 w-4" />
+                              Ver anexos ({transaction._count.attachments})
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem onClick={() => openEdit(transaction)}>
                             <Pencil className="mr-2 h-4 w-4" />
                             Editar
@@ -481,6 +507,13 @@ export default function ExtratoPage() {
           </form>
         </SheetContent>
       </Sheet>
+
+      <AttachmentViewerDialog
+        open={attachmentsDialog.open}
+        onOpenChange={closeAttachments}
+        attachments={attachments}
+        isLoading={isLoadingAttachments}
+      />
     </div>
   );
 }

@@ -52,6 +52,9 @@ export interface Transaction {
   rawText?: string | null;
   createdAt?: string;
   updatedAt?: string;
+  _count?: {
+    attachments: number;
+  };
 }
 
 export interface Subscription {
