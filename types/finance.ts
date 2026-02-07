@@ -50,11 +50,16 @@ export interface Transaction {
   dueDate: string | null;
   paymentDate: string | null;
   rawText?: string | null;
+  
+  // Campos de anexo
+  attachmentKey?: string | null;
+  attachmentOriginalName?: string | null;
+  attachmentMimeType?: string | null;
+  attachmentSize?: number | null;
+  attachmentUrl?: string | null; // URL pré-assinada gerada pelo backend
+  
   createdAt?: string;
   updatedAt?: string;
-  _count?: {
-    attachments: number;
-  };
 }
 
 export interface Subscription {

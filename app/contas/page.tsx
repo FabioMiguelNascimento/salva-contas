@@ -1,6 +1,6 @@
 "use client";
 
-import { AttachmentViewerDialog } from "@/components/attachments/attachment-viewer-dialog";
+import { AttachmentViewer } from "@/components/attachment-viewer";
 import { DatePicker } from "@/components/date-picker";
 import { PageHeader } from "@/components/page-header";
 import { SummaryCard } from "@/components/summary-card";
@@ -15,13 +15,12 @@ import { Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHea
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useFinance } from "@/hooks/use-finance";
-import { useTransactionAttachments } from "@/hooks/use-transaction-attachments";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import { cn, getTransactionCategoryLabel } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { differenceInCalendarDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { AlertTriangle, Calendar, CheckCircle2, Paperclip, PencilLine, ShieldCheck } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle2, FileText, PencilLine, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
@@ -37,12 +36,11 @@ export default function ContasPage() {
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [payDialog, setPayDialog] = useState<{ open: boolean; bill?: Transaction }>({ open: false });
   const [editSheet, setEditSheet] = useState<{ open: boolean; bill?: Transaction }>({ open: false });
+  const [attachmentViewer, setAttachmentViewer] = useState<{ open: boolean; bill?: Transaction }>({ open: false });
   const [editDate, setEditDate] = useState<Date | undefined>();
   const [isProcessing, setIsProcessing] = useState(false);
   const [amountInput, setAmountInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
-  const [attachmentsDialog, setAttachmentsDialog] = useState<{ open: boolean; transactionId?: string }>({ open: false });
-  const { attachments, isLoading: isLoadingAttachments, loadAttachments, reset } = useTransactionAttachments();
 
   const summary = useMemo(() => {
     const overdue = pendingBills.filter((bill) => bill.dueDate && differenceInCalendarDays(new Date(bill.dueDate), new Date()) < 0);
@@ -111,16 +109,6 @@ export default function ContasPage() {
     } finally {
       setIsProcessing(false);
     }
-  };
-
-  const openAttachments = async (transactionId: string) => {
-    setAttachmentsDialog({ open: true, transactionId });
-    await loadAttachments(transactionId);
-  };
-
-  const closeAttachments = () => {
-    setAttachmentsDialog({ open: false });
-    reset();
   };
 
   return (
@@ -221,17 +209,9 @@ export default function ContasPage() {
                         <TableCell>{bill.dueDate ? format(new Date(bill.dueDate), "dd/MM", { locale: ptBR }) : "—"}</TableCell>
                         <TableCell>{formatDaysRemaining(bill)}</TableCell>
                         <TableCell className="flex justify-end gap-2">
-                          {(bill._count?.attachments ?? 0) > 0 && (
-                            <Button 
-                              size="sm" 
-                              variant="ghost" 
-                              onClick={() => openAttachments(bill.id)}
-                              className="relative"
-                            >
-                              <Paperclip className="h-3.5 w-3.5" />
-                              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                                {bill._count.attachments}
-                              </span>
+                          {bill.attachmentUrl && (
+                            <Button size="sm" variant="ghost" onClick={() => setAttachmentViewer({ open: true, bill })}>
+                              <FileText className="h-3.5 w-3.5" />
                             </Button>
                           )}
                           <Button size="sm" onClick={() => setPayDialog({ open: true, bill })}>
@@ -286,20 +266,17 @@ export default function ContasPage() {
                         </div>
                       </div>
                       <div className="mt-4 flex gap-2">
+                        {bill.attachmentUrl && (
+                          <Button variant="ghost" size="sm" onClick={() => setAttachmentViewer({ open: true, bill })}>
+                            <FileText className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button className="flex-1" size="sm" onClick={() => setPayDialog({ open: true, bill })}>
                           Pagar
                         </Button>
                         <Button className="flex-1" variant="outline" size="sm" onClick={() => openEditSheet(bill)}>
                           Editar
                         </Button>
-                        {(bill._count?.attachments ?? 0) > 0 && (
-                          <Button variant="ghost" size="sm" onClick={() => openAttachments(bill.id)} className="relative">
-                            <Paperclip className="h-4 w-4" />
-                            <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                              {bill._count.attachments}
-                            </span>
-                          </Button>
-                        )}
                       </div>
                     </div>
                   );
@@ -373,11 +350,12 @@ export default function ContasPage() {
         </SheetContent>
       </Sheet>
 
-      <AttachmentViewerDialog
-        open={attachmentsDialog.open}
-        onOpenChange={closeAttachments}
-        attachments={attachments}
-        isLoading={isLoadingAttachments}
+      <AttachmentViewer
+        open={attachmentViewer.open}
+        onOpenChange={(open) => setAttachmentViewer({ open, bill: undefined })}
+        attachmentUrl={attachmentViewer.bill?.attachmentUrl}
+        attachmentOriginalName={attachmentViewer.bill?.attachmentOriginalName}
+        attachmentMimeType={attachmentViewer.bill?.attachmentMimeType}
       />
     </div>
   );

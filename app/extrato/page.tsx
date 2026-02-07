@@ -1,6 +1,6 @@
 "use client";
 
-import { AttachmentViewerDialog } from "@/components/attachments/attachment-viewer-dialog";
+import { AttachmentViewer } from "@/components/attachment-viewer";
 import { CategorySelect } from "@/components/category-select";
 import { CreditCardSelect } from "@/components/credit-card-select";
 import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
@@ -32,13 +32,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useFinance } from "@/hooks/use-finance";
-import { useTransactionAttachments } from "@/hooks/use-transaction-attachments";
 import { currencyFormatter, getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
 import { cn, getTransactionCategoryLabel } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { Filter, MoreHorizontal, Paperclip, Pencil, Trash2 } from "lucide-react";
+import { FileText, Filter, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 export default function ExtratoPage() {
@@ -57,6 +56,7 @@ export default function ExtratoPage() {
   const [page, setPage] = useState(1);
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; transaction?: Transaction }>({ open: false });
   const [editing, setEditing] = useState<{ open: boolean; transaction?: Transaction }>({ open: false });
+  const [attachmentViewer, setAttachmentViewer] = useState<{ open: boolean; transaction?: Transaction }>({ open: false });
   const [editDate, setEditDate] = useState<Date | undefined>();
   const [editAmount, setEditAmount] = useState("");
   const [editDescription, setEditDescription] = useState("");
@@ -65,8 +65,6 @@ export default function ExtratoPage() {
   const [editType, setEditType] = useState("expense");
   const [editStatus, setEditStatus] = useState("paid");
   const [isProcessing, setIsProcessing] = useState(false);
-  const [attachmentsDialog, setAttachmentsDialog] = useState<{ open: boolean; transactionId?: string }>({ open: false });
-  const { attachments, isLoading: isLoadingAttachments, loadAttachments, reset } = useTransactionAttachments();
 
   const years = getAvailableYears();
   const pageSize = 8;
@@ -136,16 +134,6 @@ export default function ExtratoPage() {
     } finally {
       setIsProcessing(false);
     }
-  };
-
-  const openAttachments = async (transactionId: string) => {
-    setAttachmentsDialog({ open: true, transactionId });
-    await loadAttachments(transactionId);
-  };
-
-  const closeAttachments = () => {
-    setAttachmentsDialog({ open: false });
-    reset();
   };
 
   return (
@@ -279,12 +267,6 @@ export default function ExtratoPage() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            {(transaction._count?.attachments ?? 0) > 0 && (
-                              <DropdownMenuItem onClick={() => openAttachments(transaction.id)}>
-                                <Paperclip className="mr-2 h-4 w-4" />
-                                Ver anexos ({transaction._count.attachments})
-                              </DropdownMenuItem>
-                            )}
                             <DropdownMenuItem onClick={() => openEdit(transaction)}>
                               <Pencil className="mr-2 h-4 w-4" />
                               Editar
@@ -342,10 +324,10 @@ export default function ExtratoPage() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          {(transaction._count?.attachments ?? 0) > 0 && (
-                            <DropdownMenuItem onClick={() => openAttachments(transaction.id)}>
-                              <Paperclip className="mr-2 h-4 w-4" />
-                              Ver anexos ({transaction._count.attachments})
+                          {transaction.attachmentUrl && (
+                            <DropdownMenuItem onClick={() => setAttachmentViewer({ open: true, transaction })}>
+                              <FileText className="mr-2 h-4 w-4" />
+                              Ver anexo
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem onClick={() => openEdit(transaction)}>
@@ -508,11 +490,12 @@ export default function ExtratoPage() {
         </SheetContent>
       </Sheet>
 
-      <AttachmentViewerDialog
-        open={attachmentsDialog.open}
-        onOpenChange={closeAttachments}
-        attachments={attachments}
-        isLoading={isLoadingAttachments}
+      <AttachmentViewer
+        open={attachmentViewer.open}
+        onOpenChange={(open) => setAttachmentViewer({ open, transaction: undefined })}
+        attachmentUrl={attachmentViewer.transaction?.attachmentUrl}
+        attachmentOriginalName={attachmentViewer.transaction?.attachmentOriginalName}
+        attachmentMimeType={attachmentViewer.transaction?.attachmentMimeType}
       />
     </div>
   );
