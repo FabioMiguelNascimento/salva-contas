@@ -1,11 +1,11 @@
 "use client";
 
+import { ShareButton } from "@/components/share-button";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Check, ExternalLink, FileText, Image as ImageIcon, Share2 } from "lucide-react";
+import { ExternalLink, FileText, Image as ImageIcon } from "lucide-react";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 interface AttachmentViewerProps {
   open: boolean;
@@ -22,7 +22,6 @@ export function AttachmentViewer({
   attachmentOriginalName,
   attachmentMimeType,
 }: AttachmentViewerProps) {
-  const [isCopied, setIsCopied] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const isImage = attachmentMimeType?.startsWith("image/");
   const isPdf = attachmentMimeType === "application/pdf";
@@ -30,50 +29,6 @@ export function AttachmentViewer({
   useEffect(() => {
     setImageLoaded(false);
   }, [attachmentUrl]);
-
-  const handleShare = async () => {
-    if (!attachmentUrl) return;
-
-    if (navigator.share) {
-      try {
-        const shareData: ShareData = {
-          title: attachmentOriginalName || "Anexo",
-          text: "Confira este anexo",
-          url: attachmentUrl,
-        };
-
-        if (isImage || isPdf) {
-          try {
-            const response = await fetch(attachmentUrl);
-            const blob = await response.blob();
-            const file = new File([blob], attachmentOriginalName || "anexo", { type: attachmentMimeType || "" });
-            
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-              shareData.files = [file];
-            }
-          } catch (err) {
-            console.warn("Não foi possível anexar o arquivo ao compartilhamento:", err);
-          }
-        }
-
-        await navigator.share(shareData);
-      } catch (error) {
-        if ((error as Error).name !== "AbortError") {
-          console.error("Erro ao compartilhar:", error);
-          toast.error("Erro ao abrir menu de compartilhamento.");
-        }
-      }
-    } else {
-      try {
-        await navigator.clipboard.writeText(attachmentUrl);
-        setIsCopied(true);
-        toast.success("Link copiado para a área de transferência!");
-        setTimeout(() => setIsCopied(false), 2000);
-      } catch (err) {
-        toast.error("Não foi possível compartilhar.");
-      }
-    }
-  };
 
   const handleOpenInNewTab = () => {
     if (attachmentUrl) {
@@ -112,16 +67,12 @@ export function AttachmentViewer({
             </DialogTitle>
 
             <div className="flex gap-2 ml-auto">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleShare}
-                title={isCopied ? "Copiado!" : "Compartilhar"}
-              >
-                {isCopied ? <Check /> : <Share2 />}
-                <span>{isCopied ? "Copiado!" : "Compartilhar"}</span>
-              </Button>
-
+              <ShareButton
+                title={attachmentOriginalName || "Anexo"}
+                text="Confira este anexo"
+                fileUrl={attachmentUrl}
+                fileName={attachmentOriginalName ? attachmentOriginalName : undefined}
+              />
               <Button
                 variant="outline"
                 size="sm"
