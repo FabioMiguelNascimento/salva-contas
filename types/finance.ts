@@ -9,6 +9,7 @@ export interface TransactionCategory {
   name: string;
   icon?: string | null;
   userId?: string;
+  isGlobal?: boolean;
 }
 
 export interface CreditCard {
