@@ -29,6 +29,7 @@ import type { ComponentType, SVGProps } from "react";
 import { useState } from "react";
 import { NewTransactionDialog } from "./new-transaction-sheet";
 import { NotificationsDropdown } from "./notifications-dropdown";
+import { WorkspaceSwitcher } from "./workspace-switcher";
 
 interface NavItem {
   label: string;
@@ -226,17 +227,20 @@ function AppShellContent({
 
   return (
     <div className="min-h-screen bg-muted/30 overflow-x-hidden">
-      <header className="hidden lg:flex fixed top-0 left-0 right-0 z-50 h-14 items-center justify-end gap-3 border-b bg-card px-6 shadow-sm">
-        <NotificationsDropdown />
-        <Button variant="outline" onClick={refresh} disabled={isSyncing} className="gap-2">
-          <RefreshCcw className={cn("h-4 w-4", isSyncing && "animate-spin")} />
-          Atualizar
-        </Button>
-        {actionNode ?? (
-          <NewTransactionDialog
-            trigger={<Button>Nova Transação</Button>}
-          />
-        )}
+      <header className="hidden lg:flex fixed top-0 left-0 right-0 z-50 h-14 items-center justify-between gap-3 border-b bg-card px-6 shadow-sm">
+        <WorkspaceSwitcher />
+        <div className="flex items-center gap-3">
+          <NotificationsDropdown />
+          <Button variant="outline" onClick={refresh} disabled={isSyncing} className="gap-2">
+            <RefreshCcw className={cn("h-4 w-4", isSyncing && "animate-spin")} />
+            Atualizar
+          </Button>
+          {actionNode ?? (
+            <NewTransactionDialog
+              trigger={<Button>Nova Transação</Button>}
+            />
+          )}
+        </div>
       </header>
 
       <div className="flex min-h-screen overflow-x-hidden">
@@ -258,9 +262,7 @@ function AppShellContent({
                 </ScrollArea>
               </SheetContent>
             </Sheet>
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Salva Contas</p>
-            </div>
+            <WorkspaceSwitcher />
             <div className="ml-auto flex items-center gap-2">
               <NotificationsDropdown />
               {actionNode ?? (

@@ -1,22 +1,24 @@
 "use client";
 
+import { useAuth } from "@/hooks/use-auth";
 import {
-    deleteNotification,
-    fetchNotifications,
-    fetchUnreadCount,
-    generateNotifications,
-    markAllNotificationsAsRead,
-    markNotificationAsRead,
+  deleteNotification,
+  fetchNotifications,
+  fetchUnreadCount,
+  generateNotifications,
+  markAllNotificationsAsRead,
+  markNotificationAsRead,
 } from "@/services/notifications";
 import type { Notification } from "@/types/finance";
 import {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useState,
-    type ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
 } from "react";
 
 interface NotificationsContextValue {
@@ -39,7 +41,10 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
+  const { isAuthenticated } = useAuth();
+
   const loadNotifications = useCallback(async () => {
+    if (!isAuthenticated) return; // don't call API when unauthenticated
     try {
       const [notifs, count] = await Promise.all([
         fetchNotifications(),
@@ -50,7 +55,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error("Failed to load notifications:", error);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   const refresh = useCallback(async () => {
     setIsLoading(true);
@@ -58,15 +63,27 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, [loadNotifications]);
 
-  // Initial load
+  // Initial load — refresh when auth becomes available
   useEffect(() => {
-    refresh();
-  }, [refresh]);
+    if (isAuthenticated) {
+      refresh();
+    } else {
+      // clear notifications when logged out
+      setNotifications([]);
+      setUnreadCount(0);
+      setIsLoading(false);
+    }
+  }, [refresh, isAuthenticated]);
 
-  // Polling for unread count
+  // Polling for unread count — keep dependency array stable to avoid hook-size warnings.
+  // Use a ref to read the current `isAuthenticated` inside the interval handler.
+  const isAuthenticatedRef = useRef(isAuthenticated);
+  useEffect(() => { isAuthenticatedRef.current = isAuthenticated; }, [isAuthenticated]);
+
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
+        if (!isAuthenticatedRef.current) return; // skip when unauthenticated
         const count = await fetchUnreadCount();
         setUnreadCount(count);
       } catch (error) {

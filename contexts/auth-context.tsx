@@ -240,10 +240,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.log('Token expired or expiring soon, attempting refresh...');
             try {
               const response = await authService.refreshToken({ refreshToken: storedRefreshToken });
+
+              // Persist tokens immediately so subsequent requests (like /me) include Authorization header
+              localStorage.setItem(TOKEN_KEY, response.accessToken);
+              localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
+              localStorage.setItem(EXPIRES_AT_KEY, response.expiresAt.toString());
+
               const user = await authService.getMe();
-              
+
+              // Now persist the user and update state
               saveTokens(response.accessToken, response.refreshToken, response.expiresAt, user);
-              
+
               setState({
                 user,
                 token: response.accessToken,
@@ -252,7 +259,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 isAuthenticated: true,
                 isLoading: false,
               });
-              
+
               scheduleTokenRefresh(response.expiresAt);
               console.log('Token refreshed successfully');
             } catch (refreshError) {

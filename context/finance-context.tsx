@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/auth-context";
+import { useWorkspace } from "@/hooks/use-workspace";
 import {
   createBudget,
   deleteBudget,
@@ -137,11 +138,16 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     }
   }, [filters]);
 
+  const { currentWorkspaceId, isLoading: workspaceLoading } = useWorkspace();
+
   useEffect(() => {
-    if (isAuthenticated && !authLoading) {
+    if (isAuthenticated && !authLoading && !workspaceLoading && currentWorkspaceId) {
+      setIsLoading(true);
       loadData();
-    } else if (!authLoading && !isAuthenticated) {
-      // Usuário não autenticado, limpar dados
+      return;
+    }
+
+    if (!authLoading && !isAuthenticated) {
       setTransactions([]);
       setMetrics(null);
       setSubscriptions([]);
@@ -153,7 +159,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setError(null);
       setLastSync(null);
     }
-  }, [loadData, isAuthenticated, authLoading]);
+  }, [loadData, isAuthenticated, authLoading, workspaceLoading, currentWorkspaceId]);
 
   const pendingBills = useMemo(
     () => transactions.filter((transaction) => transaction.status === "pending"),
