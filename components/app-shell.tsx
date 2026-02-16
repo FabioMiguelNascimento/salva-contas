@@ -1,20 +1,30 @@
 "use client";
 
+import SettingsContent from "@/components/settings-content";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/auth-context";
 import { TopbarActionProvider, useTopbarAction } from "@/contexts/topbar-action-context";
 import { useFinance } from "@/hooks/use-finance";
 import { cn } from "@/lib/utils";
 import {
+  Bell,
   CalendarClock,
   CreditCard,
+  Home,
+  Layers,
   LayoutDashboard,
+  LogOut,
+  Palette,
   PiggyBank,
   ReceiptText,
   RefreshCcw,
-  Repeat
+  Repeat,
+  Settings,
+  Shield,
+  User
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -123,6 +133,8 @@ function AppShellContent({
   const router = useRouter();
   const { user } = useAuth();
   const { pendingBills } = useFinance();
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [settingsSelectedTab, setSettingsSelectedTab] = useState<string>('profile');
 
   const userInitials = user?.name
     ? user.name
@@ -227,16 +239,69 @@ function AppShellContent({
 
                 <DropdownMenuContent align="start" className="w-56">
                   <DropdownMenuLabel className="truncate">{user?.name}</DropdownMenuLabel>
-                  <DropdownMenuItem onClick={() => router.push('/perfil')}>Perfil</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push('/workspaces')}>Meus workspaces</DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => router.push('/configuracoes')}>Configurações</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push('/perfil')}>
+                    <User className="h-4 w-4 mr-2" />
+                    Perfil
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSettingsOpen(true); setSettingsSelectedTab('workspaces'); }}>
+                    <Layers className="h-4 w-4 mr-2" />
+                    Meus workspaces
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSettingsOpen(true); setSettingsSelectedTab('profile'); }}>
+                    <Settings className="h-4 w-4 mr-2" />
+                    Configurações
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout} variant="destructive">Sair</DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout} variant="destructive">
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Sair
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
           </SidebarFooter>
         </Sidebar>
+
+        <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+          <DialogContent className="max-w-7xl w-[95vw] h-[calc(100vh-4rem)] p-0 overflow-hidden sm:!max-w-none sm:!w-[95vw] !w-[95vw]">
+            <div className="flex h-full bg-background">
+              <nav className="w-64 border-r border-border p-4">
+                <div className="mb-4">
+                  <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Configurações</p>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <button className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", settingsSelectedTab === 'profile' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")} onClick={() => setSettingsSelectedTab('profile')}>
+                    <User className="h-4 w-4" />
+                    <span>Perfil</span>
+                  </button>
+                  <button className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", settingsSelectedTab === 'appearance' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")} onClick={() => setSettingsSelectedTab('appearance')}>
+                    <Palette className="h-4 w-4" />
+                    <span>Aparência</span>
+                  </button>
+                  <button className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", settingsSelectedTab === 'notifications' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")} onClick={() => setSettingsSelectedTab('notifications')}>
+                    <Bell className="h-4 w-4" />
+                    <span>Notificações</span>
+                  </button>
+                  <button className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", settingsSelectedTab === 'security' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")} onClick={() => setSettingsSelectedTab('security')}>
+                    <Shield className="h-4 w-4" />
+                    <span>Segurança</span>
+                  </button>
+                  <hr className="my-3 border-border/60" />
+                  <button className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", settingsSelectedTab === 'workspaces' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")} onClick={() => setSettingsSelectedTab('workspaces')}>
+                    <Home className="h-4 w-4" />
+                    <span>Workspaces</span>
+                  </button>
+                </div>
+              </nav>
+
+              <div className="flex-1 overflow-auto p-6">
+                <div className="max-w-full">
+                  <SettingsContent selectedTab={settingsSelectedTab} onTabChange={setSettingsSelectedTab} />
+                </div>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
 
         <div className="flex-1 lg:pt-16 overflow-x-hidden w-full">
           <header className="flex items-center gap-3 border-b bg-card px-4 py-3 shadow-sm lg:hidden">

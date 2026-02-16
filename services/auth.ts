@@ -1,14 +1,14 @@
 import { apiClient } from "@/lib/api-client";
 import type {
-    ForgotPasswordPayload,
-    LoginPayload,
-    LoginResponse,
-    RefreshResponse,
-    RefreshTokenPayload,
-    RegisterPayload,
-    SignupResponse,
-    UpdatePasswordPayload,
-    User,
+  ForgotPasswordPayload,
+  LoginPayload,
+  LoginResponse,
+  RefreshResponse,
+  RefreshTokenPayload,
+  RegisterPayload,
+  SignupResponse,
+  UpdatePasswordPayload,
+  User,
 } from "@/types/auth";
 
 interface ApiResponse<T> {
@@ -46,6 +46,11 @@ export async function forgotPassword(payload: ForgotPasswordPayload): Promise<vo
 
 export async function updatePassword(payload: UpdatePasswordPayload): Promise<void> {
   await apiClient.put<ApiResponse<{ message: string }>>("/auth/update-password", payload);
+}
+
+export async function updateProfile(payload: { name?: string; preferences?: any }): Promise<User> {
+  const response = await apiClient.put<ApiResponse<User>>("/auth/update-profile", payload);
+  return unwrapData(response);
 }
 
 export async function getMe(): Promise<User> {
