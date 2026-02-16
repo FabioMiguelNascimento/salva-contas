@@ -210,7 +210,7 @@ function AppShellContent({
             </SidebarMenu>
           </SidebarContent>
 
-          <SidebarFooter className="mb-14">
+          <SidebarFooter className="lg:mb-14">
             <div className="w-full">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
