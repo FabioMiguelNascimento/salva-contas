@@ -17,12 +17,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useFinance } from "@/hooks/use-finance";
 import { cn } from "@/lib/utils";
 import { formatISO } from "date-fns";
-import { Loader2, TextQuote, Upload } from "lucide-react";
+import { Loader2, Upload } from "lucide-react";
 import { useCallback, useState } from "react";
 
 interface NewTransactionSheetProps {
@@ -32,7 +31,6 @@ interface NewTransactionSheetProps {
 export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
   const { processUnstructuredTransaction } = useFinance();
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"upload" | "text">("upload");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [textInput, setTextInput] = useState("");
   const [isScheduled, setIsScheduled] = useState(false);
@@ -43,7 +41,6 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const resetState = useCallback(() => {
-    setActiveTab("upload");
     setSelectedFile(null);
     setTextInput("");
     setIsScheduled(false);
@@ -57,18 +54,8 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (activeTab === "upload" && !selectedFile) {
-      setError("Selecione um recibo ou boleto para continuar.");
-      return;
-    }
-
-    if (activeTab === "text" && textInput.trim().length < 6) {
-      setError("Descreva brevemente a transação para a IA entender o contexto.");
-      return;
-    }
-
-    if (!selectedDate) {
-      setError(isScheduled ? "Informe a data de vencimento." : "Informe a data da compra.");
+    if (!selectedFile && textInput.trim().length < 6) {
+      setError("Envie um arquivo ou descreva a transação (mín. 6 caracteres)." );
       return;
     }
 
@@ -77,10 +64,10 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
 
     try {
       await processUnstructuredTransaction({
-        file: activeTab === "upload" ? selectedFile ?? undefined : undefined,
-        text: activeTab === "text" ? textInput.trim() : undefined,
+        file: selectedFile ?? undefined,
+        text: textInput.trim() ? textInput.trim() : undefined,
         isScheduled,
-        date: formatISO(selectedDate),
+        date: selectedDate ? formatISO(selectedDate) : undefined,
         creditCardId: selectedCreditCardId ?? undefined,
       });
 
@@ -126,17 +113,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
 
         <form id="new-transaction-form" onSubmit={handleSubmit} className="flex flex-1 flex-col">
           <SheetBody className="space-y-6">
-            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "upload" | "text")}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="upload" className="flex items-center gap-2">
-                  <Upload className="h-4 w-4" /> Upload
-                </TabsTrigger>
-                <TabsTrigger value="text" className="flex items-center gap-2">
-                  <TextQuote className="h-4 w-4" /> Texto livre
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="upload" className="mt-4 space-y-4">
+              <div className="mt-4 space-y-4">
                 <Label className="text-sm font-semibold text-muted-foreground">Arraste o arquivo ou clique para procurar</Label>
                 <label
                   htmlFor="file"
@@ -154,35 +131,31 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
                     Capturamos automaticamente valores, datas e categorias.
                   </p>
                 </label>
-              </TabsContent>
 
-              <TabsContent value="text" className="mt-4 space-y-4">
-                <Label htmlFor="text-input" className="text-sm font-semibold text-muted-foreground">
-                  Descreva a transação
-                </Label>
-                <Textarea
-                  id="text-input"
-                  value={textInput}
-                  onChange={(event) => setTextInput(event.target.value)}
-                  placeholder="Ex.: Gastei 42,90 no mercado Dia para comprar itens do jantar"
-                  className="min-h-[120px] resize-none"
-                />
-              </TabsContent>
-            </Tabs>
+                <div className="mt-3 space-y-2">
+                  <Label htmlFor="upload-text-input" className="text-sm font-semibold text-muted-foreground">Descrição / contexto (opcional)</Label>
+                  <Textarea
+                    id="upload-text-input"
+                    value={textInput}
+                    onChange={(e) => setTextInput(e.target.value)}
+                    placeholder="Adicione uma observação que será enviada junto com o arquivo"
+                    className="min-h-[80px] resize-none"
+                  />
+                  <p className="text-xs text-muted-foreground">Envie um arquivo, um texto (mín. 6 caracteres) ou ambos.</p>
+                </div>
+              </div>
 
             <div className="space-y-3">
               <Label className="text-sm font-semibold">Detalhes do lançamento</Label>
-              <div className="flex items-center gap-2 rounded-xl border border-border/60 p-4">
+              <label className="flex items-center gap-2 rounded-xl border border-border/60 p-4 cursor-pointer">
                 <Checkbox id="schedule" checked={isScheduled} onCheckedChange={(value) => setIsScheduled(Boolean(value))} />
                 <div className="space-y-0.5">
-                  <Label htmlFor="schedule" className="font-medium">
-                    É uma conta a pagar/agendamento?
-                  </Label>
+                  <div className="font-medium">É uma conta a pagar/agendamento?</div>
                   <p className="text-xs text-muted-foreground">
                     Se marcado, definimos data de vencimento. Caso contrário, consideramos como compra já realizada.
                   </p>
                 </div>
-              </div>
+              </label>
               <div className="grid gap-3 sm:grid-cols-1">
                 <div className="space-y-2">
                   <Label>{isScheduled ? "Data de vencimento" : "Data da compra"}</Label>
