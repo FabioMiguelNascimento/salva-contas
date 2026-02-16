@@ -1,22 +1,16 @@
 "use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/auth-context";
 import { TopbarActionProvider, useTopbarAction } from "@/contexts/topbar-action-context";
 import { useFinance } from "@/hooks/use-finance";
 import { cn } from "@/lib/utils";
 import {
   CalendarClock,
-  ChevronRight,
   CreditCard,
   LayoutDashboard,
-  LogOut,
-  Menu,
   PiggyBank,
   ReceiptText,
   RefreshCcw,
@@ -24,12 +18,24 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import type { ComponentType, SVGProps } from "react";
 import { useState } from "react";
 import { NewTransactionDialog } from "./new-transaction-sheet";
 import { NotificationsDropdown } from "./notifications-dropdown";
 import { WorkspaceSwitcher } from "./workspace-switcher";
+
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuBadge,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarTrigger
+} from "@/components/ui/sidebar";
 
 interface NavItem {
   label: string;
@@ -75,25 +81,48 @@ const baseNavItems: NavItem[] = [
     icon: ReceiptText,
     description: "Histórico completo e filtros",
   },
-  // {
-  //   label: "Configurações",
-  //   href: "/configuracoes",
-  //   icon: Settings,
-  //   description: "Preferências do workspace",
-  // },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, logout, isAuthenticated } = useAuth();
   const { pendingBills, refresh, isSyncing } = useFinance();
-  const [isSheetOpen, setIsSheetOpen] = useState(false);
-
-  // Não renderiza o shell nas páginas de auth
   const isAuthPage = pathname === "/login" || pathname === "/register";
   if (isAuthPage || !isAuthenticated) {
     return <>{children}</>;
   }
+
+  const [showSyncing, setShowSyncing] = useState(false);
+
+  return (
+    <TopbarActionProvider>
+      <AppShellContent 
+        refresh={refresh} 
+        isSyncing={isSyncing} 
+        logout={logout}
+      >
+        {children}
+      </AppShellContent>
+    </TopbarActionProvider>
+  );
+}
+
+function AppShellContent({ 
+  children, 
+  refresh, 
+  isSyncing,
+  logout,
+}: { 
+  children: React.ReactNode;
+  refresh: () => void;
+  isSyncing: boolean;
+  logout: () => void;
+}) {
+  const { actionNode } = useTopbarAction();
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user } = useAuth();
+  const { pendingBills } = useFinance();
 
   const userInitials = user?.name
     ? user.name
@@ -112,123 +141,21 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         : undefined,
   }));
 
-  const SidebarContent = () => (
-    <div className="flex h-full flex-col gap-6">
-      <div className="flex items-center gap-2">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-emerald-500 to-emerald-600 text-white overflow-hidden">
-          <Image
-            src="/app-icon.svg"
-            alt="Salva Contas"
-            width={24}
-            height={24}
-            className="h-6 w-6"
-          />
-        </div>
-        <div>
-          <p className="text-sm uppercase tracking-widest text-muted-foreground">Salva Contas</p>
-        </div>
-      </div>
-      <div className="space-y-1">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              onClick={() => setIsSheetOpen(false)}
-              className={cn(
-                "group flex items-center justify-between rounded-xl border border-transparent px-3 py-2 text-sm transition-colors",
-                isActive
-                  ? "bg-sidebar-primary/10 text-sidebar-foreground border-sidebar-border"
-                  : "hover:bg-sidebar-accent"
-              )}
-            >
-              <span className="flex items-center gap-3">
-                <span
-                  className={cn(
-                    "flex h-9 w-9 items-center justify-center rounded-xl bg-muted text-muted-foreground transition-colors",
-                    isActive && "bg-emerald-500/15 text-emerald-600"
-                  )}
-                >
-                  <Icon className="h-4 w-4" />
-                </span>
-                <span>
-                  <span className="flex items-center gap-2 font-medium text-base">
-                    {item.label}
-                    {item.badge && (
-                      <Badge variant="secondary" className="px-2 py-0 text-xs">
-                        {item.badge}
-                      </Badge>
-                    )}
-                  </span>
-                  <p className="text-xs text-muted-foreground">{item.description}</p>
-                </span>
-              </span>
-              <ChevronRight className={cn("h-4 w-4 text-muted-foreground transition-opacity", isActive ? "opacity-100" : "opacity-0 group-hover:opacity-100")}
-              />
-            </Link>
-          );
-        })}
-      </div>
-
-      <div className="mt-auto space-y-4">
-        <Separator />
-        <div className="flex items-center gap-3">
-          <Avatar className="h-12 w-12">
-            <AvatarFallback className="bg-emerald-500/15 text-emerald-600">{userInitials}</AvatarFallback>
-          </Avatar>
-          <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold">{user?.name ?? "Usuário"}</p>
-            <p className="truncate text-xs text-muted-foreground">{user?.email}</p>
-          </div>
-          <Button variant="ghost" size="icon" onClick={logout} title="Sair">
-            <LogOut className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
-    <TopbarActionProvider>
-      <AppShellContent 
-        refresh={refresh} 
-        isSyncing={isSyncing} 
-        isSheetOpen={isSheetOpen}
-        setIsSheetOpen={setIsSheetOpen}
-        SidebarContent={SidebarContent}
-        logout={logout}
-      >
-        {children}
-      </AppShellContent>
-    </TopbarActionProvider>
-  );
-}
-
-function AppShellContent({ 
-  children, 
-  refresh, 
-  isSyncing,
-  isSheetOpen,
-  setIsSheetOpen,
-  SidebarContent,
-  logout,
-}: { 
-  children: React.ReactNode;
-  refresh: () => void;
-  isSyncing: boolean;
-  isSheetOpen: boolean;
-  setIsSheetOpen: (open: boolean) => void;
-  SidebarContent: React.ComponentType;
-  logout: () => void;
-}) {
-  const { actionNode } = useTopbarAction();
-
-  return (
-    <div className="min-h-screen bg-muted/30 overflow-x-hidden">
+    <div className="min-h-screen bg-muted/30 overflow-x-hidden w-full">
       <header className="hidden lg:flex fixed top-0 left-0 right-0 z-50 h-14 items-center justify-between gap-3 border-b bg-card px-6 shadow-sm">
-        <WorkspaceSwitcher />
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-emerald-500 to-emerald-600 text-white overflow-hidden">
+              <Image src="/app-icon.svg" alt="Salva Contas" width={20} height={20} className="h-5 w-5" />
+            </div>
+            <div className="hidden lg:block">
+              <p className="text-sm uppercase tracking-widest text-muted-foreground">Salva Contas</p>
+            </div>
+          </div>
+          <WorkspaceSwitcher />
+        </div>
+
         <div className="flex items-center gap-3">
           <NotificationsDropdown />
           <Button variant="outline" onClick={refresh} disabled={isSyncing} className="gap-2">
@@ -243,25 +170,77 @@ function AppShellContent({
         </div>
       </header>
 
-      <div className="flex min-h-screen overflow-x-hidden">
-        <aside className="hidden lg:flex fixed top-14 left-0 bottom-0 w-72 flex-col border-r bg-sidebar px-5 py-6 shadow-sm z-40">
-          <SidebarContent />
-        </aside>
+      <div className="flex min-h-screen w-full overflow-x-hidden">
+        <Sidebar className="px-4" >
+          <SidebarHeader>
+            <div className="lg:hidden flex items-center gap-2">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-emerald-500 to-emerald-600 text-white overflow-hidden">
+                <Image src="/app-icon.svg" alt="Salva Contas" width={24} height={24} className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="text-sm uppercase tracking-widest text-muted-foreground">Salva Contas</p>
+              </div>
+            </div>
+          </SidebarHeader>
 
-        <div className="flex-1 lg:ml-72 lg:pt-14 overflow-x-hidden max-w-full">
+          <SidebarContent>
+            <SidebarMenu>
+              {navItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href;
+                return (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton asChild isActive={isActive}>
+                      <Link href={item.href} className="flex items-center gap-3">
+                        <span
+                          className={cn(
+                            "flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition-colors",
+                            isActive && "text-emerald-600"
+                          )}
+                        >
+                          <Icon className="h-4 w-4" />
+                        </span>
+                        <span className="flex-1 text-sm font-medium">{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                    {item.badge && <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>}
+                  </SidebarMenuItem>
+                );
+              })}
+            </SidebarMenu>
+          </SidebarContent>
+
+          <SidebarFooter className="mb-14">
+            <div className="w-full">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex w-full items-center gap-3 rounded-md p-2 text-sm hover:bg-sidebar-accent" title={user?.name ?? 'Usuário'}>
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-emerald-500/15 text-emerald-600">{userInitials}</AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-medium">{user?.name ?? 'Usuário'}</div>
+                      <div className="truncate text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">{user?.email}</div>
+                    </div>
+                  </button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="start" className="w-56">
+                  <DropdownMenuLabel className="truncate">{user?.name}</DropdownMenuLabel>
+                  <DropdownMenuItem onClick={() => router.push('/perfil')}>Perfil</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push('/workspaces')}>Meus workspaces</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => router.push('/configuracoes')}>Configurações</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout} variant="destructive">Sair</DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </SidebarFooter>
+        </Sidebar>
+
+        <div className="flex-1 lg:pt-16 overflow-x-hidden w-full">
           <header className="flex items-center gap-3 border-b bg-card px-4 py-3 shadow-sm lg:hidden">
-            <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Menu className="h-4 w-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-80 border-r p-0 overflow-y-auto">
-                <ScrollArea className="h-full px-5 py-6">
-                  <SidebarContent />
-                </ScrollArea>
-              </SheetContent>
-            </Sheet>
+            <SidebarTrigger />
             <WorkspaceSwitcher />
             <div className="ml-auto flex items-center gap-2">
               <NotificationsDropdown />
@@ -273,7 +252,7 @@ function AppShellContent({
             </div>
           </header>
 
-          <main className="relative px-2 py-4 sm:px-4 sm:py-6 lg:px-8 lg:py-8 overflow-x-hidden max-w-full">
+          <main className="relative p-4 overflow-x-hidden w-full">
             {children}
           </main>
         </div>
