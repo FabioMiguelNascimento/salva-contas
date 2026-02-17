@@ -1,34 +1,78 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Salva Contas — Web (frontend)
 
-## Getting Started
+Interface web do projeto **Salva Contas** — aplicação Next.js (React) que consome a API do backend para gerenciar workspaces, transações, assinaturas, cartões e anexos.
 
-First, run the development server:
+---
+
+## Tecnologias principais 🔧
+
+- Next.js 16 + React 19
+- TypeScript
+- Tailwind CSS
+- Client HTTP: Axios
+
+---
+
+## Quickstart — desenvolvimento local 🚀
+
+1. Instale dependências:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Crie um arquivo de ambiente `.env.local` (ou `.env`) com a variável mínima abaixo — aponte para a API backend em execução localmente:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```env
+NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
+```
 
-## Learn More
+3. Rode em modo desenvolvimento:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+pnpm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+A aplicação roda por padrão em `http://localhost:3000`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Scripts disponíveis
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `pnpm run dev` — inicia o Next.js em modo desenvolvimento
+- `pnpm run build` — build para produção
+- `pnpm run start` — start da build produzida
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Variáveis de ambiente
+
+- `NEXT_PUBLIC_API_BASE_URL` — URL base da API (ex.: `http://localhost:8000`)
+
+Obs: a frontend não precisa ter as chaves secretas do backend; use a API para operações autenticadas.
+
+---
+
+## Conectando com o backend
+
+- Certifique-se de rodar o `salva-contas-server` (porta padrão `8000`) antes de usar a UI.
+- Endpoints e comportamento do backend estão em `salva-contas-server/src/controllers` e `src/**/*.controller.ts`.
+
+---
+
+## Deploy
+
+- Build: `pnpm run build`
+- Start (produção): `pnpm run start`
+
+---
+
+## Arquivo de exemplo de ambiente
+
+Existe um arquivo sugerido `./.env.example` com as variáveis que você deve preencher.
+
+---
+
+## Contribuição
+
+Abra issues ou PRs para melhorias, bugs ou documentação.
