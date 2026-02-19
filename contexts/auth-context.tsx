@@ -5,14 +5,14 @@ import * as authService from "@/services/auth";
 import type { AuthState, LoginPayload, RegisterPayload, User } from "@/types/auth";
 import { useRouter } from "next/navigation";
 import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
+    createContext,
+    useCallback,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+    type ReactNode,
 } from "react";
 
 const TOKEN_KEY = "salva_contas_token";
@@ -396,6 +396,75 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updatePassword = useCallback(async (password: string) => {
     await authService.updatePassword({ password });
   }, []);
+
+  // Processa tokens do hash da URL (callback do Supabase após confirmação de email)
+  useEffect(() => {
+    const processHashTokens = async () => {
+      if (typeof window === "undefined") return;
+
+      const hash = window.location.hash;
+      if (!hash) return;
+
+      const params = new URLSearchParams(hash.substring(1));
+      const accessToken = params.get("access_token");
+      const refreshToken = params.get("refresh_token");
+      const expiresIn = params.get("expires_in");
+      const type = params.get("type");
+
+      if (!accessToken || !refreshToken) return;
+      if (type !== "signup" && type !== "recovery") return;
+
+      console.log(`Processing Supabase ${type} callback...`);
+
+      try {
+        // Calcula expiresAt
+        const expiresAt = Math.floor(Date.now() / 1000) + parseInt(expiresIn || "3600", 10);
+
+        // Salva tokens temporariamente
+        localStorage.setItem(TOKEN_KEY, accessToken);
+        localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+        localStorage.setItem(EXPIRES_AT_KEY, expiresAt.toString());
+
+        // Busca dados do usuário
+        const user = await authService.getMe();
+
+        // Persiste tudo
+        saveTokens(accessToken, refreshToken, expiresAt, user);
+
+        setState({
+          user,
+          token: accessToken,
+          refreshToken,
+          expiresAt,
+          isAuthenticated: true,
+          isLoading: false,
+        });
+
+        scheduleTokenRefresh(expiresAt);
+
+        // Remove o hash da URL
+        window.history.replaceState(null, "", window.location.pathname);
+
+        // Mostra mensagem de sucesso
+        if (type === "signup") {
+          (await import("sonner")).toast.success("Email confirmado com sucesso! Bem-vindo(a)!");
+          router.push("/");
+        } else if (type === "recovery") {
+          (await import("sonner")).toast.success("Email confirmado! Agora você pode redefinir sua senha.");
+          router.push("/update-password");
+        }
+
+        console.log(`Supabase ${type} callback processed successfully`);
+      } catch (error) {
+        console.error("Failed to process Supabase callback:", error);
+        (await import("sonner")).toast.error("Erro ao processar confirmação. Tente fazer login.");
+        // Remove o hash em caso de erro
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+    };
+
+    processHashTokens();
+  }, [router, saveTokens, scheduleTokenRefresh]);
 
   const value = useMemo(
     () => ({
