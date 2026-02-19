@@ -44,6 +44,7 @@ import {
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarProvider,
   SidebarTrigger
 } from "@/components/ui/sidebar";
 
@@ -97,7 +98,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { user, logout, isAuthenticated } = useAuth();
   const { pendingBills, refresh, isSyncing } = useFinance();
-  const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/update-password";
   if (isAuthPage || !isAuthenticated) {
     return <>{children}</>;
   }
@@ -105,15 +106,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const [showSyncing, setShowSyncing] = useState(false);
 
   return (
-    <TopbarActionProvider>
-      <AppShellContent 
-        refresh={refresh} 
-        isSyncing={isSyncing} 
-        logout={logout}
-      >
-        {children}
-      </AppShellContent>
-    </TopbarActionProvider>
+    <SidebarProvider>
+      <TopbarActionProvider>
+        <AppShellContent 
+          refresh={refresh} 
+          isSyncing={isSyncing} 
+          logout={logout}
+        >
+          {children}
+        </AppShellContent>
+      </TopbarActionProvider>
+    </SidebarProvider>
   );
 }
 
