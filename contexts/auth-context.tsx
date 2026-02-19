@@ -5,14 +5,14 @@ import * as authService from "@/services/auth";
 import type { AuthState, LoginPayload, RegisterPayload, User } from "@/types/auth";
 import { useRouter } from "next/navigation";
 import {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-    type ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
 } from "react";
 
 const TOKEN_KEY = "salva_contas_token";
@@ -324,25 +324,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(async (payload: LoginPayload) => {
     const response = await authService.login(payload);
-    
-    const user: User = {
+
+    // persiste token imediatamente (necessário para chamadas subsequentes a /me)
+    const provisionalUser: User = {
       id: response.user.id,
       email: response.user.email,
       name: response.user.user_metadata?.name,
     };
-    
-    saveTokens(response.accessToken, response.refreshToken, response.expiresAt, user);
-    
-    setState({
-      user,
+
+    saveTokens(response.accessToken, response.refreshToken, response.expiresAt, provisionalUser);
+
+    // atualiza estado preliminar para evitar flash enquanto buscamos /me
+    setState((prev) => ({
+      ...prev,
+      user: provisionalUser,
       token: response.accessToken,
       refreshToken: response.refreshToken,
       expiresAt: response.expiresAt,
       isAuthenticated: true,
       isLoading: false,
-    });
-    
+    }));
+
     scheduleTokenRefresh(response.expiresAt);
+
+    // busca a informação canônica do usuário pelo endpoint /auth/me e atualiza localStorage/estado
+    try {
+      const me = await authService.getMe();
+      localStorage.setItem(USER_KEY, JSON.stringify(me));
+      setState((prev) => ({ ...prev, user: me }));
+    } catch (err) {
+      // se /me falhar, mantemos o usuário provisório (não falhar o login por isso)
+      console.warn('Failed to fetch /auth/me after login:', err);
+    }
   }, [saveTokens, scheduleTokenRefresh]);
 
   const register = useCallback(async (payload: RegisterPayload): Promise<{ needsEmailConfirmation: boolean }> => {

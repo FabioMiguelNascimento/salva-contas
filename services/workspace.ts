@@ -1,9 +1,10 @@
 import { apiClient } from "@/lib/api-client";
 import type {
-    CreateWorkspacePayload,
-    InviteMemberPayload,
-    Workspace,
-    WorkspaceWithRole,
+  CreateWorkspacePayload,
+  InviteMemberPayload,
+  Workspace,
+  WorkspaceMemberWithUser,
+  WorkspaceWithRole,
 } from "@/types/workspace";
 
 interface ApiResponse<T> {
@@ -22,6 +23,11 @@ function unwrapData<T>(response: { data: ApiResponse<T> | T }): T {
 
 export async function getWorkspaces(): Promise<WorkspaceWithRole[]> {
   const response = await apiClient.get<ApiResponse<WorkspaceWithRole[]>>("/workspaces");
+  return unwrapData(response);
+}
+
+export async function getMembers(workspaceId: string): Promise<WorkspaceMemberWithUser[]> {
+  const response = await apiClient.get<ApiResponse<WorkspaceMemberWithUser[]>>(`/workspaces/${workspaceId}/members`);
   return unwrapData(response);
 }
 

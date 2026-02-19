@@ -62,7 +62,6 @@ export async function logout(): Promise<void> {
   try {
     await apiClient.post("/auth/logout");
   } catch {
-    // Ignora erros no logout - o token será removido localmente
   }
 }
 

@@ -10,12 +10,22 @@ import * as workspaceService from "@/services/workspace";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function CreateWorkspaceDialog() {
+type CreateWorkspaceDialogProps = {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  hideTrigger?: boolean;
+};
+
+export function CreateWorkspaceDialog({ open: controlledOpen, onOpenChange, hideTrigger = false }: CreateWorkspaceDialogProps) {
   const { refreshWorkspaces, setCurrentWorkspace } = useWorkspace();
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const isControlled = controlledOpen !== undefined && onOpenChange !== undefined;
+  const dialogOpen = isControlled ? controlledOpen! : internalOpen;
+  const setDialogOpen = isControlled ? onOpenChange! : setInternalOpen;
 
   async function onCreate(e?: React.FormEvent) {
     e?.preventDefault();
@@ -33,7 +43,7 @@ export function CreateWorkspaceDialog() {
       await refreshWorkspaces();
       setCurrentWorkspace(workspace.id);
       toast.success("Workspace criado com sucesso");
-      setOpen(false);
+      setDialogOpen(false);
       setName("");
       setDescription("");
     } catch (err: any) {
@@ -45,12 +55,14 @@ export function CreateWorkspaceDialog() {
   }
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="ghost" className="w-full justify-start gap-2">
-          <span className="text-sm">Criar novo Workspace</span>
-        </Button>
-      </DialogTrigger>
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      {!hideTrigger && (
+        <DialogTrigger asChild>
+          <Button variant="ghost" className="w-full justify-start gap-2">
+            <span className="text-sm">Criar novo Workspace</span>
+          </Button>
+        </DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Criar Workspace</DialogTitle>
@@ -72,7 +84,7 @@ export function CreateWorkspaceDialog() {
             <DialogClose>
               <Button variant="ghost" disabled={isLoading}>Cancelar</Button>
             </DialogClose>
-            <Button type="submit" disabled={isLoading} className="min-w-[140px]" onClick={onCreate}>
+            <Button type="submit" disabled={isLoading} className="min-w-[140px]">
               {isLoading ? "Criando..." : "Criar Workspace"}
             </Button>
           </DialogFooter>

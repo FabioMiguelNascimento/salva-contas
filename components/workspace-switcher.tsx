@@ -14,10 +14,12 @@ import { useAuth } from "@/hooks/use-auth";
 import { useWorkspace } from "@/hooks/use-workspace";
 import { cn } from "@/lib/utils";
 import { Check, ChevronDown, Home } from "lucide-react";
+import { useState } from "react";
 
 export function WorkspaceSwitcher() {
   const { isAuthenticated } = useAuth();
   const { currentWorkspace, workspaces, setCurrentWorkspace, isLoading } = useWorkspace();
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   if (!isAuthenticated || isLoading || !currentWorkspace) {
     return (
@@ -63,11 +65,11 @@ export function WorkspaceSwitcher() {
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
-        <div className="px-2">
-          {/* Dialog trigger inside the dropdown — opens the create workspace dialog */}
-          <CreateWorkspaceDialog />
-        </div>
+        <DropdownMenuItem onSelect={() => setShowCreateDialog(true)} className="cursor-pointer px-2">
+          <span className="text-sm">Criar novo Workspace</span>
+        </DropdownMenuItem>
       </DropdownMenuContent>
+      <CreateWorkspaceDialog open={showCreateDialog} onOpenChange={setShowCreateDialog} hideTrigger />
     </DropdownMenu>
   );
 }
