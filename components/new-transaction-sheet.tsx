@@ -1,10 +1,8 @@
 "use client";
 
-import { CreditCardSelect } from "@/components/credit-card-select";
-import { DatePicker } from "@/components/date-picker";
+import { AttachmentUploader } from "@/components/new-transaction/attachment-uploader";
+import { TransactionDetails } from "@/components/new-transaction/transaction-details";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -19,9 +17,8 @@ import {
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { useFinance } from "@/hooks/use-finance";
-import { cn } from "@/lib/utils";
 import { formatISO } from "date-fns";
-import { Loader2, Upload } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useCallback, useState } from "react";
 
 interface NewTransactionSheetProps {
@@ -83,13 +80,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
     }
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      setError(null);
-    }
-  };
+
 
   return (
     <Sheet
@@ -113,71 +104,28 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
 
         <form id="new-transaction-form" onSubmit={handleSubmit} className="flex flex-1 flex-col">
           <SheetBody className="space-y-6">
-              <div className="mt-4 space-y-4">
-                <Label className="text-sm font-semibold text-muted-foreground">Arraste o arquivo ou clique para procurar</Label>
-                <label
-                  htmlFor="file"
-                  className={cn(
-                    "flex min-h-[140px] cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-muted-foreground/40 bg-muted/40 text-center",
-                    selectedFile && "border-emerald-400 bg-emerald-50 text-emerald-600"
-                  )}
-                >
-                  <Input id="file" type="file" accept="image/*,.pdf" className="hidden" onChange={handleFileChange} />
-                  <Upload className="h-8 w-8 text-muted-foreground" />
-                  <p className="mt-2 text-sm">
-                    {selectedFile ? selectedFile.name : "JPG, PNG ou PDF até 10MB"}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Capturamos automaticamente valores, datas e categorias.
-                  </p>
-                </label>
+              <AttachmentUploader file={selectedFile} onFileChange={(f) => { setSelectedFile(f); setError(null); }} />
 
-                <div className="mt-3 space-y-2">
-                  <Label htmlFor="upload-text-input" className="text-sm font-semibold text-muted-foreground">Descrição / contexto (opcional)</Label>
-                  <Textarea
-                    id="upload-text-input"
-                    value={textInput}
-                    onChange={(e) => setTextInput(e.target.value)}
-                    placeholder="Adicione uma observação que será enviada junto com o arquivo"
-                    className="min-h-[80px] resize-none"
-                  />
-                  <p className="text-xs text-muted-foreground">Envie um arquivo, um texto (mín. 6 caracteres) ou ambos.</p>
-                </div>
-              </div>
-
-            <div className="space-y-3">
-              <Label className="text-sm font-semibold">Detalhes do lançamento</Label>
-              <label className="flex items-center gap-2 rounded-xl border border-border/60 p-4 cursor-pointer">
-                <Checkbox id="schedule" checked={isScheduled} onCheckedChange={(value) => setIsScheduled(Boolean(value))} />
-                <div className="space-y-0.5">
-                  <div className="font-medium">É uma conta a pagar/agendamento?</div>
-                  <p className="text-xs text-muted-foreground">
-                    Se marcado, definimos data de vencimento. Caso contrário, consideramos como compra já realizada.
-                  </p>
-                </div>
-              </label>
-              <div className="grid gap-3 sm:grid-cols-1">
-                <div className="space-y-2">
-                  <Label>{isScheduled ? "Data de vencimento" : "Data da compra"}</Label>
-                  <DatePicker
-                    date={selectedDate}
-                    onChange={setSelectedDate}
-                    placeholder={isScheduled ? "Quando vence?" : "Quando aconteceu?"}
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Cartão de crédito (opcional)</Label>
-                <CreditCardSelect
-                  value={selectedCreditCardId}
-                  onValueChange={setSelectedCreditCardId}
-                  placeholder="Nenhum"
+              <div className="mt-3 space-y-2">
+                <Label htmlFor="upload-text-input" className="text-sm font-semibold text-muted-foreground">Descrição / contexto (opcional)</Label>
+                <Textarea
+                  id="upload-text-input"
+                  value={textInput}
+                  onChange={(e) => setTextInput(e.target.value)}
+                  placeholder="Adicione uma observação que será enviada junto com o arquivo"
+                  className="min-h-20 resize-none"
                 />
-                <p className="text-xs text-muted-foreground">
-                  Se for uma compra no cartão, selecione para vincular automaticamente.
-                </p>
+                <p className="text-xs text-muted-foreground">Envie um arquivo, um texto (mín. 6 caracteres) ou ambos.</p>
               </div>
-            </div>
+
+            <TransactionDetails
+              isScheduled={isScheduled}
+              onIsScheduledChange={(v) => setIsScheduled(v)}
+              date={selectedDate}
+              onDateChange={setSelectedDate}
+              creditCardId={selectedCreditCardId}
+              onCreditCardChange={setSelectedCreditCardId}
+            />
 
             {error && <p className="text-sm font-medium text-destructive">{error}</p>}
             {successMessage && <p className="text-sm font-medium text-emerald-600">{successMessage}</p>}
