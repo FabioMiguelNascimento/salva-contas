@@ -1,6 +1,5 @@
 "use client";
 
-import { CategorySelect } from "@/components/category-select";
 import BudgetsCard from "@/components/dashboard/BudgetsCard";
 import CategoryBreakdownCard from "@/components/dashboard/CategoryBreakdownCard";
 import CreditCardsCard from "@/components/dashboard/CreditCardsCard";
@@ -8,9 +7,8 @@ import RecentTransactionsCard from "@/components/dashboard/RecentTransactionsCar
 import SpendingCard from "@/components/dashboard/SpendingCard";
 import SubscriptionsCard from "@/components/dashboard/SubscriptionsCard";
 import UpcomingBillsCard from "@/components/dashboard/UpcomingBillsCard";
+import { KpiSparklineCard } from "@/components/kpi-sparkline-card";
 import { PageHeader } from "@/components/page-header";
-import { SummaryCard } from "@/components/summary-card";
-import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import {
   Select,
   SelectContent,
@@ -18,7 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useNotifications } from "@/contexts/notifications-context";
 import { useFinance } from "@/hooks/use-finance";
 import { currencyFormatter, getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
 import { differenceInCalendarDays, format, subDays } from "date-fns";
@@ -26,7 +23,6 @@ import { ptBR } from "date-fns/locale";
 import {
   ArrowDownRight,
   ArrowUpRight,
-  TrendingUp,
   Wallet2
 } from "lucide-react";
 import { useMemo } from "react";
@@ -34,42 +30,8 @@ import { useMemo } from "react";
 export default function DashboardPage() {
   const { metrics, transactions, pendingBills, subscriptions, creditCards, budgets, categories, filters, setFilters, isLoading, lastSync } =
     useFinance();
-  const { notifications, unreadCount } = useNotifications();
 
   const years = getAvailableYears();
-
-  const kpis = [
-    {
-      title: "Total gasto no mês",
-      value: metrics?.financials.expenses ?? 0,
-      change: `${(metrics?.financials.expensesChangePercent ?? 0) > 0 ? '+' : ''}${metrics?.financials.expensesChangePercent ?? 0}% vs mês anterior`,
-      icon: ArrowDownRight,
-      trend: "down",
-    },
-    {
-      title: "Receitas",
-      value: metrics?.financials.income ?? 0,
-      change: `${(metrics?.financials.incomeChangePercent ?? 0) > 0 ? '+' : ''}${metrics?.financials.incomeChangePercent ?? 0}% vs mês anterior`,
-      icon: ArrowUpRight,
-      trend: "up",
-    },
-    {
-      title: "Saldo atual",
-      value: metrics?.financials.balance ?? 0,
-      change: `${(metrics?.financials.balanceChangePercent ?? 0) > 0 ? '+' : ''}${metrics?.financials.balanceChangePercent ?? 0}% vs mês anterior`,
-      icon: Wallet2,
-      trend: "neutral",
-    },
-    {
-      title: "Última atualização",
-      value: lastSync ? format(new Date(lastSync), "dd MMM yyyy, HH:mm", { locale: ptBR }) : "—",
-      change: metrics?.pendingBills
-        ? `${metrics.pendingBills.count} boletos abertos`
-        : "Sincronize para visualizar",
-      icon: TrendingUp,
-      trend: "neutral",
-    },
-  ];
 
   const recentTransactions = transactions.slice(0, 5);
 
@@ -94,24 +56,53 @@ export default function DashboardPage() {
 
   const dailySpending = useMemo(() => {
     const today = new Date();
-    const data = Array.from({ length: 7 }).map((_, index) => {
+    return Array.from({ length: 7 }).map((_, index) => {
       const date = subDays(today, 6 - index);
       const total = transactions
         .filter(
-          (transaction) =>
-            transaction.type === "expense" &&
-            transaction.paymentDate &&
-            format(new Date(transaction.paymentDate), "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
+          (t) =>
+            t.type === "expense" &&
+            t.paymentDate &&
+            format(new Date(t.paymentDate), "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
         )
-        .reduce((sum, item) => sum + item.amount, 0);
-
-      return {
-        day: format(date, "dd/MM"),
-        amount: total,
-      };
+        .reduce((sum, t) => sum + t.amount, 0);
+      return { day: format(date, "dd/MM"), amount: total };
     });
+  }, [transactions]);
 
-    return data;
+  const sparklineExpense = useMemo(
+    () => dailySpending.map((d) => ({ value: d.amount, day: d.day })),
+    [dailySpending]
+  );
+
+  const sparklineIncome = useMemo(() => {
+    const today = new Date();
+    return Array.from({ length: 7 }).map((_, index) => {
+      const date = subDays(today, 6 - index);
+      const total = transactions
+        .filter(
+          (t) =>
+            t.type === "income" &&
+            t.paymentDate &&
+            format(new Date(t.paymentDate), "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
+        )
+        .reduce((sum, t) => sum + t.amount, 0);
+      return { value: total, day: format(date, "dd/MM") };
+    });
+  }, [transactions]);
+
+  const sparklineBalance = useMemo(() => {
+    const today = new Date();
+    return Array.from({ length: 7 }).map((_, index) => {
+      const date = subDays(today, 6 - index);
+      const dateStr = format(date, "yyyy-MM-dd");
+      const dayTxs = transactions.filter(
+        (t) => t.paymentDate && format(new Date(t.paymentDate), "yyyy-MM-dd") === dateStr
+      );
+      const inc = dayTxs.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
+      const exp = dayTxs.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+      return { value: inc - exp, day: format(date, "dd/MM") };
+    });
   }, [transactions]);
 
   const categoryBreakdown = metrics?.categoryBreakdown ?? [];
@@ -147,10 +138,6 @@ export default function DashboardPage() {
     });
   }, [budgets, transactions]);
 
-  const recentNotifications = notifications.slice(0, 3);
-
-  const formatValue = (value: number | string) => (typeof value === "number" ? currencyFormatter.format(value) : value);
-
   const handleMonthChange = (value: string) => {
     setFilters({ ...filters, month: Number(value) });
   };
@@ -160,20 +147,12 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 lg:space-y-8 overflow-x-hidden">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 overflow-x-hidden bg-gray-50 min-h-screen">
       <PageHeader
         tag="Visão geral"
         title="Dashboard Financeiro"
         description={lastSync ? `Atualizado ${format(new Date(lastSync), "dd 'de' MMMM, HH:mm", { locale: ptBR })}` : "Sincronizando dados..."}
       >
-        <div className="w-full max-w-xs">
-          <CategorySelect
-            value={filters.categoryId ?? null}
-            onValueChange={(id) => setFilters({ ...filters, categoryId: id ?? undefined })}
-            placeholder="Categoria"
-          />
-        </div>
-
         <Select value={String(filters.month)} onValueChange={handleMonthChange}>
           <SelectTrigger className="w-full sm:w-[110px]">
             <SelectValue placeholder="Mês" />
@@ -200,18 +179,35 @@ export default function DashboardPage() {
         </Select>
       </PageHeader>
 
-      <SummaryCardsGrid>
-        {kpis.map((item) => (
-          <SummaryCard
-            key={item.title}
-            icon={item.icon}
-            title={item.title}
-            value={formatValue(item.value)}
-            helper={item.change}
-            isLoading={isLoading}
-          />
-        ))}
-      </SummaryCardsGrid>
+      <section className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+        <KpiSparklineCard
+          variant="expense"
+          icon={ArrowDownRight}
+          title="Total gasto no mês"
+          value={currencyFormatter.format(metrics?.financials.expenses ?? 0)}
+          change={`${(metrics?.financials.expensesChangePercent ?? 0) > 0 ? '+' : ''}${metrics?.financials.expensesChangePercent ?? 0}% vs mês anterior`}
+          sparklineData={sparklineExpense}
+          isLoading={isLoading}
+        />
+        <KpiSparklineCard
+          variant="income"
+          icon={ArrowUpRight}
+          title="Receitas no mês"
+          value={currencyFormatter.format(metrics?.financials.income ?? 0)}
+          change={`${(metrics?.financials.incomeChangePercent ?? 0) > 0 ? '+' : ''}${metrics?.financials.incomeChangePercent ?? 0}% vs mês anterior`}
+          sparklineData={sparklineIncome}
+          isLoading={isLoading}
+        />
+        <KpiSparklineCard
+          variant="balance"
+          icon={Wallet2}
+          title="Saldo atual"
+          value={currencyFormatter.format(metrics?.financials.balance ?? 0)}
+          change={`${(metrics?.financials.balanceChangePercent ?? 0) > 0 ? '+' : ''}${metrics?.financials.balanceChangePercent ?? 0}% vs mês anterior`}
+          sparklineData={sparklineBalance}
+          isLoading={isLoading}
+        />
+      </section>
 
       <section className="grid gap-4 lg:grid-cols-3 overflow-hidden">
         <SpendingCard data={dailySpending} isLoading={isLoading} />

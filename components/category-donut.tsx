@@ -38,7 +38,7 @@ export function CategoryDonut({ data, total }: { data: CategoryDonutItem[]; tota
               data={pieData}
               dataKey="value"
               nameKey="name"
-              innerRadius="60%"
+              innerRadius="65%"
               outerRadius="90%"
               paddingAngle={2}
               startAngle={90}

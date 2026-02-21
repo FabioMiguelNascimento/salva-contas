@@ -1,7 +1,6 @@
 "use client";
 
 import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -9,8 +8,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Progress } from "@/components/ui/progress";
-import { formatCardNumber, getStatusLabel, getStatusVariant } from "@/lib/credit-cards/constants";
+import { formatCardNumber } from "@/lib/credit-cards/constants";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import { cn } from "@/lib/utils";
 import type { CreditCard } from "@/types/finance";
@@ -22,26 +20,34 @@ interface CreditCardListCardProps {
   onDelete: (card: CreditCard) => void;
 }
 
+const flagGradients: Record<string, string> = {
+  visa: "from-blue-700 to-blue-900",
+  mastercard: "from-gray-700 to-gray-900",
+  american_express: "from-sky-600 to-sky-900",
+  elo: "from-zinc-800 to-zinc-950",
+  hipercard: "from-red-700 to-red-950",
+};
+
 export function CreditCardListCard({ card, onEdit, onDelete }: CreditCardListCardProps) {
   const usedAmount = card.limit - card.availableLimit;
-  const usedPercentage = (usedAmount / card.limit) * 100;
-  const isHighUsage = usedPercentage > 80;
+  const usedPercentage = card.limit > 0 ? (usedAmount / card.limit) * 100 : 0;
+  const gradient = flagGradients[card.flag] ?? "from-indigo-600 to-purple-800";
 
   return (
-    <div className="rounded-2xl border border-border/60 p-4">
+    <div className={cn("rounded-2xl p-5 text-white shadow-lg bg-linear-to-br", gradient)}>
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-3">
-          <CardFlagIcon flag={card.flag} className="h-8 w-auto shrink-0" />
+          <CardFlagIcon flag={card.flag} className="h-8 w-auto shrink-0 opacity-90" />
           <div>
-            <p className="font-semibold">{card.name}</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="font-bold text-white">{card.name}</p>
+            <p className="text-xs text-white/60">
               {formatCardNumber(card.lastFourDigits)}
             </p>
           </div>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
+            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 text-white/70 hover:text-white hover:bg-white/10">
               <MoreHorizontal className="h-4 w-4" />
               <span className="sr-only">Abrir menu</span>
             </Button>
@@ -62,36 +68,30 @@ export function CreditCardListCard({ card, onEdit, onDelete }: CreditCardListCar
         </DropdownMenu>
       </div>
 
-      <div className="mt-3 space-y-2">
+      <div className="mt-4 space-y-2">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-muted-foreground">Usado</span>
-          <span className={cn("font-medium", isHighUsage && "text-destructive")}>
+          <span className="text-white/70">Usado</span>
+          <span className="font-bold text-white">
             {currencyFormatter.format(usedAmount)} de {currencyFormatter.format(card.limit)}
           </span>
         </div>
-        <Progress
-          value={usedPercentage}
-          className={cn("h-2", isHighUsage && "[&>div]:bg-destructive")}
-        />
+        <div className="h-2 w-full rounded-full bg-white/20 overflow-hidden">
+          <div
+            className="h-full rounded-full bg-white/80 transition-all"
+            style={{ width: `${Math.min(usedPercentage, 100)}%` }}
+          />
+        </div>
       </div>
 
-      <div className="mt-3 flex items-center justify-between">
+      <div className="mt-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xs text-muted-foreground">Fecha dia {card.closingDay}</span>
-          <span className="text-xs text-muted-foreground">•</span>
-          <span className="text-xs text-muted-foreground">Vence dia {card.dueDay}</span>
+          <span className="text-xs text-white/60">Fecha dia {card.closingDay}</span>
+          <span className="text-xs text-white/40">•</span>
+          <span className="text-xs text-white/60">Vence dia {card.dueDay}</span>
         </div>
-        <Badge
-          className={cn(
-            "text-xs",
-            getStatusVariant(card.status) === "success" && "bg-emerald-100 text-emerald-800",
-            getStatusVariant(card.status) === "warning" && "bg-yellow-100 text-yellow-800",
-            getStatusVariant(card.status) === "danger" && "bg-destructive/15 text-destructive",
-            getStatusVariant(card.status) === "muted" && "bg-muted text-muted-foreground"
-          )}
-        >
-          {getStatusLabel(card.status)}
-        </Badge>
+        <span className="text-xs font-medium text-white/80 bg-white/10 px-2 py-0.5 rounded-full">
+          {usedPercentage > 80 ? "Alta utilização" : usedPercentage > 50 ? "Moderado" : "Disponível"}
+        </span>
       </div>
     </div>
   );

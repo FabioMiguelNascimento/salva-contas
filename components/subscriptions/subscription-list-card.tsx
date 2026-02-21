@@ -1,4 +1,5 @@
 import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
+import { DynamicIcon } from "@/components/dynamic-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,12 +20,19 @@ interface SubscriptionListCardProps {
 }
 
 export function SubscriptionListCard({ subscription, onEdit, onDelete }: SubscriptionListCardProps) {
+  const iconName = subscription.category?.icon ?? "tag";
+
   return (
-    <div className="rounded-2xl border border-border/60 p-4">
+    <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-2">
-        <div className="flex-1">
-          <p className="font-semibold">{subscription.description}</p>
-          <p className="text-xs text-muted-foreground">{subscription.category?.name ?? "Sem categoria"}</p>
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-indigo-50 shrink-0">
+            <DynamicIcon name={iconName} className="h-5 w-5 text-indigo-600" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-gray-800 truncate">{subscription.description}</p>
+            <p className="text-xs text-gray-400">{subscription.category?.name ?? "Sem categoria"}</p>
+          </div>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -49,7 +57,7 @@ export function SubscriptionListCard({ subscription, onEdit, onDelete }: Subscri
         </DropdownMenu>
       </div>
       <div className="mt-3 flex items-center justify-between">
-        <strong>{currencyFormatter.format(subscription.amount)}</strong>
+        <strong className="font-bold text-gray-900">{currencyFormatter.format(subscription.amount)}</strong>
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="text-xs">
             {getFrequencyLabel(subscription.frequency)}
@@ -59,7 +67,7 @@ export function SubscriptionListCard({ subscription, onEdit, onDelete }: Subscri
           </Badge>
         </div>
       </div>
-      <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+      <div className="mt-2 flex items-center gap-2 text-xs text-gray-400">
         <span>Dia programado: {getScheduleLabel(subscription)}</span>
         {subscription.creditCard && (
           <>
