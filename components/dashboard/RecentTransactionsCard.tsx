@@ -21,7 +21,7 @@ export interface RecentTransactionsCardProps {
 function TransactionRow({ transaction }: { transaction: Transaction }) {
   const isIncome = transaction.type === "income";
   const categoryLabel = getTransactionCategoryLabel(transaction);
-  const iconName = transaction.category?.icon ?? "tag";
+  const iconName = transaction.categoryRel?.icon ?? "tag";
 
   return (
     <div className="flex items-center gap-3 py-2.5 border-b border-gray-50 last:border-0 overflow-hidden">
