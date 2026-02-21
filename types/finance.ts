@@ -118,6 +118,7 @@ export interface TransactionFilters {
   year: number;
   status?: TransactionStatus;
   type?: TransactionType;
+  categoryId?: string;
 }
 
 export interface ManualTransactionPayload {

@@ -1,13 +1,16 @@
 "use client";
 
-import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
+import { CategorySelect } from "@/components/category-select";
+import BudgetsCard from "@/components/dashboard/BudgetsCard";
+import CategoryBreakdownCard from "@/components/dashboard/CategoryBreakdownCard";
+import CreditCardsCard from "@/components/dashboard/CreditCardsCard";
+import RecentTransactionsCard from "@/components/dashboard/RecentTransactionsCard";
+import SpendingCard from "@/components/dashboard/SpendingCard";
+import SubscriptionsCard from "@/components/dashboard/SubscriptionsCard";
+import UpcomingBillsCard from "@/components/dashboard/UpcomingBillsCard";
 import { PageHeader } from "@/components/page-header";
 import { SummaryCard } from "@/components/summary-card";
 import { SummaryCardsGrid } from "@/components/summary-cards-grid";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -15,30 +18,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useNotifications } from "@/contexts/notifications-context";
 import { useFinance } from "@/hooks/use-finance";
 import { currencyFormatter, getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
-import { cn, getTransactionCategoryLabel } from "@/lib/utils";
-import type { Transaction } from "@/types/finance";
-import { differenceInCalendarDays, format, isPast, subDays } from "date-fns";
+import { differenceInCalendarDays, format, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
-  AlertCircle,
-  AlertTriangle,
   ArrowDownRight,
   ArrowUpRight,
-  Bell,
-  CreditCard,
-  Link,
-  Repeat,
   TrendingUp,
   Wallet2
 } from "lucide-react";
 import { useMemo } from "react";
 
 export default function DashboardPage() {
-  const { metrics, transactions, pendingBills, subscriptions, creditCards, budgets, filters, setFilters, isLoading, lastSync } =
+  const { metrics, transactions, pendingBills, subscriptions, creditCards, budgets, categories, filters, setFilters, isLoading, lastSync } =
     useFinance();
   const { notifications, unreadCount } = useNotifications();
 
@@ -123,7 +117,6 @@ export default function DashboardPage() {
   const categoryBreakdown = metrics?.categoryBreakdown ?? [];
   const donutTotal = categoryBreakdown.reduce((sum, item) => sum + item.total, 0);
 
-  // Subscriptions summary
   const activeSubscriptions = subscriptions.filter((s) => s.isActive);
   const monthlySubscriptionTotal = useMemo(() => {
     return activeSubscriptions.reduce((sum, sub) => {
@@ -134,13 +127,11 @@ export default function DashboardPage() {
     }, 0);
   }, [activeSubscriptions]);
 
-  // Credit cards summary
   const activeCards = creditCards.filter((c) => c.status === "active");
   const totalCreditLimit = activeCards.reduce((sum, c) => sum + c.limit, 0);
   const totalCreditUsed = activeCards.reduce((sum, c) => sum + (c.limit - c.availableLimit), 0);
   const creditUsagePercent = totalCreditLimit > 0 ? (totalCreditUsed / totalCreditLimit) * 100 : 0;
 
-  // Budgets summary
   const budgetsWithUsage = useMemo(() => {
     return budgets.map((budget) => {
       const categoryExpenses = transactions
@@ -156,7 +147,6 @@ export default function DashboardPage() {
     });
   }, [budgets, transactions]);
 
-  // Recent notifications
   const recentNotifications = notifications.slice(0, 3);
 
   const formatValue = (value: number | string) => (typeof value === "number" ? currencyFormatter.format(value) : value);
@@ -176,6 +166,14 @@ export default function DashboardPage() {
         title="Dashboard Financeiro"
         description={lastSync ? `Atualizado ${format(new Date(lastSync), "dd 'de' MMMM, HH:mm", { locale: ptBR })}` : "Sincronizando dados..."}
       >
+        <div className="w-full max-w-xs">
+          <CategorySelect
+            value={filters.categoryId ?? null}
+            onValueChange={(id) => setFilters({ ...filters, categoryId: id ?? undefined })}
+            placeholder="Categoria"
+          />
+        </div>
+
         <Select value={String(filters.month)} onValueChange={handleMonthChange}>
           <SelectTrigger className="w-full sm:w-[110px]">
             <SelectValue placeholder="Mês" />
@@ -216,390 +214,25 @@ export default function DashboardPage() {
       </SummaryCardsGrid>
 
       <section className="grid gap-4 lg:grid-cols-3 overflow-hidden">
-        <Card className="lg:col-span-2 overflow-hidden">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div className="min-w-0 flex-1">
-              <CardTitle className="text-base">Gastos dos últimos 7 dias</CardTitle>
-              <p className="text-sm text-muted-foreground">Somente despesas pagas</p>
-            </div>
-          </CardHeader>
-          <CardContent className="overflow-hidden p-3 sm:p-6">
-            {isLoading ? <Skeleton className="h-48 w-full" /> : <SpendingBarChart data={dailySpending} />}
-          </CardContent>
-        </Card>
-        <Card className="overflow-hidden">
-          <CardHeader>
-            <CardTitle className="text-base">Gastos por categoria</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center gap-4 sm:gap-6 p-3 sm:p-6 overflow-hidden">
-            {isLoading ? (
-              <Skeleton className="h-32 w-32 sm:h-44 sm:w-44 rounded-full" />
-            ) : (
-              <CategoryDonut data={categoryBreakdown} total={donutTotal} />
-            )}
-            <div className="w-full space-y-2 sm:space-y-3">
-              {categoryBreakdown.slice(0, 4).map((item, index) => (
-                <div key={item.category} className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                    <span className="h-3 w-3 shrink-0 rounded-full" style={{ backgroundColor: chartColors[index % chartColors.length] }} />
-                    <span className="text-sm font-medium truncate">{item.category}</span>
-                  </div>
-                  <span className="text-sm text-muted-foreground shrink-0">{currencyFormatter.format(item.total)}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <SpendingCard data={dailySpending} isLoading={isLoading} />
+        <CategoryBreakdownCard breakdown={categoryBreakdown} total={donutTotal} categoriesMeta={categories} isLoading={isLoading} />
       </section>
 
       <section className="grid gap-4 lg:grid-cols-3 overflow-hidden">
-        <Card className="lg:col-span-2 overflow-hidden">
-          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <CardTitle className="text-base">Últimas transações</CardTitle>
-            <Button variant="ghost" size="sm" className="self-start sm:self-auto" asChild>
-              <Link href="/extrato">Ver extrato completo</Link>
-            </Button>
-          </CardHeader>
-          <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-6 overflow-hidden">
-            {isLoading
-              ? Array.from({ length: 5 }).map((_, index) => <Skeleton key={index} className="h-12 w-full" />)
-              : recentTransactions.map((transaction) => <TransactionRow key={transaction.id} transaction={transaction} />)}
-          </CardContent>
-        </Card>
-        <Card className={cn("border-l-4 overflow-hidden", urgentBills.length > 0 ? "border-destructive" : "border-emerald-500/70") }>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <AlertTriangle className={cn("h-5 w-5 shrink-0", urgentBills.length > 0 ? "text-destructive" : "text-emerald-500") } />
-              <span className="truncate">{urgentBills.length > 0 ? "Contas vencendo" : "Tudo em dia"}</span>
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              {urgentBills.length > 0
-                ? "Priorize os boletos abaixo para manter o fluxo saudável."
-                : "Nenhuma conta vencendo hoje. Ótima organização!"}
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-3 sm:space-y-4 p-3 sm:p-6 overflow-hidden">
-            {(urgentBills.length > 0 ? urgentBills : nextBills).map((bill) => (
-              <div key={bill.id} className="rounded-xl border border-border/60 p-3">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold truncate">{bill.description}</p>
-                    <p className="text-xs text-muted-foreground">{currencyFormatter.format(bill.amount)}</p>
-                  </div>
-                  <Badge variant={isPast(new Date(bill.dueDate ?? 0)) ? "destructive" : "secondary"} className="shrink-0">
-                    {bill.dueDate ? format(new Date(bill.dueDate), "dd/MM") : "—"}
-                  </Badge>
-                </div>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  {bill.dueDate
-                    ? (() => {
-                        const days = differenceInCalendarDays(new Date(bill.dueDate), new Date());
-                        return days >= 0
-                          ? `Faltam ${days} dias`
-                          : `${Math.abs(days)} dias em atraso`;
-                      })()
-                    : "Sem data de vencimento"}
-                </p>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
+        <RecentTransactionsCard transactions={recentTransactions} isLoading={isLoading} />
+        <UpcomingBillsCard urgentBills={urgentBills} nextBills={nextBills} isLoading={isLoading} />
       </section>
 
-      {/* Credit Cards & Subscriptions Section */}
       <section className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-muted-foreground shrink-0" />
-              <CardTitle className="text-base">Cartões de Crédito</CardTitle>
-            </div>
-            <Button variant="ghost" size="sm" className="self-start sm:self-auto" asChild>
-              <Link href="/cartoes">Ver todos</Link>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-32 w-full" />
-            ) : activeCards.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-6 text-center">
-                <CreditCard className="mb-2 h-10 w-10 text-muted-foreground/50" />
-                <p className="text-sm text-muted-foreground">Nenhum cartão cadastrado</p>
-              </div>
-            ) : (
-              <div className="space-y-4 p-4 sm:p-6">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-lg bg-muted/50 p-3">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Limite utilizado</p>
-                    <p className="text-lg font-semibold">{currencyFormatter.format(totalCreditUsed)}</p>
-                  </div>
-                  <div className="text-left sm:text-right">
-                    <p className="text-xs text-muted-foreground">de {currencyFormatter.format(totalCreditLimit)}</p>
-                    <p className={cn("text-sm font-medium", creditUsagePercent > 80 ? "text-destructive" : creditUsagePercent > 50 ? "text-yellow-600" : "text-emerald-600")}>
-                      {creditUsagePercent.toFixed(0)}% usado
-                    </p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  {activeCards.slice(0, 3).map((card) => {
-                    const cardUsed = card.limit - card.availableLimit;
-                    const cardPercent = card.limit > 0 ? (cardUsed / card.limit) * 100 : 0;
-                    return (
-                      <div key={card.id} className="flex items-center gap-3">
-                        <CardFlagIcon flag={card.flag} className="h-6 w-6 shrink-0" />
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between">
-                            <p className="truncate text-sm font-medium">{card.name}</p>
-                            <span className="text-xs text-muted-foreground shrink-0">{cardPercent.toFixed(0)}%</span>
-                          </div>
-                          <Progress value={cardPercent} className="mt-1 h-1.5" />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2">
-              <Repeat className="h-5 w-5 text-muted-foreground shrink-0" />
-              <CardTitle className="text-base">Assinaturas Ativas</CardTitle>
-            </div>
-            <Button variant="ghost" size="sm" className="self-start sm:self-auto" asChild>
-              <Link href="/assinaturas">Ver todas</Link>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-32 w-full" />
-            ) : activeSubscriptions.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-6 text-center">
-                <Repeat className="mb-2 h-10 w-10 text-muted-foreground/50" />
-                <p className="text-sm text-muted-foreground">Nenhuma assinatura ativa</p>
-              </div>
-            ) : (
-              <div className="space-y-4 p-4 sm:p-6">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-lg bg-muted/50 p-3">
-                  <div>
-                    <p className="text-xs text-muted-foreground">Custo mensal estimado</p>
-                    <p className="text-lg font-semibold">{currencyFormatter.format(monthlySubscriptionTotal)}</p>
-                  </div>
-                  <div className="text-left sm:text-right">
-                    <p className="text-xs text-muted-foreground">{activeSubscriptions.length} assinatura{activeSubscriptions.length !== 1 ? "s" : ""}</p>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  {activeSubscriptions.slice(0, 4).map((sub) => (
-                    <div key={sub.id} className="flex items-center justify-between rounded-lg border p-2 gap-3">
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-medium">{sub.description}</p>
-                        <p className="text-xs text-muted-foreground capitalize">{sub.frequency === "monthly" ? "Mensal" : sub.frequency === "yearly" ? "Anual" : "Semanal"}</p>
-                      </div>
-                      <p className="text-sm font-semibold shrink-0">{currencyFormatter.format(sub.amount)}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <CreditCardsCard activeCards={activeCards} totalCreditLimit={totalCreditLimit} totalCreditUsed={totalCreditUsed} creditUsagePercent={creditUsagePercent} isLoading={isLoading} />
+        <SubscriptionsCard subscriptions={activeSubscriptions} monthlyTotal={monthlySubscriptionTotal} isLoading={isLoading} />
       </section>
 
-      {/* Budgets & Notifications Section */}
-      <section className="grid gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-            <div className="min-w-0 flex-1">
-              <CardTitle className="text-base">Orçamentos do Mês</CardTitle>
-              <p className="text-sm text-muted-foreground">Acompanhe seus limites por categoria</p>
-            </div>
-            <Button variant="ghost" size="sm" className="self-start sm:self-auto shrink-0" asChild>
-              <Link href="/orcamentos">Gerenciar</Link>
-            </Button>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <Skeleton className="h-32 w-full" />
-            ) : budgetsWithUsage.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-6 text-center">
-                <Wallet2 className="mb-2 h-10 w-10 text-muted-foreground/50" />
-                <p className="text-sm text-muted-foreground">Nenhum orçamento definido</p>
-                <p className="text-xs text-muted-foreground">Defina limites para controlar seus gastos</p>
-              </div>
-            ) : (
-              <div className="space-y-4 p-4 sm:p-6">
-                {budgetsWithUsage.slice(0, 5).map((budget) => (
-                  <div key={budget.id} className="space-y-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-2 min-w-0 flex-1">
-                        <span className="text-sm font-medium truncate">{budget.category?.name ?? "Categoria"}</span>
-                        {budget.isOverBudget && (
-                          <Badge variant="destructive" className="text-xs shrink-0">Excedido</Badge>
-                        )}
-                      </div>
-                      <span className="text-xs text-muted-foreground shrink-0">
-                        {currencyFormatter.format(budget.spent)} / {currencyFormatter.format(budget.amount)}
-                      </span>
-                    </div>
-                    <Progress
-                      value={budget.usagePercent}
-                      className={cn("h-2", budget.isOverBudget && "[&>div]:bg-destructive")}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className={cn(unreadCount > 0 && "border-l-4 border-amber-500")}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Bell className={cn("h-5 w-5 shrink-0", unreadCount > 0 ? "text-amber-500" : "text-muted-foreground")} />
-              <span className="truncate">Notificações</span>
-              {unreadCount > 0 && (
-                <Badge variant="secondary" className="ml-auto shrink-0">
-                  {unreadCount} nova{unreadCount !== 1 ? "s" : ""}
-                </Badge>
-              )}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {recentNotifications.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-6 text-center">
-                <Bell className="mb-2 h-10 w-10 text-muted-foreground/50" />
-                <p className="text-sm text-muted-foreground">Nenhuma notificação</p>
-              </div>
-            ) : (
-              <div className="space-y-3 p-4 sm:p-6">
-                {recentNotifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={cn(
-                      "rounded-lg border p-3",
-                      notification.status === "unread" && "bg-muted/50"
-                    )}
-                  >
-                    <div className="flex items-start gap-2">
-                      <AlertCircle className={cn(
-                        "mt-0.5 h-4 w-4 shrink-0",
-                        notification.type === "budget_limit" ? "text-destructive" :
-                        notification.type === "due_date" ? "text-amber-500" :
-                        "text-muted-foreground"
-                      )} />
-                      <div className="min-w-0 flex-1">
-                        <p className="text-sm font-medium truncate">{notification.title}</p>
-                        <p className="truncate text-xs text-muted-foreground">{notification.message}</p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+      <section className="">
+        <BudgetsCard budgetsWithUsage={budgetsWithUsage} isLoading={isLoading} />
       </section>
     </div>
   );
 }
 
-const chartColors = [
-  "#10b981",
-  "#6366f1",
-  "#f97316",
-  "#0ea5e9",
-  "#ec4899",
-];
 
-function SpendingBarChart({ data }: { data: { day: string; amount: number }[] }) {
-  const max = Math.max(...data.map((item) => item.amount), 1);
-  const maxHeight = 140;
-
-  const formatCompact = (value: number) => {
-    if (value >= 1000) return `${(value / 1000).toFixed(0)}k`;
-    return value.toFixed(0);
-  };
-
-  return (
-    <div className="overflow-x-auto overflow-y-hidden -mx-3 px-3 sm:mx-0 sm:px-0">
-      <div className="flex h-48 sm:h-56 items-end gap-3 sm:gap-4 min-w-[400px] sm:min-w-0 sm:w-full">
-        {data.map((item) => {
-          const height = Math.max((item.amount / max) * maxHeight, 6);
-          return (
-            <div key={item.day} className="flex flex-1 flex-col items-center gap-1 min-w-[50px] sm:min-w-0">
-              <div className="flex h-full w-full items-end justify-center">
-                <div className="flex w-8 sm:w-10 items-end">
-                  <div className="w-full rounded-full bg-muted/40">
-                    <div
-                      className="rounded-sm bg-emerald-500"
-                      style={{ height, transition: "height 0.3s ease" }}
-                    />
-                  </div>
-                </div>
-              </div>
-              <div className="text-center w-full">
-                <p className="text-xs sm:text-sm font-semibold">{currencyFormatter.format(item.amount)}</p>
-                <p className="text-xs text-muted-foreground">{item.day}</p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-function CategoryDonut({ data, total }: { data: { category: string; total: number }[]; total: number }) {
-  const segments: string[] = [];
-  let current = 0;
-
-  data.forEach((item, index) => {
-    const percentage = total === 0 ? 0 : (item.total / total) * 360;
-    const start = current;
-    const end = current + percentage;
-    segments.push(`${chartColors[index % chartColors.length]} ${start}deg ${end}deg`);
-    current = end;
-  });
-
-  const background = segments.length ? `conic-gradient(${segments.join(",")})` : "conic-gradient(#e5e7eb 0deg 360deg)";
-
-  return (
-    <div className="flex flex-col items-center gap-2 w-full overflow-hidden">
-      <div className="relative h-32 w-32 sm:h-44 sm:w-44 shrink-0">
-        <div className="h-full w-full rounded-full" style={{ background }} />
-        <div className="absolute inset-4 sm:inset-6 flex flex-col items-center justify-center rounded-full bg-card text-center">
-          <span className="text-[8px] sm:text-xs uppercase tracking-widest text-muted-foreground">Total</span>
-          <strong className="text-sm sm:text-lg">{currencyFormatter.format(total)}</strong>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TransactionRow({ transaction }: { transaction: Transaction }) {
-  const isIncome = transaction.type === "income";
-  const categoryLabel = getTransactionCategoryLabel(transaction);
-  return (
-    <div className="flex items-center justify-between rounded-2xl border border-border/60 p-2 sm:p-3 gap-2 overflow-hidden">
-      <div className="min-w-0 flex-1 overflow-hidden">
-        <p className="text-xs sm:text-sm font-semibold truncate">{transaction.description}</p>
-        <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
-          {categoryLabel} • {transaction.paymentDate ? format(new Date(transaction.paymentDate), "dd MMM", { locale: ptBR }) : "pendente"}
-        </p>
-      </div>
-      <div className="text-right shrink-0">
-        <p className={cn("text-xs sm:text-sm font-semibold whitespace-nowrap", isIncome ? "text-emerald-600" : "text-destructive")}>
-          {isIncome ? "+" : "-"}
-          {currencyFormatter.format(transaction.amount)}
-        </p>
-        <Badge variant={isIncome ? "secondary" : "outline"} className="text-[10px] sm:text-xs">
-          {isIncome ? "Receita" : transaction.status === "pending" ? "Pendente" : "Despesa"}
-        </Badge>
-      </div>
-    </div>
-  );
-}
