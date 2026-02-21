@@ -11,7 +11,21 @@ export const apiClient = axios.create({
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    const message = error?.response?.data?.message ?? error.message ?? "Erro inesperado";
+    let message = error?.response?.data?.message ?? error.message ?? "Erro inesperado";
+    const details = error?.response?.data?.error?.details;
+    if (Array.isArray(details) && details.length > 0) {
+      // join human-readable messages and include field paths
+      const detailMsgs = details
+        .map((d: any) => {
+          const path = Array.isArray(d.path) && d.path.length ? d.path.join('.') : null;
+          const msg = d.message ?? "invalid";
+          return path ? `${path}: ${msg}` : msg;
+        })
+        .filter(Boolean);
+      if (detailMsgs.length > 0) {
+        message += ` (${detailMsgs.join(', ')})`;
+      }
+    }
     return Promise.reject(new Error(message));
   }
 );

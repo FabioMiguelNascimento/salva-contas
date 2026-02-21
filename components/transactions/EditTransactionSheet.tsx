@@ -13,6 +13,7 @@ interface Props {
   open: boolean;
   transaction?: Transaction;
   isProcessing: boolean;
+  error?: string | null;
   editDescription: string;
   editAmount: string;
   editType: string;
@@ -35,6 +36,7 @@ export function EditTransactionSheet({
   open,
   transaction,
   isProcessing,
+  error,
   editDescription,
   editAmount,
   editType,
@@ -113,6 +115,8 @@ export function EditTransactionSheet({
               <Label>Notas internas</Label>
               <Textarea placeholder="Adicione um contexto adicional" disabled />
             </div>
+
+            {error && <p className="text-sm text-destructive">{error}</p>}
           </SheetBody>
 
           <SheetFooter className="flex-row gap-2">

@@ -7,6 +7,7 @@ export function useTransactionEditor() {
   const [open, setOpen] = useState(false);
   const [transaction, setTransaction] = useState<Transaction | undefined>();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const [editDate, setEditDate] = useState<Date | undefined>();
   const [editAmount, setEditAmount] = useState("");
@@ -39,6 +40,7 @@ export function useTransactionEditor() {
       if (!transaction) return;
       const parsedAmount = Number(editAmount.replace(/,/g, "."));
       setIsProcessing(true);
+      setError(null);
       try {
         await updateExistingTransaction(transaction.id, {
           description: editDescription,
@@ -50,6 +52,13 @@ export function useTransactionEditor() {
           creditCardId: editCreditCardId,
         });
         closeEditor();
+      } catch (err) {
+        let msg = err instanceof Error ? err.message : "Erro ao atualizar transação";
+        // user-friendly overrides based on validation paths
+        if (msg.includes("categoryId") || msg.includes("expected string, received null")) {
+          msg = "Categoria inválida ou não fornecida";
+        }
+        setError(msg);
       } finally {
         setIsProcessing(false);
       }
@@ -61,6 +70,7 @@ export function useTransactionEditor() {
     open,
     transaction,
     isProcessing,
+    error,
     editDate,
     editAmount,
     editDescription,

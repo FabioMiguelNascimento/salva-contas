@@ -156,6 +156,7 @@ export default function ExtratoPage() {
         open={editor.open}
         transaction={editor.transaction}
         isProcessing={editor.isProcessing}
+        error={editor.error}
         editDescription={editor.editDescription}
         editAmount={editor.editAmount}
         editType={editor.editType}
