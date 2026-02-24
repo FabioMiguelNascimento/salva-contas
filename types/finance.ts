@@ -3,6 +3,24 @@ export type TransactionStatus = "paid" | "pending";
 export type SubscriptionFrequency = "weekly" | "monthly" | "yearly";
 export type CreditCardFlag = "visa" | "mastercard" | "american_express" | "elo" | "hipercard" | "other";
 export type CreditCardStatus = "active" | "blocked" | "expired" | "cancelled";
+export type PaymentMethod = "credit_card" | "debit" | "pix" | "cash" | "transfer" | "other";
+
+export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
+  credit_card: "Cartão de crédito",
+  debit: "Cartão de débito",
+  pix: "PIX",
+  cash: "Dinheiro",
+  transfer: "Transferência",
+  other: "Outro",
+};
+
+export interface TransactionSplit {
+  id?: string;
+  amount: number;
+  paymentMethod: PaymentMethod;
+  creditCardId?: string | null;
+  creditCard?: CreditCard | null;
+}
 
 export interface TransactionCategory {
   id: string;
@@ -58,7 +76,9 @@ export interface Transaction {
   attachmentMimeType?: string | null;
   attachmentSize?: number | null;
   attachmentUrl?: string | null; // URL pré-assinada gerada pelo backend
-  
+
+  splits?: TransactionSplit[];
+
   createdAt?: string;
   updatedAt?: string;
 }
@@ -130,6 +150,7 @@ export interface ManualTransactionPayload {
   dueDate?: string | null;
   paymentDate?: string | null;
   creditCardId?: string | null;
+  splits?: Omit<TransactionSplit, 'id' | 'creditCard'>[];
 }
 
 export interface UpdateTransactionPayload {
@@ -141,6 +162,7 @@ export interface UpdateTransactionPayload {
   dueDate?: string | null;
   paymentDate?: string | null;
   creditCardId?: string | null;
+  splits?: Omit<TransactionSplit, 'id' | 'creditCard'>[];
 }
 
 export interface CreateSubscriptionPayload {

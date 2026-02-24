@@ -2,10 +2,10 @@ import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
@@ -13,13 +13,14 @@ import { cn, getTransactionCategoryLabel } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { FileText, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 interface Props {
   transactions: Transaction[];
   isLoading: boolean;
   onEdit: (tx: Transaction) => void;
   onDelete: (tx: Transaction) => void;
+  onViewAttachment?: (tx: Transaction) => void;
 }
 
 function formatDate(tx: Transaction) {
@@ -32,7 +33,7 @@ function formatDate(tx: Transaction) {
   return "—";
 }
 
-export function TransactionTable({ transactions, isLoading, onEdit, onDelete }: Props) {
+export function TransactionTable({ transactions, isLoading, onEdit, onDelete, onViewAttachment }: Props) {
   const pageSize = 8;
 
   return (
@@ -118,6 +119,12 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete }: 
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
+                    {transaction.attachmentUrl && onViewAttachment && (
+                      <DropdownMenuItem onClick={() => onViewAttachment(transaction)}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        Ver anexo
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem onClick={() => onEdit(transaction)}>
                       <Pencil className="mr-2 h-4 w-4" />
                       Editar

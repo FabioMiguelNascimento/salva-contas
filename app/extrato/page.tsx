@@ -107,6 +107,7 @@ export default function ExtratoPage() {
               isLoading={isLoading}
               onEdit={editor.openEditor}
               onDelete={(tx) => setDeleteDialog({ open: true, transaction: tx })}
+              onViewAttachment={(tx) => setAttachmentViewer({ open: true, transaction: tx })}
             />
           </ScrollArea>
 
@@ -164,6 +165,9 @@ export default function ExtratoPage() {
         editDate={editor.editDate}
         editCategoryId={editor.editCategoryId}
         editCreditCardId={editor.editCreditCardId}
+        editPaymentMethod={editor.editPaymentMethod}
+        editIsSplitMode={editor.editIsSplitMode}
+        editSplits={editor.editSplits}
         setEditDescription={editor.setEditDescription}
         setEditAmount={editor.setEditAmount}
         setEditType={editor.setEditType}
@@ -171,6 +175,9 @@ export default function ExtratoPage() {
         setEditDate={editor.setEditDate}
         setEditCategoryId={editor.setEditCategoryId}
         setEditCreditCardId={editor.setEditCreditCardId}
+        setEditPaymentMethod={editor.setEditPaymentMethod}
+        setEditIsSplitMode={editor.setEditIsSplitMode}
+        setEditSplits={editor.setEditSplits}
         onClose={editor.closeEditor}
         onSubmit={editor.handleSubmit}
       />

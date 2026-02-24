@@ -33,6 +33,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
   const [isScheduled, setIsScheduled] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedCreditCardId, setSelectedCreditCardId] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"credit_card" | "debit" | "pix" | "cash" | "transfer" | "other">("cash");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -43,6 +44,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
     setIsScheduled(false);
     setSelectedDate(undefined);
     setSelectedCreditCardId(null);
+    setPaymentMethod("cash");
     setIsSubmitting(false);
     setError(null);
     setSuccessMessage(null);
@@ -65,7 +67,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
         text: textInput.trim() ? textInput.trim() : undefined,
         isScheduled,
         date: selectedDate ? formatISO(selectedDate) : undefined,
-        creditCardId: selectedCreditCardId ?? undefined,
+        creditCardId: paymentMethod === "credit_card" ? (selectedCreditCardId ?? undefined) : undefined,
       });
 
       setSuccessMessage("Transação enviada! A IA já está organizando tudo por aqui.");
@@ -125,6 +127,13 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
               onDateChange={setSelectedDate}
               creditCardId={selectedCreditCardId}
               onCreditCardChange={setSelectedCreditCardId}
+              paymentMethod={paymentMethod}
+              onPaymentMethodChange={setPaymentMethod}
+              isSplitMode={false}
+              onSplitModeChange={() => {}}
+              splits={[]}
+              onSplitsChange={() => {}}
+              totalAmount={0}
             />
 
             {error && <p className="text-sm font-medium text-destructive">{error}</p>}

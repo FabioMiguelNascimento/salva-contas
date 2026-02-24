@@ -2,16 +2,38 @@
 
 import { CreditCardSelect } from "@/components/credit-card-select"
 import { DatePicker } from "@/components/date-picker"
+import { SplitPaymentBuilder, SplitRow } from "@/components/new-transaction/split-payment-builder"
+import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { PAYMENT_METHOD_LABELS, PaymentMethod } from "@/types/finance"
+import { SplitSquareHorizontal } from "lucide-react"
+
+const PAYMENT_METHODS = Object.entries(PAYMENT_METHOD_LABELS) as [PaymentMethod, string][]
 
 export type TransactionDetailsProps = {
   isScheduled: boolean
   onIsScheduledChange: (value: boolean) => void
   date?: Date | undefined
   onDateChange: (date?: Date) => void
+  // Simple (no-split) mode
   creditCardId?: string | null
   onCreditCardChange: (id: string | null) => void
+  paymentMethod?: PaymentMethod
+  onPaymentMethodChange: (method: PaymentMethod) => void
+  // Split mode
+  isSplitMode: boolean
+  onSplitModeChange: (v: boolean) => void
+  splits: SplitRow[]
+  onSplitsChange: (splits: SplitRow[]) => void
+  totalAmount: number
   className?: string
 }
 
@@ -22,8 +44,32 @@ export function TransactionDetails({
   onDateChange,
   creditCardId,
   onCreditCardChange,
+  paymentMethod = "cash",
+  onPaymentMethodChange,
+  isSplitMode,
+  onSplitModeChange,
+  splits,
+  onSplitsChange,
+  totalAmount,
   className,
 }: TransactionDetailsProps) {
+
+  function toggleSplitMode() {
+    if (!isSplitMode) {
+      // Enter split mode — pre-populate with one row for the current selection
+      const initialSplit: SplitRow = {
+        amount: totalAmount || 0,
+        paymentMethod: paymentMethod === "credit_card" ? "credit_card" : paymentMethod,
+        creditCardId: paymentMethod === "credit_card" ? (creditCardId ?? null) : null,
+      }
+      onSplitsChange([initialSplit])
+      onSplitModeChange(true)
+    } else {
+      onSplitsChange([])
+      onSplitModeChange(false)
+    }
+  }
+
   return (
     <div className={className}>
       <div className="space-y-3">
@@ -46,10 +92,53 @@ export function TransactionDetails({
           </div>
         </div>
 
+        {/* Payment section */}
         <div className="space-y-2">
-          <Label>Cartão de crédito (opcional)</Label>
-          <CreditCardSelect value={creditCardId ?? null} onValueChange={onCreditCardChange} placeholder="Nenhum" />
-          <p className="text-xs text-muted-foreground">Se for uma compra no cartão, selecione para vincular automaticamente.</p>
+          <div className="flex items-center justify-between">
+            <Label>Forma de pagamento</Label>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 gap-1.5 text-xs text-muted-foreground"
+              onClick={toggleSplitMode}
+            >
+              <SplitSquareHorizontal className="h-3.5 w-3.5" />
+              {isSplitMode ? "Pagamento único" : "Dividir pagamento"}
+            </Button>
+          </div>
+
+          {isSplitMode ? (
+            <SplitPaymentBuilder
+              splits={splits}
+              totalAmount={totalAmount}
+              onChange={onSplitsChange}
+            />
+          ) : (
+            <div className="space-y-2">
+              <Select value={paymentMethod} onValueChange={(v) => onPaymentMethodChange(v as PaymentMethod)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PAYMENT_METHODS.map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {paymentMethod === "credit_card" && (
+                <CreditCardSelect
+                  value={creditCardId ?? null}
+                  onValueChange={onCreditCardChange}
+                  placeholder="Selecione o cartão"
+                  allowClear
+                />
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
