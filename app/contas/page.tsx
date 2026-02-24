@@ -16,7 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useFinance } from "@/hooks/use-finance";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
-import { cn, getTransactionCategoryLabel } from "@/lib/utils";
+import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { differenceInCalendarDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -43,11 +43,11 @@ export default function ContasPage() {
   const [descriptionInput, setDescriptionInput] = useState("");
 
   const summary = useMemo(() => {
-    const overdue = pendingBills.filter((bill) => bill.dueDate && differenceInCalendarDays(new Date(bill.dueDate), new Date()) < 0);
-    const today = pendingBills.filter((bill) => bill.dueDate && differenceInCalendarDays(new Date(bill.dueDate), new Date()) === 0);
+    const overdue = pendingBills.filter((bill) => bill.dueDate && differenceInCalendarDays(parseDateOnly(bill.dueDate)!, new Date()) < 0);
+    const today = pendingBills.filter((bill) => bill.dueDate && differenceInCalendarDays(parseDateOnly(bill.dueDate)!, new Date()) === 0);
     const soon = pendingBills.filter((bill) => {
       if (!bill.dueDate) return false;
-      const diff = differenceInCalendarDays(new Date(bill.dueDate), new Date());
+      const diff = differenceInCalendarDays(parseDateOnly(bill.dueDate)!, new Date());
       return diff > 0 && diff <= 3;
     });
 
@@ -63,7 +63,7 @@ export default function ContasPage() {
   const filteredBills = useMemo(() => {
     return pendingBills.filter((bill) => {
       if (!bill.dueDate) return activeFilter === "all";
-      const diff = differenceInCalendarDays(new Date(bill.dueDate), new Date());
+      const diff = differenceInCalendarDays(parseDateOnly(bill.dueDate)!, new Date());
       if (activeFilter === "overdue") return diff < 0;
       if (activeFilter === "today") return diff === 0;
       if (activeFilter === "upcoming") return diff > 0 && diff <= 3;
@@ -73,7 +73,7 @@ export default function ContasPage() {
 
   const openEditSheet = (bill: Transaction) => {
     setEditSheet({ open: true, bill });
-    setEditDate(bill.dueDate ? new Date(bill.dueDate) : undefined);
+    setEditDate(bill.dueDate ? parseDateOnly(bill.dueDate)! : undefined);
     setAmountInput(String(bill.amount));
     setDescriptionInput(bill.description);
   };
@@ -206,7 +206,7 @@ export default function ContasPage() {
                           <StatusBadge bill={bill} />
                         </TableCell>
                         <TableCell>{currencyFormatter.format(bill.amount)}</TableCell>
-                        <TableCell>{bill.dueDate ? format(new Date(bill.dueDate), "dd/MM", { locale: ptBR }) : "—"}</TableCell>
+                        <TableCell>{bill.dueDate ? format(parseDateOnly(bill.dueDate)!, "dd/MM", { locale: ptBR }) : "—"}</TableCell>
                         <TableCell>{formatDaysRemaining(bill)}</TableCell>
                         <TableCell className="flex justify-end gap-2">
                           {bill.attachmentUrl && (
@@ -258,7 +258,7 @@ export default function ContasPage() {
                         </div>
                         <div>
                           <p className="text-muted-foreground">Vence</p>
-                          <p>{bill.dueDate ? format(new Date(bill.dueDate), "dd/MM") : "—"}</p>
+                          <p>{bill.dueDate ? format(parseDateOnly(bill.dueDate)!, "dd/MM") : "—"}</p>
                         </div>
                         <div>
                           <p className="text-muted-foreground">Tempo</p>
@@ -375,7 +375,7 @@ function getStatusMeta(bill: Transaction) {
       className: "bg-slate-200 text-slate-800 dark:bg-slate-900 dark:text-slate-200",
     };
   }
-  const diff = differenceInCalendarDays(new Date(bill.dueDate), new Date());
+  const diff = differenceInCalendarDays(parseDateOnly(bill.dueDate)!, new Date());
   if (diff < 0) {
     return { label: "ATRASADO", className: "bg-destructive/15 text-destructive" };
   }
@@ -390,7 +390,7 @@ function getStatusMeta(bill: Transaction) {
 
 function formatDaysRemaining(bill: Transaction) {
   if (!bill.dueDate) return "—";
-  const diff = differenceInCalendarDays(new Date(bill.dueDate), new Date());
+  const diff = differenceInCalendarDays(parseDateOnly(bill.dueDate)!, new Date());
   const prefix = diff > 0 ? "+" : "";
   return `${prefix}${diff} dias`;
 }

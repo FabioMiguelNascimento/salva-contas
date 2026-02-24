@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
-import { cn, getTransactionCategoryLabel } from "@/lib/utils";
+import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -25,10 +25,10 @@ interface Props {
 
 function formatDate(tx: Transaction) {
   if (tx.paymentDate) {
-    return format(new Date(tx.paymentDate), "dd/MM/yyyy", { locale: ptBR });
+    return format(parseDateOnly(tx.paymentDate)!, "dd/MM/yyyy", { locale: ptBR });
   }
   if (tx.dueDate) {
-    return `${format(new Date(tx.dueDate), "dd/MM", { locale: ptBR })} (previsto)`;
+    return `${format(parseDateOnly(tx.dueDate)!, "dd/MM", { locale: ptBR })} (previsto)`;
   }
   return "—";
 }

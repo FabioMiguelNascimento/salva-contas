@@ -2,13 +2,13 @@ import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
-import { cn, getTransactionCategoryLabel } from "@/lib/utils";
+import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -24,10 +24,10 @@ interface Props {
 
 function formatDate(tx: Transaction) {
   if (tx.paymentDate) {
-    return format(new Date(tx.paymentDate), "dd/MM/yyyy", { locale: ptBR });
+    return format(parseDateOnly(tx.paymentDate)!, "dd/MM/yyyy", { locale: ptBR });
   }
   if (tx.dueDate) {
-    return `${format(new Date(tx.dueDate), "dd/MM", { locale: ptBR })} (previsto)`;
+    return `${format(parseDateOnly(tx.dueDate)!, "dd/MM", { locale: ptBR })} (previsto)`;
   }
   return "—";
 }

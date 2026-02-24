@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
-import { cn, getTransactionCategoryLabel } from "@/lib/utils";
+import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -39,7 +39,7 @@ function TransactionRow({ transaction }: { transaction: Transaction }) {
       <div className="min-w-0 flex-1 overflow-hidden">
         <p className="text-sm font-medium text-gray-800 truncate">{transaction.description}</p>
         <p className="text-xs text-gray-400 truncate">
-          {categoryLabel} • {transaction.paymentDate ? format(new Date(transaction.paymentDate), "dd MMM", { locale: ptBR }) : "pendente"}
+          {categoryLabel} • {transaction.paymentDate ? format(parseDateOnly(transaction.paymentDate)!, "dd MMM", { locale: ptBR }) : "pendente"}
         </p>
       </div>
       <div className="text-right shrink-0">

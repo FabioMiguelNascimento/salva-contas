@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { useFinance } from "@/hooks/use-finance";
 import { currencyFormatter, getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
+import { parseDateOnly } from "@/lib/utils";
 import { differenceInCalendarDays, format, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
@@ -63,7 +64,7 @@ export default function DashboardPage() {
           (t) =>
             t.type === "expense" &&
             t.paymentDate &&
-            format(new Date(t.paymentDate), "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
+            format(parseDateOnly(t.paymentDate)!, "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
         )
         .reduce((sum, t) => sum + t.amount, 0);
       return { day: format(date, "dd/MM"), amount: total };
@@ -84,7 +85,7 @@ export default function DashboardPage() {
           (t) =>
             t.type === "income" &&
             t.paymentDate &&
-            format(new Date(t.paymentDate), "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
+            format(parseDateOnly(t.paymentDate)!, "yyyy-MM-dd") === format(date, "yyyy-MM-dd")
         )
         .reduce((sum, t) => sum + t.amount, 0);
       return { value: total, day: format(date, "dd/MM") };
@@ -97,7 +98,7 @@ export default function DashboardPage() {
       const date = subDays(today, 6 - index);
       const dateStr = format(date, "yyyy-MM-dd");
       const dayTxs = transactions.filter(
-        (t) => t.paymentDate && format(new Date(t.paymentDate), "yyyy-MM-dd") === dateStr
+        (t) => t.paymentDate && format(parseDateOnly(t.paymentDate)!, "yyyy-MM-dd") === dateStr
       );
       const inc = dayTxs.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
       const exp = dayTxs.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);

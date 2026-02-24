@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
-import { cn } from "@/lib/utils";
+import { cn, parseDateOnly } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { differenceInCalendarDays, format, isPast } from "date-fns";
 import { AlertCircle, CalendarClock, CheckCircle2, Clock } from "lucide-react";
@@ -15,9 +15,9 @@ export interface UpcomingBillsCardProps {
 }
 
 function BillRow({ bill }: { bill: Transaction }) {
-  const isOverdue = bill.dueDate ? isPast(new Date(bill.dueDate)) : false;
+  const isOverdue = bill.dueDate ? isPast(parseDateOnly(bill.dueDate)!) : false;
   const days = bill.dueDate
-    ? differenceInCalendarDays(new Date(bill.dueDate), new Date())
+    ? differenceInCalendarDays(parseDateOnly(bill.dueDate)!, new Date())
     : null;
 
   const daysLabel =
@@ -64,7 +64,7 @@ function BillRow({ bill }: { bill: Transaction }) {
               : "bg-amber-100 text-amber-600"
           )}
         >
-          {bill.dueDate ? format(new Date(bill.dueDate), "dd/MM") : "—"}
+          {bill.dueDate ? format(parseDateOnly(bill.dueDate)!, "dd/MM") : "—"}
         </p>
       </div>
     </div>
