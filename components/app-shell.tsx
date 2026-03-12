@@ -13,8 +13,6 @@ import {
   Bell,
   CalendarClock,
   CreditCard,
-  Home,
-  Layers,
   LayoutDashboard,
   LogOut,
   Palette,
@@ -33,7 +31,6 @@ import { useState } from "react";
 import { NewTransactionDialog } from "./new-transaction-sheet";
 import { NotificationsDropdown } from "./notifications-dropdown";
 import { Topbar } from "./topbar";
-import { WorkspaceSwitcher } from "./workspace-switcher";
 
 import {
   Sidebar,
@@ -228,10 +225,6 @@ function AppShellContent({
                     <User className="h-4 w-4 mr-2" />
                     Perfil
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => { setSettingsOpen(true); setSettingsSelectedTab('workspaces'); }}>
-                    <Layers className="h-4 w-4 mr-2" />
-                    Meus workspaces
-                  </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => { setSettingsOpen(true); setSettingsSelectedTab('profile'); }}>
                     <Settings className="h-4 w-4 mr-2" />
                     Configurações
@@ -272,10 +265,6 @@ function AppShellContent({
                     <span>Segurança</span>
                   </button>
                   <hr className="my-3 border-border/60" />
-                  <button className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", settingsSelectedTab === 'workspaces' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")} onClick={() => setSettingsSelectedTab('workspaces')}>
-                    <Home className="h-4 w-4" />
-                    <span>Workspaces</span>
-                  </button>
                 </div>
               </nav>
 
@@ -291,7 +280,6 @@ function AppShellContent({
         <div className="flex-1 lg:pt-16 overflow-x-hidden w-full">
           <header className="flex items-center gap-3 border-b bg-card px-4 py-3 shadow-sm lg:hidden">
             <SidebarTrigger />
-            <WorkspaceSwitcher />
             <div className="ml-auto flex items-center gap-2">
               <NotificationsDropdown />
               {actionNode ?? (

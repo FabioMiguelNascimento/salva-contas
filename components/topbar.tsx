@@ -7,7 +7,6 @@ import Image from "next/image";
 import * as React from "react";
 import { NewTransactionDialog } from "./new-transaction-sheet";
 import { NotificationsDropdown } from "./notifications-dropdown";
-import { WorkspaceSwitcher } from "./workspace-switcher";
 
 export interface TopbarProps {
   userName?: string;
@@ -38,7 +37,6 @@ export function Topbar({
           </div>
         </div>
 
-        <WorkspaceSwitcher />
       </div>
 
       <div className="flex items-center gap-3">

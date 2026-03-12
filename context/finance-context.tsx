@@ -1,7 +1,6 @@
 "use client";
 
 import { useAuth } from "@/contexts/auth-context";
-import { useWorkspace } from "@/hooks/use-workspace";
 import {
   createBudget,
   deleteBudget,
@@ -138,10 +137,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     }
   }, [filters]);
 
-  const { currentWorkspaceId, isLoading: workspaceLoading } = useWorkspace();
-
   useEffect(() => {
-    if (isAuthenticated && !authLoading && !workspaceLoading && currentWorkspaceId) {
+    if (isAuthenticated && !authLoading) {
       setIsLoading(true);
       loadData();
       return;
@@ -159,7 +156,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setError(null);
       setLastSync(null);
     }
-  }, [loadData, isAuthenticated, authLoading, workspaceLoading, currentWorkspaceId]);
+  }, [loadData, isAuthenticated, authLoading]);
 
   const pendingBills = useMemo(
     () => transactions.filter((transaction) => transaction.status === "pending"),
