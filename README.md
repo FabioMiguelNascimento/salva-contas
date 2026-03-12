@@ -1,6 +1,6 @@
 # Salva Contas — Web (frontend)
 
-Interface web do projeto **Salva Contas** — aplicação Next.js (React) que consome a API do backend para gerenciar workspaces, transações, assinaturas, cartões e anexos.
+Interface web do projeto **Salva Contas** — aplicação Next.js (React) que consome a API do backend para gerenciar transações, assinaturas, cartões e anexos.
 
 ---
 
