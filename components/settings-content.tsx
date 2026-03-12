@@ -4,10 +4,8 @@ import AppearanceCard from "@/components/settings/appearance-card";
 import NotificationsCard from "@/components/settings/notifications-card";
 import ProfileCard from "@/components/settings/profile-card";
 import SecurityCard from "@/components/settings/security-card";
-import WorkspacesCard from "@/components/settings/workspaces-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
-import { useWorkspace } from "@/hooks/use-workspace";
 import { useEffect, useState } from "react";
 
 
@@ -25,7 +23,6 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
   const [savingPassword, setSavingPassword] = useState(false);
 
   const [activeTab, setActiveTab] = useState<string>(selectedTab ?? 'profile');
-  const { workspaces, currentWorkspace, isLoading: workspacesLoading, setCurrentWorkspace, refreshWorkspaces } = useWorkspace();
 
   // sync selectedTab prop
   useEffect(() => {
@@ -117,10 +114,6 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
     />
   );
 
-
-
-  const workspacesCard = <WorkspacesCard />;
-
   if (selectedTab) {
     return (
       <div className="space-y-6">
@@ -128,7 +121,6 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
         {selectedTab === 'appearance' && appearanceCard}
         {selectedTab === 'notifications' && notificationsCard}
         {selectedTab === 'security' && securityCard}
-        {selectedTab === 'workspaces' && workspacesCard}
       </div>
     );
   }
@@ -139,7 +131,6 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
       {appearanceCard}
       {notificationsCard}
       {securityCard}
-      {workspacesCard}
     </>
   );
 
@@ -152,7 +143,6 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
             <TabsTrigger value="appearance">Aparência</TabsTrigger>
             <TabsTrigger value="notifications">Notificações</TabsTrigger>
             <TabsTrigger value="security">Segurança</TabsTrigger>
-            <TabsTrigger value="workspaces">Workspaces</TabsTrigger>
           </TabsList>
 
           <div className="flex-1 overflow-auto space-y-6">
@@ -160,7 +150,6 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
             <TabsContent value="appearance">{appearanceCard}</TabsContent>
             <TabsContent value="notifications">{notificationsCard}</TabsContent>
             <TabsContent value="security">{securityCard}</TabsContent>
-            <TabsContent value="workspaces">{workspacesCard}</TabsContent>
           </div>
         </Tabs>
       </div>
