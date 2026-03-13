@@ -1,5 +1,6 @@
 "use client";
 
+import { DynamicIcon } from "@/components/dynamic-icon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -51,6 +52,10 @@ export default function BudgetsCard({ budgetsWithUsage, isLoading }: BudgetsCard
               <div key={budget.id} className="space-y-1">
                 <div className="flex items-center justify-between gap-2">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
+                    <DynamicIcon
+                      name={budget.category?.icon ?? "tag"}
+                      className="h-4 w-4 shrink-0 text-gray-400"
+                    />
                     <span className="text-sm font-medium text-gray-700 truncate">{budget.category?.name ?? "Categoria"}</span>
                     {budget.isOverBudget && (
                       <span className="text-xs shrink-0 bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium">Excedido</span>

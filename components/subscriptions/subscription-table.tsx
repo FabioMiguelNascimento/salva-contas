@@ -1,11 +1,12 @@
 import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
+import { DynamicIcon } from "@/components/dynamic-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
@@ -49,7 +50,19 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
             </TableCell>
             <TableCell>{currencyFormatter.format(subscription.amount)}</TableCell>
             <TableCell className="text-muted-foreground">{getScheduleLabel(subscription)}</TableCell>
-            <TableCell>{subscription.category?.name ?? "–"}</TableCell>
+            <TableCell>
+              {subscription.category ? (
+                <div className="flex items-center gap-2 min-w-0">
+                  <DynamicIcon
+                    name={subscription.category.icon ?? "tag"}
+                    className="h-4 w-4 shrink-0 text-muted-foreground"
+                  />
+                  <span className="truncate">{subscription.category.name}</span>
+                </div>
+              ) : (
+                <span className="text-xs text-muted-foreground">—</span>
+              )}
+            </TableCell>
             <TableCell>
               {subscription.creditCard ? (
                 <div className="flex items-center gap-2">

@@ -1,5 +1,6 @@
 "use client";
 
+import { DynamicIcon } from "@/components/dynamic-icon";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -62,7 +63,13 @@ export function BudgetTable({ budgetProgress, onEdit, onDelete }: BudgetTablePro
             <TableRow key={budget.id}>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <span className="font-medium">{budget.category?.name ?? budget.categoryId}</span>
+                  <span className="flex items-center gap-2 min-w-0">
+                    <DynamicIcon
+                      name={budget.category?.icon ?? "tag"}
+                      className="h-4 w-4 shrink-0 text-muted-foreground"
+                    />
+                    <span className="font-medium truncate">{budget.category?.name ?? budget.categoryId}</span>
+                  </span>
                   {isOverBudget && (
                     <span className="rounded-full bg-destructive/10 px-2 py-0.5 text-xs font-medium text-destructive">
                       Estourado

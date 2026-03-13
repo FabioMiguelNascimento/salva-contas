@@ -1,4 +1,5 @@
 import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
+import { DynamicIcon } from "@/components/dynamic-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -72,7 +73,13 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
               </TableCell>
               <TableCell>
                 <Badge variant="outline" className="text-xs">
-                  {getTransactionCategoryLabel(transaction)}
+                  <span className="flex items-center gap-1.5">
+                    <DynamicIcon
+                      name={transaction.categoryRel?.icon ?? "tag"}
+                      className="h-3.5 w-3.5 shrink-0"
+                    />
+                    <span>{getTransactionCategoryLabel(transaction)}</span>
+                  </span>
                 </Badge>
               </TableCell>
               <TableCell>
