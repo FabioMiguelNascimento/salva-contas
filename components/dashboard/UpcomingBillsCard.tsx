@@ -77,7 +77,7 @@ export default function UpcomingBillsCard({ urgentBills, nextBills, isLoading }:
 
   if (isLoading) {
     return (
-      <Card className="bg-white shadow-sm border border-gray-100">
+      <Card className="bg-white shadow-sm border border-gray-100 min-h-[220px] h-full">
         <CardContent className="p-5 space-y-4">
           <Skeleton className="h-4 w-32" />
           <Skeleton className="h-14 w-full rounded-xl" />
@@ -89,18 +89,20 @@ export default function UpcomingBillsCard({ urgentBills, nextBills, isLoading }:
 
   if (allClear && items.length === 0) {
     return (
-      <div className="bg-linear-to-r from-emerald-50 to-teal-50 border border-emerald-100 rounded-2xl p-4 flex items-start gap-3">
-        <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
-        <div>
-          <p className="font-semibold text-emerald-800">Tudo em dia</p>
-          <p className="text-sm text-emerald-600">Nenhuma conta vencendo hoje. Ótima organização!</p>
-        </div>
-      </div>
+      <Card className="bg-linear-to-r from-emerald-50 to-teal-50 border border-emerald-100 rounded-2xl min-h-[220px] h-full">
+        <CardContent className="h-full p-5 sm:p-6 flex items-start gap-3">
+          <CheckCircle2 className="h-5 w-5 text-emerald-500 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="font-semibold text-emerald-800 text-xl leading-none">Tudo em dia</p>
+            <p className="text-sm sm:text-base text-emerald-600 max-w-[28ch]">Nenhuma conta vencendo hoje. Ótima organização!</p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <Card className="overflow-hidden bg-white shadow-sm border border-gray-100">
+    <Card className="overflow-hidden bg-white shadow-sm border border-gray-100 min-h-[220px] h-full">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2">
           <CalendarClock className="h-4 w-4 text-rose-500 shrink-0" />

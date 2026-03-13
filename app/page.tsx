@@ -10,11 +10,11 @@ import UpcomingBillsCard from "@/components/dashboard/UpcomingBillsCard";
 import { KpiSparklineCard } from "@/components/kpi-sparkline-card";
 import { PageHeader } from "@/components/page-header";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { useFinance } from "@/hooks/use-finance";
 import { currencyFormatter, getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
@@ -22,9 +22,9 @@ import { parseDateOnly } from "@/lib/utils";
 import { differenceInCalendarDays, format, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
-  ArrowDownRight,
-  ArrowUpRight,
-  Wallet2
+    ArrowDownRight,
+    ArrowUpRight,
+    Wallet2
 } from "lucide-react";
 import { useMemo } from "react";
 
@@ -215,7 +215,7 @@ export default function DashboardPage() {
         <CategoryBreakdownCard breakdown={categoryBreakdown} total={donutTotal} categoriesMeta={categories} isLoading={isLoading} />
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-3 overflow-hidden">
+      <section className="grid gap-4 lg:grid-cols-[1.15fr_minmax(320px,0.85fr)] overflow-hidden items-stretch">
         <RecentTransactionsCard transactions={recentTransactions} isLoading={isLoading} />
         <UpcomingBillsCard urgentBills={urgentBills} nextBills={nextBills} isLoading={isLoading} />
       </section>

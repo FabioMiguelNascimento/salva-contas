@@ -54,20 +54,20 @@ function TransactionRow({ transaction }: { transaction: Transaction }) {
 
 export default function RecentTransactionsCard({ transactions, isLoading, title = "Últimas transações" }: RecentTransactionsCardProps) {
   return (
-    <Card className="bg-white shadow-sm border border-gray-100">
+    <Card className="bg-white shadow-sm border border-gray-100 min-h-[220px] h-full">
       <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <CardTitle className="text-base font-semibold text-gray-800">{title}</CardTitle>
         <Button variant="ghost" size="sm" className="self-start sm:self-auto" asChild>
           <Link href="/extrato">Ver extrato completo</Link>
         </Button>
       </CardHeader>
-      <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6 overflow-hidden">
+      <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6 overflow-hidden flex-1">
         {isLoading ? (
           <div className="space-y-3">
             {Array.from({ length: 5 }).map((_, index) => <Skeleton key={index} className="h-12 w-full" />)}
           </div>
         ) : (
-          <div>
+          <div className="space-y-1">
             {transactions.map((transaction) => <TransactionRow key={transaction.id} transaction={transaction} />)}
           </div>
         )}
