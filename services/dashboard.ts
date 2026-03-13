@@ -1,5 +1,14 @@
 import { apiClient } from "@/lib/api-client";
-import type { DashboardMetrics, TransactionFilters } from "@/types/finance";
+import type {
+    Budget,
+    BudgetProgress,
+    CreditCard,
+    DashboardMetrics,
+    Subscription,
+    Transaction,
+    TransactionCategory,
+    TransactionFilters,
+} from "@/types/finance";
 
 type ApiDashboardData = {
   totalIncome?: number | string;
@@ -29,6 +38,54 @@ type ApiDashboardData = {
 
 type ApiDashboardResponse = ApiDashboardData | { data: ApiDashboardData };
 
+type ApiResponse<T> = T | { data: T };
+
+type ApiTransaction = Omit<Transaction, "amount" | "category"> & {
+  amount: string | number;
+  category?: string | null;
+};
+
+type ApiSubscription = Omit<Subscription, "amount" | "category"> & {
+  amount: number | string;
+  category?: Subscription["category"];
+};
+
+type ApiCreditCard = Omit<CreditCard, "limit" | "availableLimit"> & {
+  limit: string | number;
+  availableLimit: string | number;
+};
+
+type ApiBudget = Omit<Budget, "amount"> & {
+  amount: number | string;
+};
+
+type ApiBudgetProgress = Omit<BudgetProgress, "budget" | "spent" | "remaining" | "percentage"> & {
+  budget: ApiBudget;
+  spent: number | string;
+  remaining: number | string;
+  percentage: number | string;
+};
+
+type DashboardSnapshot = {
+  metrics: DashboardMetrics;
+  transactions: Transaction[];
+  subscriptions: Subscription[];
+  budgets: Budget[];
+  budgetProgress: BudgetProgress[];
+  categories: TransactionCategory[];
+  creditCards: CreditCard[];
+};
+
+type ApiDashboardSnapshot = {
+  metrics: ApiDashboardData;
+  transactions: ApiTransaction[];
+  subscriptions: ApiSubscription[];
+  budgets: ApiBudget[];
+  budgetProgress: ApiBudgetProgress[];
+  categories: TransactionCategory[];
+  creditCards: ApiCreditCard[];
+};
+
 const toNumber = (value: number | string): number => {
   const parsed = typeof value === "string" ? Number(value) : value;
   return Number.isFinite(parsed) ? parsed : 0;
@@ -40,6 +97,58 @@ const unwrapData = (payload: ApiDashboardResponse): ApiDashboardData => {
   }
   return (payload as ApiDashboardData) ?? {};
 };
+
+const unwrapPayload = <T>(payload: ApiResponse<T>): T => {
+  if (payload && typeof payload === "object" && "data" in payload) {
+    return (payload as { data: T }).data;
+  }
+  return payload as T;
+};
+
+const normalizeTransaction = (transaction: ApiTransaction): Transaction => {
+  const categoryLabel =
+    transaction.categoryName ?? transaction.categoryRel?.name ?? transaction.category ?? "Sem categoria";
+
+  return {
+    ...transaction,
+    amount: toNumber(transaction.amount),
+    category: categoryLabel,
+    categoryName: categoryLabel,
+    categoryId: transaction.categoryId ?? transaction.categoryRel?.id ?? null,
+    categoryRel: transaction.categoryRel ?? null,
+    creditCard: transaction.creditCard ?? null,
+    creditCardId: transaction.creditCardId ?? transaction.creditCard?.id ?? null,
+  };
+};
+
+const normalizeSubscription = (subscription: ApiSubscription): Subscription => ({
+  ...subscription,
+  amount: toNumber(subscription.amount),
+  category: subscription.category ?? null,
+  dayOfMonth: subscription.dayOfMonth ?? null,
+  dayOfWeek: subscription.dayOfWeek ?? null,
+  month: subscription.month ?? null,
+  isActive: subscription.isActive ?? true,
+});
+
+const normalizeCreditCard = (card: ApiCreditCard): CreditCard => ({
+  ...card,
+  limit: toNumber(card.limit),
+  availableLimit: toNumber(card.availableLimit),
+});
+
+const normalizeBudget = (budget: ApiBudget): Budget => ({
+  ...budget,
+  amount: toNumber(budget.amount),
+});
+
+const normalizeBudgetProgress = (progress: ApiBudgetProgress): BudgetProgress => ({
+  ...progress,
+  budget: normalizeBudget(progress.budget),
+  spent: toNumber(progress.spent),
+  remaining: toNumber(progress.remaining),
+  percentage: toNumber(progress.percentage),
+});
 
 const normalizeMetrics = (metrics: ApiDashboardData): DashboardMetrics => ({
   financials: {
@@ -74,4 +183,22 @@ export async function fetchDashboardMetrics(filters: TransactionFilters) {
 
   const data = unwrapData(response.data);
   return normalizeMetrics(data);
+}
+
+export async function fetchDashboardSnapshot(filters: TransactionFilters): Promise<DashboardSnapshot> {
+  const response = await apiClient.get<ApiResponse<ApiDashboardSnapshot>>("/dashboard/snapshot", {
+    params: filters,
+  });
+
+  const payload = unwrapPayload(response.data);
+
+  return {
+    metrics: normalizeMetrics(payload.metrics ?? {}),
+    transactions: (payload.transactions ?? []).map(normalizeTransaction),
+    subscriptions: (payload.subscriptions ?? []).map(normalizeSubscription),
+    budgets: (payload.budgets ?? []).map(normalizeBudget),
+    budgetProgress: (payload.budgetProgress ?? []).map(normalizeBudgetProgress),
+    categories: payload.categories ?? [],
+    creditCards: (payload.creditCards ?? []).map(normalizeCreditCard),
+  };
 }

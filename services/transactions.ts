@@ -1,6 +1,5 @@
 import { apiClient } from "@/lib/api-client";
 import type {
-  ManualTransactionPayload,
   ProcessTransactionClientPayload,
   Transaction,
   TransactionFilters,
@@ -49,11 +48,6 @@ export async function fetchTransactions(filters: TransactionFilters) {
 
   const transactions = unwrapData(response.data);
   return (transactions ?? []).map(normalizeTransaction);
-}
-
-export async function createTransaction(payload: ManualTransactionPayload) {
-  const response = await apiClient.post<ApiResponse<ApiTransaction>>("/transactions", payload);
-  return normalizeTransaction(unwrapData(response.data));
 }
 
 export async function processTransaction(payload: ProcessTransactionClientPayload) {

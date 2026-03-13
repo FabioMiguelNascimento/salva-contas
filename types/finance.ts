@@ -141,18 +141,6 @@ export interface TransactionFilters {
   categoryId?: string;
 }
 
-export interface ManualTransactionPayload {
-  amount: number;
-  description: string;
-  categoryId: string;
-  type: TransactionType;
-  status: TransactionStatus;
-  dueDate?: string | null;
-  paymentDate?: string | null;
-  creditCardId?: string | null;
-  splits?: Omit<TransactionSplit, 'id' | 'creditCard'>[];
-}
-
 export interface UpdateTransactionPayload {
   amount?: number;
   description?: string;

@@ -2,53 +2,46 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import {
-  createBudget,
-  deleteBudget,
-  fetchBudgetProgress,
-  fetchBudgets,
-  updateBudget,
+    createBudget,
+    deleteBudget,
+    updateBudget
 } from "@/services/budgets";
-import { fetchCategories } from "@/services/categories";
 import {
-  createCreditCard,
-  deleteCreditCard,
-  fetchCreditCards,
-  updateCreditCard,
+    createCreditCard,
+    deleteCreditCard,
+    updateCreditCard
 } from "@/services/credit-cards";
-import { fetchDashboardMetrics } from "@/services/dashboard";
-import { createSubscription, deleteSubscription, fetchSubscriptions, updateSubscription } from "@/services/subscriptions";
+import { fetchDashboardSnapshot } from "@/services/dashboard";
+import { createSubscription, deleteSubscription, updateSubscription } from "@/services/subscriptions";
 import {
-  createTransaction,
-  deleteTransaction,
-  fetchTransactions,
-  processTransaction,
-  updateTransaction,
+    deleteTransaction,
+    processTransaction,
+    updateTransaction
 } from "@/services/transactions";
 import type {
-  Budget,
-  BudgetProgress,
-  CreateBudgetPayload,
-  CreateCreditCardPayload,
-  CreateSubscriptionPayload,
-  CreditCard,
-  DashboardMetrics,
-  ManualTransactionPayload,
-  ProcessTransactionClientPayload,
-  Subscription,
-  Transaction,
-  TransactionCategory,
-  TransactionFilters,
-  UpdateBudgetPayload,
-  UpdateCreditCardPayload,
-  UpdateSubscriptionPayload,
-  UpdateTransactionPayload,
+    Budget,
+    BudgetProgress,
+    CreateBudgetPayload,
+    CreateCreditCardPayload,
+    CreateSubscriptionPayload,
+    CreditCard,
+    DashboardMetrics,
+    ProcessTransactionClientPayload,
+    Subscription,
+    Transaction,
+    TransactionCategory,
+    TransactionFilters,
+    UpdateBudgetPayload,
+    UpdateCreditCardPayload,
+    UpdateSubscriptionPayload,
+    UpdateTransactionPayload,
 } from "@/types/finance";
 import {
-  createContext,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
+    createContext,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
 } from "react";
 
 interface FinanceContextValue {
@@ -68,7 +61,6 @@ interface FinanceContextValue {
   creditCards: CreditCard[];
   refresh: () => Promise<void>;
   processUnstructuredTransaction: (payload: ProcessTransactionClientPayload) => Promise<Transaction | void>;
-  createManualTransaction: (payload: ManualTransactionPayload) => Promise<Transaction | void>;
   updateExistingTransaction: (id: string, payload: UpdateTransactionPayload) => Promise<Transaction | void>;
   markAsPaid: (id: string) => Promise<Transaction | void>;
   removeTransaction: (id: string) => Promise<void>;
@@ -109,23 +101,15 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const loadData = useCallback(async () => {
     setIsSyncing(true);
     try {
-      const [transactionsResponse, metricsResponse, subscriptionsResponse, budgetsResponse, budgetProgressResponse, categoriesResponse, creditCardsResponse] = await Promise.all([
-        fetchTransactions(filters),
-        fetchDashboardMetrics(filters),
-        fetchSubscriptions(),
-        fetchBudgets({ month: filters.month, year: filters.year }),
-        fetchBudgetProgress(filters.month, filters.year),
-        fetchCategories(),
-        fetchCreditCards(),
-      ]);
+      const snapshot = await fetchDashboardSnapshot(filters);
 
-      setTransactions(transactionsResponse);
-      setMetrics(metricsResponse);
-      setSubscriptions(subscriptionsResponse);
-      setBudgets(budgetsResponse);
-      setBudgetProgress(budgetProgressResponse);
-      setCategories(categoriesResponse);
-      setCreditCards(creditCardsResponse);
+      setTransactions(snapshot.transactions);
+      setMetrics(snapshot.metrics);
+      setSubscriptions(snapshot.subscriptions);
+      setBudgets(snapshot.budgets);
+      setBudgetProgress(snapshot.budgetProgress);
+      setCategories(snapshot.categories);
+      setCreditCards(snapshot.creditCards);
       setLastSync(new Date().toISOString());
       setError(null);
     } catch (err) {
@@ -180,18 +164,6 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       return transaction;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao processar transação");
-      throw err;
-    }
-  };
-
-  const createManualTransaction = async (payload: ManualTransactionPayload) => {
-    try {
-      const transaction = await createTransaction(payload);
-      upsertTransaction(transaction);
-      await loadData();
-      return transaction;
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Erro ao criar transação");
       throw err;
     }
   };
@@ -353,7 +325,6 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     creditCards,
     refresh: loadData,
     processUnstructuredTransaction,
-    createManualTransaction,
     updateExistingTransaction,
     markAsPaid,
     removeTransaction,
