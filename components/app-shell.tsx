@@ -1,10 +1,12 @@
 "use client";
 
+import AiAdvisorCard from "@/components/dashboard/AiAdvisorCard";
 import SettingsContent from "@/components/settings-content";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetBody, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/auth-context";
 import { TopbarActionProvider, useTopbarAction } from "@/contexts/topbar-action-context";
 import { useFinance } from "@/hooks/use-finance";
@@ -21,6 +23,7 @@ import {
   Repeat,
   Settings,
   Shield,
+  Sparkles,
   User
 } from "lucide-react";
 import Image from "next/image";
@@ -132,9 +135,10 @@ function AppShellContent({
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth();
-  const { pendingBills } = useFinance();
+  const { pendingBills, filters } = useFinance();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsSelectedTab, setSettingsSelectedTab] = useState<string>('profile');
+  const [aiAdvisorOpen, setAiAdvisorOpen] = useState(false);
 
   const userInitials = user?.name
     ? user.name
@@ -201,6 +205,15 @@ function AppShellContent({
                   </SidebarMenuItem>
                 );
               })}
+
+              <SidebarMenuItem>
+                <SidebarMenuButton onClick={() => setAiAdvisorOpen(true)} className="cursor-pointer">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition-colors">
+                    <Sparkles className="h-4 w-4" />
+                  </span>
+                  <span className="flex-1 text-sm font-medium">Assistente Boletinho</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
 
@@ -241,7 +254,7 @@ function AppShellContent({
         </Sidebar>
 
         <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-          <DialogContent className="max-w-7xl w-[95vw] h-[calc(100vh-4rem)] p-0 overflow-hidden sm:!max-w-none sm:!w-[95vw] !w-[95vw]">
+          <DialogContent className="max-w-7xl w-[95vw] h-[calc(100vh-4rem)] p-0 overflow-hidden sm:max-w-none">
             <div className="flex h-full bg-background">
               <nav className="w-64 border-r border-border p-4">
                 <div className="mb-4">
@@ -276,6 +289,20 @@ function AppShellContent({
             </div>
           </DialogContent>
         </Dialog>
+
+        <Sheet open={aiAdvisorOpen} onOpenChange={setAiAdvisorOpen}>
+          <SheetContent className="w-full h-[100dvh] sm:w-[96vw] sm:max-w-[860px] p-0 gap-0">
+            <SheetHeader className="border-b border-border bg-white/95 px-5 py-4">
+              <SheetTitle>Boletinho</SheetTitle>
+              <SheetDescription>
+                Converse com o Boletinho e visualize graficos e tabelas dentro do chat.
+              </SheetDescription>
+            </SheetHeader>
+            <SheetBody className="flex-1 min-h-0 p-4">
+              <AiAdvisorCard month={filters.month} year={filters.year} />
+            </SheetBody>
+          </SheetContent>
+        </Sheet>
 
         <div className="flex-1 lg:pt-16 overflow-x-hidden w-full">
           <header className="flex items-center gap-3 border-b bg-card px-4 py-3 shadow-sm lg:hidden">

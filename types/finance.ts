@@ -270,3 +270,24 @@ export interface CreateNotificationPayload {
   type: NotificationType;
   relatedId?: string;
 }
+
+export type AiVisualizationType = "chart_donut" | "chart_line" | "table_summary" | "transaction";
+
+export interface AiVisualization {
+  type: AiVisualizationType;
+  toolName: string;
+  title: string;
+  payload: Record<string, any>;
+}
+
+export interface AiAdvisorChatHistoryMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
+export interface AiAdvisorChatResponse {
+  message: string;
+  toolCalls: string[];
+  visualization: AiVisualization | null;
+  visualizations: AiVisualization[];
+}
