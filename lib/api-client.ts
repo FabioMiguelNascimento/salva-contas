@@ -12,6 +12,8 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     let message = error?.response?.data?.message ?? error.message ?? "Erro inesperado";
+    const code = error?.response?.data?.code ?? error?.response?.data?.error?.code;
+    const status = error?.response?.status;
     const details = error?.response?.data?.error?.details;
     if (Array.isArray(details) && details.length > 0) {
       // join human-readable messages and include field paths
@@ -26,6 +28,9 @@ apiClient.interceptors.response.use(
         message += ` (${detailMsgs.join(', ')})`;
       }
     }
-    return Promise.reject(new Error(message));
+    const normalizedError = new Error(message) as Error & { code?: string; status?: number };
+    if (code) normalizedError.code = code;
+    if (typeof status === 'number') normalizedError.status = status;
+    return Promise.reject(normalizedError);
   }
 );
