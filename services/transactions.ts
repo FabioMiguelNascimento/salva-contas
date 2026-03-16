@@ -1,14 +1,16 @@
 import { apiClient } from "@/lib/api-client";
 import type {
-  ProcessTransactionClientPayload,
-  Transaction,
-  TransactionFilters,
-  UpdateTransactionPayload,
+    ProcessTransactionClientPayload,
+    Transaction,
+    TransactionFilters,
+    UpdateTransactionPayload,
 } from "@/types/finance";
 
 type ApiTransaction = Omit<Transaction, "amount" | "category"> & {
   amount: string | number;
   category?: string | null;
+  createdById?: string | null;
+  createdByName?: string | null;
 };
 
 type ApiResponse<T> = T | { data: T };
@@ -31,6 +33,8 @@ const normalizeTransaction = (transaction: ApiTransaction): Transaction => {
     categoryRel: transaction.categoryRel ?? null,
     creditCard: transaction.creditCard ?? null,
     creditCardId: transaction.creditCardId ?? transaction.creditCard?.id ?? null,
+    createdById: transaction.createdById ?? null,
+    createdByName: transaction.createdByName ?? null,
   };
 };
 
@@ -73,11 +77,18 @@ export async function processTransaction(payload: ProcessTransactionClientPayloa
     formData.append("creditCardId", payload.creditCardId);
   }
 
-  const response = await apiClient.post<ApiResponse<ApiTransaction>>("/transactions", formData, {
+  const response = await apiClient.post<ApiResponse<ApiTransaction | ApiTransaction[]>>("/transactions", formData, {
     headers: { "Content-Type": "multipart/form-data" },
   });
 
-  return normalizeTransaction(unwrapData(response.data));
+  const data = unwrapData(response.data);
+  const transactions = Array.isArray(data) ? data : [data];
+
+  if (transactions.length === 0) {
+    throw new Error("Nenhuma transação foi identificada no documento enviado.");
+  }
+
+  return normalizeTransaction(transactions[0]);
 }
 
 export async function updateTransaction(id: string, payload: UpdateTransactionPayload) {

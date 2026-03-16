@@ -3,10 +3,10 @@ import { DynamicIcon } from "@/components/dynamic-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
@@ -43,6 +43,7 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
         <TableRow>
           <TableHead>Data</TableHead>
           <TableHead>Descrição</TableHead>
+          <TableHead>Criado por</TableHead>
           <TableHead>Categoria</TableHead>
           <TableHead>Cartão</TableHead>
           <TableHead>Tipo</TableHead>
@@ -54,7 +55,7 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
         {isLoading ? (
           Array.from({ length: pageSize }).map((_, index) => (
             <TableRow key={`skeleton-${index}`}>
-              <TableCell colSpan={7}>
+              <TableCell colSpan={8}>
                 <div className="h-12 w-full bg-slate-100 animate-pulse" />
               </TableCell>
             </TableRow>
@@ -70,6 +71,11 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
                     {transaction.status === "paid" ? "Liquidado" : "Pendente"}
                   </p>
                 </div>
+              </TableCell>
+              <TableCell>
+                <span className="text-xs text-muted-foreground">
+                  {transaction.createdByName || "—"}
+                </span>
               </TableCell>
               <TableCell>
                 <Badge variant="outline" className="text-xs">
@@ -150,7 +156,7 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
           ))
         ) : (
           <TableRow>
-            <TableCell colSpan={7} className="text-center text-sm text-muted-foreground">
+            <TableCell colSpan={8} className="text-center text-sm text-muted-foreground">
               Nenhuma transação encontrada.
             </TableCell>
           </TableRow>

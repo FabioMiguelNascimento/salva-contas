@@ -130,6 +130,11 @@ function AiVisualizationRenderer({ visualization }: { visualization: AiVisualiza
         </div>
 
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3 text-xs text-slate-500">
+          {transaction.createdByName && (
+            <div className="rounded-md bg-slate-50 px-2 py-1">
+              <span className="font-medium text-slate-600">Criado por:</span> {transaction.createdByName}
+            </div>
+          )}
           {transaction.paymentDate && (
             <div className="rounded-md bg-slate-50 px-2 py-1">
               <span className="font-medium text-slate-600">Pago:</span> {formatDate(transaction.paymentDate)}
@@ -154,6 +159,43 @@ function AiVisualizationRenderer({ visualization }: { visualization: AiVisualiza
   }
 
   const payload = visualization.payload || {};
+
+  if (Array.isArray(payload.items)) {
+    const items = payload.items as Array<{ description?: string; amount?: number; category?: string; createdByName?: string | null }>;
+    const total = items.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+
+    return (
+      <div className="mt-3 rounded-xl border border-gray-100 bg-white p-3">
+        <p className="text-xs font-semibold text-gray-600 mb-2">{visualization.title}</p>
+        <div className="mb-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
+          <div className="rounded-lg bg-emerald-50 p-2">
+            <p className="text-xs text-emerald-700">Transações</p>
+            <p className="font-semibold text-emerald-800">{Number(payload.totalTransactions || items.length || 0)}</p>
+          </div>
+          <div className="rounded-lg bg-slate-100 p-2">
+            <p className="text-xs text-slate-600">Valor total</p>
+            <p className="font-semibold text-slate-800">R$ {total.toFixed(2)}</p>
+          </div>
+        </div>
+
+        <div className="space-y-1 max-h-56 overflow-auto pr-1">
+          {items.slice(0, 12).map((item, index) => (
+            <div key={`${item.description || 'item'}-${index}`} className="rounded-md border border-slate-100 px-2 py-1.5">
+              <p className="text-xs font-medium text-slate-800 truncate">{item.description || 'Sem descricao'}</p>
+              <p className="text-[11px] text-slate-500">
+                {item.category || 'Sem categoria'} • R$ {Number(item.amount || 0).toFixed(2)}
+                {item.createdByName ? ` • Criado por ${item.createdByName}` : ''}
+              </p>
+            </div>
+          ))}
+          {items.length > 12 ? (
+            <p className="text-[11px] text-slate-500">+ {items.length - 12} transações não exibidas</p>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-3 rounded-xl border border-gray-100 bg-white p-3">
       <p className="text-xs font-semibold text-gray-600 mb-2">{visualization.title}</p>

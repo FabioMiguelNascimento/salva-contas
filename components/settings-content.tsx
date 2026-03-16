@@ -1,6 +1,7 @@
 "use client";
 
 import AppearanceCard from "@/components/settings/appearance-card";
+import FamilyShareCard from "@/components/settings/family-share-card";
 import NotificationsCard from "@/components/settings/notifications-card";
 import ProfileCard from "@/components/settings/profile-card";
 import SecurityCard from "@/components/settings/security-card";
@@ -114,6 +115,8 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
     />
   );
 
+  const familyShareCard = <FamilyShareCard />;
+
   if (selectedTab) {
     return (
       <div className="space-y-6">
@@ -121,6 +124,7 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
         {selectedTab === 'appearance' && appearanceCard}
         {selectedTab === 'notifications' && notificationsCard}
         {selectedTab === 'security' && securityCard}
+        {selectedTab === 'family' && familyShareCard}
       </div>
     );
   }
@@ -131,6 +135,7 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
       {appearanceCard}
       {notificationsCard}
       {securityCard}
+      {familyShareCard}
     </>
   );
 
@@ -143,6 +148,7 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
             <TabsTrigger value="appearance">Aparência</TabsTrigger>
             <TabsTrigger value="notifications">Notificações</TabsTrigger>
             <TabsTrigger value="security">Segurança</TabsTrigger>
+            <TabsTrigger value="family">Partilha Familiar</TabsTrigger>
           </TabsList>
 
           <div className="flex-1 overflow-auto space-y-6">
@@ -150,6 +156,7 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
             <TabsContent value="appearance">{appearanceCard}</TabsContent>
             <TabsContent value="notifications">{notificationsCard}</TabsContent>
             <TabsContent value="security">{securityCard}</TabsContent>
+            <TabsContent value="family">{familyShareCard}</TabsContent>
           </div>
         </Tabs>
       </div>

@@ -200,6 +200,9 @@ export default function ContasPage() {
                           <div>
                             <p className="font-semibold">{bill.description}</p>
                             <p className="text-xs text-muted-foreground">{categoryLabel}</p>
+                            {bill.createdByName ? (
+                              <p className="text-[11px] text-muted-foreground">Criado por {bill.createdByName}</p>
+                            ) : null}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -248,6 +251,9 @@ export default function ContasPage() {
                         <div>
                           <p className="font-semibold">{bill.description}</p>
                           <p className="text-xs text-muted-foreground">{categoryLabel}</p>
+                          {bill.createdByName ? (
+                            <p className="text-[11px] text-muted-foreground">Criado por {bill.createdByName}</p>
+                          ) : null}
                         </div>
                         <StatusBadge bill={bill} />
                       </div>

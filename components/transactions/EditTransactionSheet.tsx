@@ -92,6 +92,9 @@ export function EditTransactionSheet({
       <SheetContent className="flex flex-col">
         <SheetHeader>
           <SheetTitle>Editar transação</SheetTitle>
+          {transaction?.createdByName ? (
+            <p className="text-xs text-muted-foreground">Criado por {transaction.createdByName}</p>
+          ) : null}
         </SheetHeader>
 
         <form id="edit-transaction-form" onSubmit={onSubmit} className="flex flex-1 flex-col">

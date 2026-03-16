@@ -5,26 +5,27 @@ import { Loader2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 
-const PUBLIC_ROUTES = ["/login", "/register", "/forgot-password", "/update-password"];
+const AUTH_ROUTES = ["/login", "/register", "/forgot-password", "/update-password"];
 
 export function AuthGuard({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
-  const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
+  const isAuthRoute = AUTH_ROUTES.includes(pathname);
+  const isInviteRoute = pathname.startsWith('/invite/');
 
   useEffect(() => {
     if (isLoading) return;
 
-    if (!isAuthenticated && !isPublicRoute) {
+    if (!isAuthenticated && !isAuthRoute && !isInviteRoute) {
       router.push("/login");
     }
 
-    if (isAuthenticated && isPublicRoute) {
+    if (isAuthenticated && isAuthRoute) {
       router.push("/");
     }
-  }, [isAuthenticated, isLoading, isPublicRoute, router]);
+  }, [isAuthenticated, isLoading, isAuthRoute, isInviteRoute, router]);
 
   if (isLoading) {
     return (
@@ -38,12 +39,12 @@ export function AuthGuard({ children }: { children: ReactNode }) {
   }
 
   // Se não está autenticado e não é rota pública, não renderiza nada (vai redirecionar)
-  if (!isAuthenticated && !isPublicRoute) {
+  if (!isAuthenticated && !isAuthRoute && !isInviteRoute) {
     return null;
   }
 
-  // Se está autenticado e é rota pública, não renderiza nada (vai redirecionar)
-  if (isAuthenticated && isPublicRoute) {
+  // Se está autenticado e é rota de auth, não renderiza nada (vai redirecionar)
+  if (isAuthenticated && isAuthRoute) {
     return null;
   }
 

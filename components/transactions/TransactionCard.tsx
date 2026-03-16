@@ -2,10 +2,10 @@ import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
@@ -50,6 +50,12 @@ export function TransactionCard({
           <p className="font-semibold">{transaction.description}</p>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span>{formatDate(transaction)}</span>
+            {transaction.createdByName ? (
+              <>
+                <span>•</span>
+                <span>Criado por {transaction.createdByName}</span>
+              </>
+            ) : null}
             {transaction.creditCard && (
               <>
                 <span>•</span>

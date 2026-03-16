@@ -31,6 +31,9 @@ export function DeleteTransactionDialog({
               ? `Deseja excluir a transação "${transaction.description}"?`
               : ""}
           </p>
+          {transaction?.createdByName ? (
+            <p className="mt-2 text-xs text-muted-foreground">Criado por {transaction.createdByName}</p>
+          ) : null}
         </SheetBody>
 
         <SheetFooter className="flex-row gap-2">

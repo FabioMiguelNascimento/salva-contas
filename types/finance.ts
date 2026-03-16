@@ -33,6 +33,7 @@ export interface TransactionCategory {
 export interface CreditCard {
   id: string;
   userId?: string | null;
+  createdById?: string | null;
   name: string;
   flag: CreditCardFlag;
   lastFourDigits?: string | null;
@@ -56,6 +57,8 @@ export interface CreditCardSummary {
 export interface Transaction {
   id: string;
   userId?: string | null;
+  createdById?: string | null;
+  createdByName?: string | null;
   description: string;
   amount: number;
   category: string;
@@ -86,6 +89,7 @@ export interface Transaction {
 export interface Subscription {
   id: string;
   userId?: string | null;
+  createdById?: string | null;
   description: string;
   amount: number;
   categoryId: string;

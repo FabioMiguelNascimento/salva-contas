@@ -24,7 +24,8 @@ import {
   Settings,
   Shield,
   Sparkles,
-  User
+  User,
+  Users
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -242,6 +243,10 @@ function AppShellContent({
                     <Settings className="h-4 w-4 mr-2" />
                     Configurações
                   </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => { setSettingsOpen(true); setSettingsSelectedTab('family'); }}>
+                    <Users className="h-4 w-4 mr-2" />
+                    Partilha Familiar
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout} variant="destructive">
                     <LogOut className="h-4 w-4 mr-2" />
@@ -276,6 +281,10 @@ function AppShellContent({
                   <button className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", settingsSelectedTab === 'security' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")} onClick={() => setSettingsSelectedTab('security')}>
                     <Shield className="h-4 w-4" />
                     <span>Segurança</span>
+                  </button>
+                  <button className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", settingsSelectedTab === 'family' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")} onClick={() => setSettingsSelectedTab('family')}>
+                    <Users className="h-4 w-4" />
+                    <span>Partilha Familiar</span>
                   </button>
                   <hr className="my-3 border-border/60" />
                 </div>
