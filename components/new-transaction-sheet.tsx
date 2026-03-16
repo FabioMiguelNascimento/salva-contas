@@ -6,14 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
+    Sheet,
+    SheetBody,
+    SheetContent,
+    SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
 } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
 import { useFinance } from "@/hooks/use-finance";
@@ -33,6 +33,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
   const [isScheduled, setIsScheduled] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedCreditCardId, setSelectedCreditCardId] = useState<string | null>(null);
+  const [selectedDebitCardId, setSelectedDebitCardId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"credit_card" | "debit" | "pix" | "cash" | "transfer" | "other">("cash");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,6 +45,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
     setIsScheduled(false);
     setSelectedDate(undefined);
     setSelectedCreditCardId(null);
+    setSelectedDebitCardId(null);
     setPaymentMethod("cash");
     setIsSubmitting(false);
     setError(null);
@@ -68,6 +70,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
         isScheduled,
         date: selectedDate ? formatISO(selectedDate) : undefined,
         creditCardId: paymentMethod === "credit_card" ? (selectedCreditCardId ?? undefined) : undefined,
+        debitCardId: paymentMethod === "debit" ? (selectedDebitCardId ?? undefined) : undefined,
       });
 
       setSuccessMessage("Transação enviada! A IA já está organizando tudo por aqui.");
@@ -127,6 +130,8 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
               onDateChange={setSelectedDate}
               creditCardId={selectedCreditCardId}
               onCreditCardChange={setSelectedCreditCardId}
+              debitCardId={selectedDebitCardId}
+              onDebitCardChange={setSelectedDebitCardId}
               paymentMethod={paymentMethod}
               onPaymentMethodChange={setPaymentMethod}
               isSplitMode={false}

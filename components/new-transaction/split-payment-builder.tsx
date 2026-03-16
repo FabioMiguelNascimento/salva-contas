@@ -1,6 +1,7 @@
 "use client";
 
 import { CreditCardSelect } from "@/components/credit-card-select";
+import { DebitCardSelect } from "@/components/debit-card-select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -14,7 +15,7 @@ import { formatCurrency } from "@/lib/utils";
 import { PAYMENT_METHOD_LABELS, PaymentMethod, TransactionSplit } from "@/types/finance";
 import { PlusCircle, Trash2 } from "lucide-react";
 
-export type SplitRow = Omit<TransactionSplit, "id" | "creditCard">;
+export type SplitRow = Omit<TransactionSplit, "id" | "creditCard" | "debitCard">;
 
 interface SplitPaymentBuilderProps {
   splits: SplitRow[];
@@ -41,6 +42,7 @@ export function SplitPaymentBuilder({
       amount: remaining > 0 ? remaining : 0,
       paymentMethod: "cash",
       creditCardId: null,
+      debitCardId: null,
     };
     onChange([...splits, next]);
   }
@@ -57,6 +59,9 @@ export function SplitPaymentBuilder({
         // Clear creditCardId when method is not credit_card
         if (patch.paymentMethod && patch.paymentMethod !== "credit_card") {
           updated.creditCardId = null;
+        }
+        if (patch.paymentMethod && patch.paymentMethod !== "debit") {
+          updated.debitCardId = null;
         }
         return updated;
       }),
@@ -110,6 +115,17 @@ export function SplitPaymentBuilder({
                 value={split.creditCardId ?? null}
                 onValueChange={(v) => updateRow(index, { creditCardId: v })}
                 placeholder="Selecione o cartão"
+                allowClear={false}
+              />
+            </div>
+          )}
+
+          {split.paymentMethod === "debit" && (
+            <div className="flex-1 min-w-0">
+              <DebitCardSelect
+                value={(split as any).debitCardId ?? null}
+                onValueChange={(v) => updateRow(index, { debitCardId: v } as any)}
+                placeholder="Selecione o débito"
                 allowClear={false}
               />
             </div>

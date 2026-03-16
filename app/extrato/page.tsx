@@ -165,6 +165,7 @@ export default function ExtratoPage() {
         editDate={editor.editDate}
         editCategoryId={editor.editCategoryId}
         editCreditCardId={editor.editCreditCardId}
+        editDebitCardId={editor.editDebitCardId}
         editPaymentMethod={editor.editPaymentMethod}
         editIsSplitMode={editor.editIsSplitMode}
         editSplits={editor.editSplits}
@@ -175,6 +176,7 @@ export default function ExtratoPage() {
         setEditDate={editor.setEditDate}
         setEditCategoryId={editor.setEditCategoryId}
         setEditCreditCardId={editor.setEditCreditCardId}
+        setEditDebitCardId={editor.setEditDebitCardId}
         setEditPaymentMethod={editor.setEditPaymentMethod}
         setEditIsSplitMode={editor.setEditIsSplitMode}
         setEditSplits={editor.setEditSplits}

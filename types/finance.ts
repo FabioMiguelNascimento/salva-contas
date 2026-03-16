@@ -3,6 +3,7 @@ export type TransactionStatus = "paid" | "pending";
 export type SubscriptionFrequency = "weekly" | "monthly" | "yearly";
 export type CreditCardFlag = "visa" | "mastercard" | "american_express" | "elo" | "hipercard" | "other";
 export type CreditCardStatus = "active" | "blocked" | "expired" | "cancelled";
+export type DebitCardStatus = "active" | "blocked" | "expired" | "cancelled";
 export type PaymentMethod = "credit_card" | "debit" | "pix" | "cash" | "transfer" | "other";
 
 export const PAYMENT_METHOD_LABELS: Record<PaymentMethod, string> = {
@@ -19,7 +20,9 @@ export interface TransactionSplit {
   amount: number;
   paymentMethod: PaymentMethod;
   creditCardId?: string | null;
+  debitCardId?: string | null;
   creditCard?: CreditCard | null;
+  debitCard?: DebitCard | null;
 }
 
 export interface TransactionCategory {
@@ -54,6 +57,18 @@ export interface CreditCardSummary {
   nextDueDate: string;
 }
 
+export interface DebitCard {
+  id: string;
+  userId?: string | null;
+  createdById?: string | null;
+  name: string;
+  flag: CreditCardFlag;
+  lastFourDigits?: string | null;
+  status: DebitCardStatus;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface Transaction {
   id: string;
   userId?: string | null;
@@ -67,6 +82,8 @@ export interface Transaction {
   categoryRel?: TransactionCategory | null;
   creditCard?: CreditCard | null;
   creditCardId?: string | null;
+  debitCard?: DebitCard | null;
+  debitCardId?: string | null;
   status: TransactionStatus;
   type: TransactionType;
   dueDate: string | null;
@@ -96,6 +113,8 @@ export interface Subscription {
   category?: TransactionCategory | null;
   creditCardId?: string | null;
   creditCard?: CreditCard | null;
+  debitCardId?: string | null;
+  debitCard?: DebitCard | null;
   frequency: SubscriptionFrequency;
   dayOfMonth?: number | null;
   dayOfWeek?: number | null;
@@ -182,6 +201,7 @@ export interface ProcessTransactionClientPayload {
   isScheduled?: boolean;
   date?: string | null;
   creditCardId?: string;
+  debitCardId?: string;
 }
 
 // Budget types
@@ -242,6 +262,25 @@ export interface UpdateCreditCardPayload {
 
 export interface CreditCardFilters {
   status?: CreditCardStatus;
+  page?: number;
+  limit?: number;
+}
+
+export interface CreateDebitCardPayload {
+  name: string;
+  flag: CreditCardFlag;
+  lastFourDigits?: string;
+}
+
+export interface UpdateDebitCardPayload {
+  name?: string;
+  flag?: CreditCardFlag;
+  lastFourDigits?: string;
+  status?: DebitCardStatus;
+}
+
+export interface DebitCardFilters {
+  status?: DebitCardStatus;
   page?: number;
   limit?: number;
 }

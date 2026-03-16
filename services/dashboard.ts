@@ -4,6 +4,7 @@ import type {
     BudgetProgress,
     CreditCard,
     DashboardMetrics,
+    DebitCard,
     Subscription,
     Transaction,
     TransactionCategory,
@@ -74,6 +75,7 @@ type DashboardSnapshot = {
   budgetProgress: BudgetProgress[];
   categories: TransactionCategory[];
   creditCards: CreditCard[];
+  debitCards: DebitCard[];
 };
 
 type ApiDashboardSnapshot = {
@@ -84,6 +86,7 @@ type ApiDashboardSnapshot = {
   budgetProgress: ApiBudgetProgress[];
   categories: TransactionCategory[];
   creditCards: ApiCreditCard[];
+  debitCards: DebitCard[];
 };
 
 const toNumber = (value: number | string): number => {
@@ -118,6 +121,8 @@ const normalizeTransaction = (transaction: ApiTransaction): Transaction => {
     categoryRel: transaction.categoryRel ?? null,
     creditCard: transaction.creditCard ?? null,
     creditCardId: transaction.creditCardId ?? transaction.creditCard?.id ?? null,
+    debitCard: transaction.debitCard ?? null,
+    debitCardId: transaction.debitCardId ?? transaction.debitCard?.id ?? null,
   };
 };
 
@@ -200,5 +205,6 @@ export async function fetchDashboardSnapshot(filters: TransactionFilters): Promi
     budgetProgress: (payload.budgetProgress ?? []).map(normalizeBudgetProgress),
     categories: payload.categories ?? [],
     creditCards: (payload.creditCards ?? []).map(normalizeCreditCard),
+    debitCards: payload.debitCards ?? [],
   };
 }

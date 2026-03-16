@@ -33,6 +33,8 @@ const normalizeTransaction = (transaction: ApiTransaction): Transaction => {
     categoryRel: transaction.categoryRel ?? null,
     creditCard: transaction.creditCard ?? null,
     creditCardId: transaction.creditCardId ?? transaction.creditCard?.id ?? null,
+    debitCard: transaction.debitCard ?? null,
+    debitCardId: transaction.debitCardId ?? transaction.debitCard?.id ?? null,
     createdById: transaction.createdById ?? null,
     createdByName: transaction.createdByName ?? null,
   };
@@ -75,6 +77,10 @@ export async function processTransaction(payload: ProcessTransactionClientPayloa
 
   if (payload.creditCardId) {
     formData.append("creditCardId", payload.creditCardId);
+  }
+
+  if (payload.debitCardId) {
+    formData.append("debitCardId", payload.debitCardId);
   }
 
   const response = await apiClient.post<ApiResponse<ApiTransaction | ApiTransaction[]>>("/transactions", formData, {

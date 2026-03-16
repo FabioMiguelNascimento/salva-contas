@@ -12,6 +12,11 @@ import {
     updateCreditCard
 } from "@/services/credit-cards";
 import { fetchDashboardSnapshot } from "@/services/dashboard";
+import {
+    createDebitCard,
+    deleteDebitCard,
+    updateDebitCard
+} from "@/services/debit-cards";
 import { createSubscription, deleteSubscription, updateSubscription } from "@/services/subscriptions";
 import {
     deleteTransaction,
@@ -23,9 +28,11 @@ import type {
     BudgetProgress,
     CreateBudgetPayload,
     CreateCreditCardPayload,
+    CreateDebitCardPayload,
     CreateSubscriptionPayload,
     CreditCard,
     DashboardMetrics,
+    DebitCard,
     ProcessTransactionClientPayload,
     Subscription,
     Transaction,
@@ -33,6 +40,7 @@ import type {
     TransactionFilters,
     UpdateBudgetPayload,
     UpdateCreditCardPayload,
+    UpdateDebitCardPayload,
     UpdateSubscriptionPayload,
     UpdateTransactionPayload,
 } from "@/types/finance";
@@ -59,6 +67,7 @@ interface FinanceContextValue {
   budgetProgress: BudgetProgress[];
   categories: TransactionCategory[];
   creditCards: CreditCard[];
+  debitCards: DebitCard[];
   refresh: () => Promise<void>;
   processUnstructuredTransaction: (payload: ProcessTransactionClientPayload) => Promise<Transaction | void>;
   updateExistingTransaction: (id: string, payload: UpdateTransactionPayload) => Promise<Transaction | void>;
@@ -73,6 +82,9 @@ interface FinanceContextValue {
   createCreditCardEntry: (payload: CreateCreditCardPayload) => Promise<CreditCard | void>;
   updateCreditCardEntry: (id: string, payload: UpdateCreditCardPayload) => Promise<CreditCard | void>;
   deleteCreditCardEntry: (id: string) => Promise<void>;
+  createDebitCardEntry: (payload: CreateDebitCardPayload) => Promise<DebitCard | void>;
+  updateDebitCardEntry: (id: string, payload: UpdateDebitCardPayload) => Promise<DebitCard | void>;
+  deleteDebitCardEntry: (id: string) => Promise<void>;
 }
 
 const FinanceContext = createContext<FinanceContextValue | null>(null);
@@ -93,6 +105,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [budgetProgress, setBudgetProgress] = useState<BudgetProgress[]>([]);
   const [categories, setCategories] = useState<TransactionCategory[]>([]);
   const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
+  const [debitCards, setDebitCards] = useState<DebitCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -110,6 +123,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setBudgetProgress(snapshot.budgetProgress);
       setCategories(snapshot.categories);
       setCreditCards(snapshot.creditCards);
+      setDebitCards(snapshot.debitCards);
       setLastSync(new Date().toISOString());
       setError(null);
     } catch (err) {
@@ -136,6 +150,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setBudgetProgress([]);
       setCategories([]);
       setCreditCards([]);
+      setDebitCards([]);
       setIsLoading(false);
       setError(null);
       setLastSync(null);
@@ -308,6 +323,38 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const createDebitCardEntry = async (payload: CreateDebitCardPayload) => {
+    try {
+      const card = await createDebitCard(payload);
+      setDebitCards((prev) => [card, ...prev]);
+      return card;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao criar cartão de débito");
+      throw err;
+    }
+  };
+
+  const updateDebitCardEntry = async (id: string, payload: UpdateDebitCardPayload) => {
+    try {
+      const card = await updateDebitCard(id, payload);
+      setDebitCards((prev) => prev.map((item) => (item.id === id ? card : item)));
+      return card;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao atualizar cartão de débito");
+      throw err;
+    }
+  };
+
+  const deleteDebitCardEntry = async (id: string) => {
+    try {
+      await deleteDebitCard(id);
+      setDebitCards((prev) => prev.filter((item) => item.id !== id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao remover cartão de débito");
+      throw err;
+    }
+  };
+
   const value: FinanceContextValue = {
     filters,
     setFilters,
@@ -323,6 +370,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     budgetProgress,
     categories,
     creditCards,
+    debitCards,
     refresh: loadData,
     processUnstructuredTransaction,
     updateExistingTransaction,
@@ -337,6 +385,9 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     createCreditCardEntry,
     updateCreditCardEntry,
     deleteCreditCardEntry,
+    createDebitCardEntry,
+    updateDebitCardEntry,
+    deleteDebitCardEntry,
   };
 
   return <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>;

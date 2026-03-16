@@ -2,16 +2,17 @@
 
 import { CreditCardSelect } from "@/components/credit-card-select"
 import { DatePicker } from "@/components/date-picker"
+import { DebitCardSelect } from "@/components/debit-card-select"
 import { SplitPaymentBuilder, SplitRow } from "@/components/new-transaction/split-payment-builder"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select"
 import { PAYMENT_METHOD_LABELS, PaymentMethod } from "@/types/finance"
 import { SplitSquareHorizontal } from "lucide-react"
@@ -26,6 +27,8 @@ export type TransactionDetailsProps = {
   // Simple (no-split) mode
   creditCardId?: string | null
   onCreditCardChange: (id: string | null) => void
+  debitCardId?: string | null
+  onDebitCardChange: (id: string | null) => void
   paymentMethod?: PaymentMethod
   onPaymentMethodChange: (method: PaymentMethod) => void
   // Split mode
@@ -44,6 +47,8 @@ export function TransactionDetails({
   onDateChange,
   creditCardId,
   onCreditCardChange,
+  debitCardId,
+  onDebitCardChange,
   paymentMethod = "cash",
   onPaymentMethodChange,
   isSplitMode,
@@ -61,6 +66,7 @@ export function TransactionDetails({
         amount: totalAmount || 0,
         paymentMethod: paymentMethod === "credit_card" ? "credit_card" : paymentMethod,
         creditCardId: paymentMethod === "credit_card" ? (creditCardId ?? null) : null,
+        debitCardId: paymentMethod === "debit" ? (debitCardId ?? null) : null,
       }
       onSplitsChange([initialSplit])
       onSplitModeChange(true)
@@ -134,6 +140,15 @@ export function TransactionDetails({
                   value={creditCardId ?? null}
                   onValueChange={onCreditCardChange}
                   placeholder="Selecione o cartão"
+                  allowClear
+                />
+              )}
+
+              {paymentMethod === "debit" && (
+                <DebitCardSelect
+                  value={debitCardId ?? null}
+                  onValueChange={onDebitCardChange}
+                  placeholder="Selecione o cartão de débito"
                   allowClear
                 />
               )}

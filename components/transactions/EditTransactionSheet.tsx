@@ -1,6 +1,7 @@
 import { CategorySelect } from "@/components/category-select";
 import { CreditCardSelect } from "@/components/credit-card-select";
 import { DatePicker } from "@/components/date-picker";
+import { DebitCardSelect } from "@/components/debit-card-select";
 import { SplitPaymentBuilder, SplitRow } from "@/components/new-transaction/split-payment-builder";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,7 @@ interface Props {
   editDate?: Date;
   editCategoryId: string | null;
   editCreditCardId: string | null;
+  editDebitCardId: string | null;
   editPaymentMethod: PaymentMethod;
   editIsSplitMode: boolean;
   editSplits: SplitRow[];
@@ -35,6 +37,7 @@ interface Props {
   setEditDate: (d: Date | undefined) => void;
   setEditCategoryId: (v: string | null) => void;
   setEditCreditCardId: (v: string | null) => void;
+  setEditDebitCardId: (v: string | null) => void;
   setEditPaymentMethod: (v: PaymentMethod) => void;
   setEditIsSplitMode: (v: boolean) => void;
   setEditSplits: (splits: SplitRow[]) => void;
@@ -54,6 +57,7 @@ export function EditTransactionSheet({
   editDate,
   editCategoryId,
   editCreditCardId,
+  editDebitCardId,
   editPaymentMethod,
   editIsSplitMode,
   editSplits,
@@ -64,6 +68,7 @@ export function EditTransactionSheet({
   setEditDate,
   setEditCategoryId,
   setEditCreditCardId,
+  setEditDebitCardId,
   setEditPaymentMethod,
   setEditIsSplitMode,
   setEditSplits,
@@ -150,6 +155,15 @@ export function EditTransactionSheet({
                       value={editCreditCardId}
                       onValueChange={setEditCreditCardId}
                       placeholder="Selecione o cartão"
+                      allowClear
+                    />
+                  )}
+
+                  {editPaymentMethod === "debit" && (
+                    <DebitCardSelect
+                      value={editDebitCardId}
+                      onValueChange={setEditDebitCardId}
+                      placeholder="Selecione o débito"
                       allowClear
                     />
                   )}

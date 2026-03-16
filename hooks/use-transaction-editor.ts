@@ -15,6 +15,7 @@ export function useTransactionEditor() {
   const [editDescription, setEditDescription] = useState("");
   const [editCategoryId, setEditCategoryId] = useState<string | null>(null);
   const [editCreditCardId, setEditCreditCardId] = useState<string | null>(null);
+  const [editDebitCardId, setEditDebitCardId] = useState<string | null>(null);
   const [editPaymentMethod, setEditPaymentMethod] = useState<PaymentMethod>("cash");
   const [editIsSplitMode, setEditIsSplitMode] = useState(false);
   const [editSplits, setEditSplits] = useState<SplitRow[]>([]);
@@ -38,15 +39,18 @@ export function useTransactionEditor() {
           amount: Number(s.amount),
           paymentMethod: s.paymentMethod,
           creditCardId: s.creditCardId ?? null,
+          debitCardId: (s as any).debitCardId ?? null,
         }))
       );
       setEditCreditCardId(null);
+      setEditDebitCardId(null);
       setEditPaymentMethod("cash");
     } else {
       setEditIsSplitMode(false);
       setEditSplits([]);
       setEditCreditCardId(tx.creditCardId ?? null);
-      setEditPaymentMethod(tx.creditCardId ? "credit_card" : "cash");
+      setEditDebitCardId(tx.debitCardId ?? null);
+      setEditPaymentMethod(tx.creditCardId ? "credit_card" : tx.debitCardId ? "debit" : "cash");
     }
 
     setOpen(true);
@@ -77,8 +81,10 @@ export function useTransactionEditor() {
         if (editIsSplitMode) {
           payload.splits = editSplits;
           payload.creditCardId = null;
+          payload.debitCardId = null;
         } else {
           payload.creditCardId = editPaymentMethod === "credit_card" ? editCreditCardId : null;
+          payload.debitCardId = editPaymentMethod === "debit" ? editDebitCardId : null;
         }
 
         await updateExistingTransaction(transaction.id, payload);
@@ -94,7 +100,7 @@ export function useTransactionEditor() {
         setIsProcessing(false);
       }
     },
-    [transaction, editAmount, editDescription, editType, editStatus, editDate, editCategoryId, editCreditCardId, editPaymentMethod, editIsSplitMode, editSplits, updateExistingTransaction, closeEditor]
+    [transaction, editAmount, editDescription, editType, editStatus, editDate, editCategoryId, editCreditCardId, editDebitCardId, editPaymentMethod, editIsSplitMode, editSplits, updateExistingTransaction, closeEditor]
   );
 
   return {
@@ -107,6 +113,7 @@ export function useTransactionEditor() {
     editDescription,
     editCategoryId,
     editCreditCardId,
+    editDebitCardId,
     editPaymentMethod,
     editIsSplitMode,
     editSplits,
@@ -117,6 +124,7 @@ export function useTransactionEditor() {
     setEditDescription,
     setEditCategoryId,
     setEditCreditCardId,
+    setEditDebitCardId,
     setEditPaymentMethod,
     setEditIsSplitMode,
     setEditSplits,
