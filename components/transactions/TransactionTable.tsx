@@ -15,6 +15,7 @@ import type { Transaction } from "@/types/finance";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { FileText, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface Props {
   transactions: Transaction[];
@@ -36,6 +37,15 @@ function formatDate(tx: Transaction) {
 
 export function TransactionTable({ transactions, isLoading, onEdit, onDelete, onViewAttachment }: Props) {
   const pageSize = 8;
+
+  const copyTransactionId = async (transaction: Transaction) => {
+    try {
+      await navigator.clipboard.writeText(transaction.id);
+      toast.success("ID da transação copiado");
+    } catch {
+      toast.error("Não foi possível copiar o ID");
+    }
+  };
 
   return (
     <Table>
@@ -66,7 +76,14 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
               <TableCell>{formatDate(transaction)}</TableCell>
               <TableCell>
                 <div>
-                  <p className="font-semibold">{transaction.description}</p>
+                  <button
+                    type="button"
+                    onClick={() => copyTransactionId(transaction)}
+                    className="font-semibold text-left hover:underline decoration-dotted"
+                    title="Clique para copiar o ID da transação"
+                  >
+                    {transaction.description}
+                  </button>
                   <p className="text-xs text-muted-foreground">
                     {transaction.status === "paid" ? "Liquidado" : "Pendente"}
                   </p>

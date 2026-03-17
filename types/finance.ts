@@ -173,7 +173,8 @@ export interface UpdateTransactionPayload {
   dueDate?: string | null;
   paymentDate?: string | null;
   creditCardId?: string | null;
-  splits?: Omit<TransactionSplit, 'id' | 'creditCard'>[];
+  debitCardId?: string | null;
+  splits?: Omit<TransactionSplit, 'id' | 'creditCard' | 'debitCard'>[];
 }
 
 export interface CreateSubscriptionPayload {

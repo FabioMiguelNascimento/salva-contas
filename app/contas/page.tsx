@@ -23,6 +23,7 @@ import { ptBR } from "date-fns/locale";
 import { AlertTriangle, Calendar, CheckCircle2, FileText, PencilLine, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 const filterTabs = [
   { value: "all", label: "Todas" },
@@ -108,6 +109,15 @@ export default function ContasPage() {
       setEditSheet({ open: false });
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const copyTransactionId = async (bill: Transaction) => {
+    try {
+      await navigator.clipboard.writeText(bill.id);
+      toast.success("ID da transação copiado");
+    } catch {
+      toast.error("Não foi possível copiar o ID");
     }
   };
 
@@ -198,7 +208,14 @@ export default function ContasPage() {
                       <TableRow key={bill.id}>
                         <TableCell>
                           <div>
-                            <p className="font-semibold">{bill.description}</p>
+                            <button
+                              type="button"
+                              onClick={() => copyTransactionId(bill)}
+                              className="font-semibold text-left hover:underline decoration-dotted"
+                              title="Clique para copiar o ID da transação"
+                            >
+                              {bill.description}
+                            </button>
                             <p className="text-xs text-muted-foreground">{categoryLabel}</p>
                             {bill.createdByName ? (
                               <p className="text-[11px] text-muted-foreground">Criado por {bill.createdByName}</p>
@@ -249,7 +266,14 @@ export default function ContasPage() {
                     <div key={bill.id} className="rounded-2xl border border-border/60 p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-semibold">{bill.description}</p>
+                          <button
+                            type="button"
+                            onClick={() => copyTransactionId(bill)}
+                            className="font-semibold text-left hover:underline decoration-dotted"
+                            title="Clique para copiar o ID da transação"
+                          >
+                            {bill.description}
+                          </button>
                           <p className="text-xs text-muted-foreground">{categoryLabel}</p>
                           {bill.createdByName ? (
                             <p className="text-[11px] text-muted-foreground">Criado por {bill.createdByName}</p>

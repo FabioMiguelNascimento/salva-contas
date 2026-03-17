@@ -2,10 +2,10 @@ import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
@@ -13,6 +13,7 @@ import type { Transaction } from "@/types/finance";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { FileText, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface Props {
   transaction: Transaction;
@@ -39,6 +40,15 @@ export function TransactionCard({
   onViewAttachment,
   isLoading,
 }: Props) {
+  const copyTransactionId = async () => {
+    try {
+      await navigator.clipboard.writeText(transaction.id);
+      toast.success("ID da transação copiado");
+    } catch {
+      toast.error("Não foi possível copiar o ID");
+    }
+  };
+
   if (isLoading) {
     return <div className="h-28 w-full rounded-2xl bg-slate-100 animate-pulse" />;
   }
@@ -47,7 +57,14 @@ export function TransactionCard({
     <div className="rounded-2xl border border-border/60 p-4">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1">
-          <p className="font-semibold">{transaction.description}</p>
+          <button
+            type="button"
+            onClick={copyTransactionId}
+            className="font-semibold text-left hover:underline decoration-dotted"
+            title="Clique para copiar o ID da transação"
+          >
+            {transaction.description}
+          </button>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span>{formatDate(transaction)}</span>
             {transaction.createdByName ? (

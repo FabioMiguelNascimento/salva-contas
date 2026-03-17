@@ -1,6 +1,6 @@
 "use client";
 
-import { CardFlagIcon } from '@/components/credit-cards/card-flag-icon';
+import { DynamicIcon } from '@/components/dynamic-icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -121,20 +121,36 @@ function AiVisualizationRenderer({ visualization }: { visualization: AiVisualiza
 
     return (
       <div className="mt-3 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold text-slate-900">{transaction.description || 'Transação registrada'}</p>
-            <p className="text-xs text-slate-500">{transaction.categoryName ?? transaction.category ?? 'Sem categoria'}</p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-slate-900 truncate">{transaction.description || 'Transação registrada'}</p>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+              <span className="flex items-center gap-2 whitespace-nowrap">
+                {transaction.categoryIcon ? (
+                  <DynamicIcon name={transaction.categoryIcon} className="h-4 w-4 text-slate-500" />
+                ) : (
+                  <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                )}
+                <span className="truncate">{transaction.categoryName ?? transaction.category ?? 'Sem categoria'}</span>
+              </span>
+              {transaction.createdByName ? (
+                <span className="flex items-center gap-1">
+                  <span className="h-2 w-2 rounded-full bg-slate-400" />
+                  Criado por {transaction.createdByName}
+                </span>
+              ) : null}
+            </div>
           </div>
-          <p className="text-base font-semibold text-emerald-700">R$ {Number(transaction.amount || 0).toFixed(2)}</p>
+
+          <div className="flex items-center gap-2">
+            <div className="text-right">
+              <p className="text-base font-semibold text-emerald-700">R$ {Number(transaction.amount || 0).toFixed(2)}</p>
+              <p className="text-xs text-slate-500">{transaction.status === 'paid' ? 'Liquidado' : 'Pendente'}</p>
+            </div>
+          </div>
         </div>
 
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3 text-xs text-slate-500">
-          {transaction.createdByName && (
-            <div className="rounded-md bg-slate-50 px-2 py-1">
-              <span className="font-medium text-slate-600">Criado por:</span> {transaction.createdByName}
-            </div>
-          )}
           {transaction.paymentDate && (
             <div className="rounded-md bg-slate-50 px-2 py-1">
               <span className="font-medium text-slate-600">Pago:</span> {formatDate(transaction.paymentDate)}
@@ -145,12 +161,60 @@ function AiVisualizationRenderer({ visualization }: { visualization: AiVisualiza
               <span className="font-medium text-slate-600">Vencimento:</span> {formatDate(transaction.dueDate)}
             </div>
           )}
-          {cardLabel && (
-            <div className="rounded-md bg-slate-50 px-2 py-1 flex items-center gap-1.5">
-              {cardFlag ? (
-                <CardFlagIcon flag={cardFlag} className="h-4 w-auto" />
-              ) : null}
-              <span className="font-medium text-slate-600">Cartão:</span> {cardLabel}
+          <div className="rounded-md bg-slate-50 px-2 py-1">
+            <span className="font-medium text-slate-600">Tipo:</span> {transaction.type === 'income' ? 'Receita' : 'Despesa'}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (
+    visualization.type === 'table_summary' &&
+    visualization.payload &&
+    typeof visualization.payload === 'object' &&
+    'description' in visualization.payload &&
+    'amount' in visualization.payload
+  ) {
+    const t = visualization.payload as any;
+
+    const formatDate = (value?: string | Date | null) => {
+      if (!value) return null;
+      try {
+        let date: Date;
+        if (typeof value === 'string') date = parseISO(value);
+        else if (value instanceof Date) date = value;
+        else return String(value);
+        return format(date, "dd/MM/yyyy", { locale: ptBR });
+      } catch {
+        return String(value);
+      }
+    };
+
+    return (
+      <div className="mt-3 rounded-xl border border-gray-100 bg-white p-4 shadow-sm">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-semibold text-slate-900">{t.description || 'Transação'}</p>
+            <p className="text-xs text-slate-500">{t.categoryName ?? t.category ?? 'Sem categoria'}</p>
+          </div>
+          <p className="text-base font-semibold text-emerald-700">R$ {Number(t.amount || 0).toFixed(2)}</p>
+        </div>
+
+        <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3 text-xs text-slate-500">
+          {t.paymentDate && (
+            <div className="rounded-md bg-slate-50 px-2 py-1">
+              <span className="font-medium text-slate-600">Pago:</span> {formatDate(t.paymentDate)}
+            </div>
+          )}
+          {t.dueDate && (
+            <div className="rounded-md bg-slate-50 px-2 py-1">
+              <span className="font-medium text-slate-600">Vencimento:</span> {formatDate(t.dueDate)}
+            </div>
+          )}
+          {t.createdByName && (
+            <div className="rounded-md bg-slate-50 px-2 py-1">
+              <span className="font-medium text-slate-600">Criado por:</span> {t.createdByName}
             </div>
           )}
         </div>
@@ -184,6 +248,7 @@ function AiVisualizationRenderer({ visualization }: { visualization: AiVisualiza
               <p className="text-xs font-medium text-slate-800 truncate">{item.description || 'Sem descricao'}</p>
               <p className="text-[11px] text-slate-500">
                 {item.category || 'Sem categoria'} • R$ {Number(item.amount || 0).toFixed(2)}
+                {(item as any).id ? ` • ${(item as any).id.slice(0, 8)}…` : ''}
                 {item.createdByName ? ` • Criado por ${item.createdByName}` : ''}
               </p>
             </div>
