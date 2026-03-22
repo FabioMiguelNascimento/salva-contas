@@ -1,5 +1,6 @@
 "use client";
 
+import CategoryDonut from "@/components/category-donut";
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { Button } from "@/components/ui/button";
 import type { AiVisualization } from "@/types/finance";
@@ -216,6 +217,28 @@ export default function AiAdvisorVisualizationRenderer({
     );
   }
 
+  if (visualization.type === "chart_donut") {
+    const items = Array.isArray((payload as any).items)
+      ? ((payload as any).items as Array<{ category?: string; total?: number | string }>)
+      : [];
+
+    const donutData = items.map((item) => ({
+      category: item.category || "Sem categoria",
+      total: parseAmount(item.total),
+    }));
+
+    const total = items.reduce((sum, item) => sum + parseAmount(item.total), 0);
+    return (
+      <div className="mt-3 w-full min-w-0 overflow-x-hidden rounded-xl bg-white p-3">
+        <p className="mb-2 text-xs font-semibold text-gray-600">{visualization.title}</p>
+        <div className="mb-3 flex items-center justify-center rounded-lg bg-slate-50/60 p-2">
+          <CategoryDonut data={donutData} total={total} />
+        </div>
+        {requiresConfirmation && renderConfirmationActions(status, onConfirm, onCancel)}
+      </div>
+    );
+  }
+
   if (
     visualization.type === "table_summary" &&
     visualization.payload &&
@@ -259,7 +282,7 @@ export default function AiAdvisorVisualizationRenderer({
     );
   }
 
-  if (Array.isArray(payload.items)) {
+  if (requiresConfirmation && Array.isArray(payload.items)) {
     const allItems = payload.items as Array<{ description?: string; amount?: number; category?: string; createdByName?: string | null }>;
     const selectedItems = allItems.filter((_, idx) => !deselectedIndices.has(idx));
     const total = selectedItems.reduce((sum, item) => sum + parseAmount(item.amount), 0);
