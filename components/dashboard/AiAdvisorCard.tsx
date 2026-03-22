@@ -13,15 +13,15 @@ import { Paperclip, Send, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import {
-    Cell,
-    Line,
-    LineChart,
-    Pie,
-    PieChart,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis,
+  Cell,
+  Line,
+  LineChart,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from 'recharts';
 import { toast } from 'sonner';
 
@@ -31,19 +31,33 @@ type ChatAttachment = {
   type: string;
 };
 
+type VisualizationStatus = 'idle' | 'confirming' | 'confirmed' | 'cancelled';
 type ChatMessage = {
   id: string;
   role: 'user' | 'assistant';
   content: string;
   visualizations?: AiVisualization[];
+  visualizationStatuses?: Record<string, VisualizationStatus>;
   attachments?: ChatAttachment[];
 };
 
 const CHART_COLORS = ['#10b981', '#0ea5e9', '#f97316', '#6366f1', '#ec4899', '#14b8a6'];
 
-function AiVisualizationRenderer({ visualization }: { visualization: AiVisualization }) {
-  const [confirmState, setConfirmState] = useState<'idle' | 'confirming' | 'confirmed' | 'cancelled'>('idle');
-
+function AiVisualizationRenderer({
+  visualization,
+  messageId,
+  index,
+  status,
+  onConfirmVisualization,
+  onCancelVisualization,
+}: {
+  visualization: AiVisualization;
+  messageId: string;
+  index: number;
+  status: VisualizationStatus;
+  onConfirmVisualization: (messageId: string, index: number, payload: any) => Promise<void>;
+  onCancelVisualization: (messageId: string, index: number) => void;
+}) {
   const requiresConfirmation = Boolean(visualization.payload?.requiresConfirmation);
   const proposedTransactions = Array.isArray(visualization.payload?.proposedTransactions)
     ? visualization.payload.proposedTransactions
@@ -60,30 +74,10 @@ function AiVisualizationRenderer({ visualization }: { visualization: AiVisualiza
     return [];
   };
 
-  const onConfirm = async () => {
-    if (!requiresConfirmation || confirmState === 'confirming' || confirmState === 'confirmed') return;
-
-    setConfirmState('confirming');
-    try {
-      const confirmed = await confirmTransaction(buildConfirmData());
-      toast.success('Confirmação realizada! ' + (Array.isArray(confirmed) ? `${confirmed.length} transações` : '1 transação'));
-      setConfirmState('confirmed');
-    } catch (error: any) {
-      toast.error(error?.message || 'Falha ao confirmar transação. Tente novamente.');
-      setConfirmState('idle');
-    }
-  };
-
-  const onCancel = () => {
-    if (!requiresConfirmation || confirmState === 'confirmed') return;
-    setConfirmState('cancelled');
-    toast('Operação cancelada.');
-  };
-
   const renderConfirmationActions = () => {
     if (!requiresConfirmation) return null;
 
-    if (confirmState === 'confirmed') {
+    if (status === 'confirmed') {
       return (
         <div className="mt-3 rounded-md border border-emerald-200 bg-emerald-50 p-2 text-sm text-emerald-700">
           Transação confirmada com sucesso.
@@ -91,7 +85,7 @@ function AiVisualizationRenderer({ visualization }: { visualization: AiVisualiza
       );
     }
 
-    if (confirmState === 'cancelled') {
+    if (status === 'cancelled') {
       return (
         <div className="mt-3 rounded-md border border-rose-200 bg-rose-50 p-2 text-sm text-rose-700">
           Transação cancelada. A ação não será realizada.
@@ -101,10 +95,15 @@ function AiVisualizationRenderer({ visualization }: { visualization: AiVisualiza
 
     return (
       <div className="mt-3 flex flex-wrap gap-2">
-        <Button size="sm" variant="secondary" onClick={onConfirm} disabled={confirmState === 'confirming'}>
-          {confirmState === 'confirming' ? 'Confirmando...' : 'Confirmar'}
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={() => onConfirmVisualization(messageId, index, buildConfirmData())}
+          disabled={status === 'confirming'}
+        >
+          {status === 'confirming' ? 'Confirmando...' : 'Confirmar'}
         </Button>
-        <Button size="sm" variant="outline" onClick={onCancel}>
+        <Button size="sm" variant="outline" onClick={() => onCancelVisualization(messageId, index)}>
           Cancelar
         </Button>
       </div>
@@ -368,7 +367,15 @@ function AiVisualizationRenderer({ visualization }: { visualization: AiVisualiza
   );
 }
 
-function MessageBubble({ message }: { message: ChatMessage }) {
+function MessageBubble({
+  message,
+  onConfirmVisualization,
+  onCancelVisualization,
+}: {
+  message: ChatMessage;
+  onConfirmVisualization: (messageId: string, index: number, payload: any) => Promise<void>;
+  onCancelVisualization: (messageId: string, index: number) => void;
+}) {
   const isAssistant = message.role === 'assistant';
   return (
     <div className={`w-full flex ${isAssistant ? 'justify-start' : 'justify-end'}`}>
@@ -408,7 +415,15 @@ function MessageBubble({ message }: { message: ChatMessage }) {
         ) : null}
 
         {isAssistant && (message.visualizations || []).map((visual, index) => (
-          <AiVisualizationRenderer key={`${message.id}-${visual.toolName}-${index}`} visualization={visual} />
+          <AiVisualizationRenderer
+            key={`${message.id}-${visual.toolName}-${index}`}
+            visualization={visual}
+            messageId={message.id}
+            index={index}
+            status={message.visualizationStatuses?.[String(index)] ?? 'idle'}
+            onConfirmVisualization={onConfirmVisualization}
+            onCancelVisualization={onCancelVisualization}
+          />
         ))}
       </div>
     </div>
@@ -447,6 +462,75 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
       return initialMessages;
     }
   });
+
+  const handleConfirmVisualization = async (messageId: string, idx: number, payload: any) => {
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === messageId
+          ? {
+              ...msg,
+              visualizationStatuses: {
+                ...(msg.visualizationStatuses ?? {}),
+                [idx]: 'confirming',
+              },
+            }
+          : msg,
+      ),
+    );
+
+    try {
+      const confirmed = await confirmTransaction(payload);
+      toast.success(
+        `Confirmação realizada: ${Array.isArray(confirmed) ? confirmed.length : 1} transação(ões)`,
+      );
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId
+            ? {
+                ...msg,
+                visualizationStatuses: {
+                  ...(msg.visualizationStatuses ?? {}),
+                  [idx]: 'confirmed',
+                },
+              }
+            : msg,
+        ),
+      );
+    } catch (error: any) {
+      toast.error(error?.message || 'Falha ao confirmar transação. Tente novamente.');
+      setMessages((prev) =>
+        prev.map((msg) =>
+          msg.id === messageId
+            ? {
+                ...msg,
+                visualizationStatuses: {
+                  ...(msg.visualizationStatuses ?? {}),
+                  [idx]: 'idle',
+                },
+              }
+            : msg,
+        ),
+      );
+    }
+  };
+
+  const handleCancelVisualization = (messageId: string, idx: number) => {
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === messageId
+          ? {
+              ...msg,
+              visualizationStatuses: {
+                ...(msg.visualizationStatuses ?? {}),
+                [idx]: 'cancelled',
+              },
+            }
+          : msg,
+      ),
+    );
+    toast('Operação cancelada.');
+  };
+
   const [input, setInput] = useState('');
   const [attachedFiles, setAttachedFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -538,7 +622,12 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
             >
               <div className="space-y-3">
                 {messages.map((message) => (
-                  <MessageBubble key={message.id} message={message} />
+                  <MessageBubble
+                    key={message.id}
+                    message={message}
+                    onConfirmVisualization={handleConfirmVisualization}
+                    onCancelVisualization={handleCancelVisualization}
+                  />
                 ))}
 
                 {isLoading && (
