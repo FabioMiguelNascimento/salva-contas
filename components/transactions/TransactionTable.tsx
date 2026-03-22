@@ -75,11 +75,11 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
             <TableRow key={transaction.id}>
               <TableCell>{formatDate(transaction)}</TableCell>
               <TableCell>
-                <div>
+                <div className="min-w-0">
                   <button
                     type="button"
                     onClick={() => copyTransactionId(transaction)}
-                    className="font-semibold text-left hover:underline decoration-dotted"
+                    className="font-semibold text-left hover:underline decoration-dotted break-words whitespace-normal max-w-full"
                     title="Clique para copiar o ID da transação"
                   >
                     {transaction.description}

@@ -37,8 +37,10 @@ function TransactionRow({ transaction }: { transaction: Transaction }) {
         />
       </div>
       <div className="min-w-0 flex-1 overflow-hidden">
-        <p className="text-sm font-medium text-gray-800 truncate">{transaction.description}</p>
-        <p className="text-xs text-gray-400 truncate">
+        <p className="text-sm font-medium text-gray-800 break-words whitespace-pre-wrap overflow-hidden">
+          {transaction.description}
+        </p>
+        <p className="text-xs text-gray-400 break-words whitespace-pre-wrap overflow-hidden">
           {categoryLabel} • {transaction.paymentDate ? format(parseDateOnly(transaction.paymentDate)!, "dd MMM", { locale: ptBR }) : "pendente"}
         </p>
       </div>
