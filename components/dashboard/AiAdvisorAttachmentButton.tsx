@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef } from 'react';
+import { Button } from '../ui/button';
 
 type AiAdvisorAttachmentButtonProps = {
   disabled?: boolean;
@@ -29,8 +30,9 @@ export default function AiAdvisorAttachmentButton({
         }}
       />
 
-      <button
+      <Button
         type="button"
+        variant="ghost"
         disabled={disabled}
         className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
         onClick={() => fileInputRef.current?.click()}
@@ -50,7 +52,7 @@ export default function AiAdvisorAttachmentButton({
           <polyline points="7 10 12 15 17 10" />
           <line x1="12" y1="15" x2="12" y2="3" />
         </svg>
-      </button>
+      </Button>
     </>
   );
 }

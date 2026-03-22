@@ -8,6 +8,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Plus } from 'lucide-react';
+import { Button } from '../ui/button';
 
 const TOOL_PROMPT_OPTIONS = [
   {
@@ -60,15 +61,16 @@ export default function AiAdvisorToolsDropdown({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button
+        <Button
           type="button"
+          variant="ghost"
           disabled={disabled}
           className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
           title="Sugestoes de ferramentas"
           aria-label="Sugestoes de ferramentas"
         >
          <Plus />
-        </button>
+        </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-64">
         {TOOL_PROMPT_OPTIONS.map((option) => (
