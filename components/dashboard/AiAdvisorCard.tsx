@@ -50,7 +50,7 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
     if (typeof window === 'undefined') return initialMessages;
 
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
+      const stored = sessionStorage.getItem(STORAGE_KEY);
       if (!stored) return initialMessages;
 
       const parsed = JSON.parse(stored) as ChatMessage[];
@@ -71,8 +71,16 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const messagesToStore = messages.map(({ attachments, ...rest }) => rest);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(messagesToStore));
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(messagesToStore));
   }, [messages]);
+
+  const handleClearHistory = () => {
+    setMessages(initialMessages);
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem(STORAGE_KEY);
+    }
+    toast.success('Historico do assistente limpo para esta sessao.');
+  };
 
   const history = useMemo(
     () => messages.filter((m) => m.id !== 'seed-1').map((m) => ({ role: m.role, content: m.content })),
@@ -233,6 +241,18 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
 
           <div className="bg-white/70 p-3 sm:p-4">
             <div className="flex flex-col gap-2">
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClearHistory}
+                  disabled={messages.length <= 1 || isLoading}
+                >
+                  Limpar historico
+                </Button>
+              </div>
+
               <div className="relative flex items-center rounded-full border border-slate-200 bg-white/80 px-3 py-2 shadow-sm">
                 <input
                   ref={fileInputRef}
@@ -289,7 +309,7 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
                       key={`${file.name}-${file.size}-${file.lastModified}`}
                       className="flex items-center gap-2 rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-700"
                     >
-                      <span className="truncate max-w-[12rem]">{file.name}</span>
+                      <span className="max-w-48 truncate">{file.name}</span>
                       <button
                         type="button"
                         onClick={() => setAttachedFiles((prev) => prev.filter((f) => f !== file))}
