@@ -97,6 +97,17 @@ export async function processTransaction(payload: ProcessTransactionClientPayloa
   return normalizeTransaction(transactions[0]);
 }
 
+export async function confirmTransaction(payload: Record<string, any> | Record<string, any>[]) {
+  const response = await apiClient.post<ApiResponse<ApiTransaction | ApiTransaction[]>>('/transactions/confirm', payload);
+  const data = unwrapData(response.data);
+
+  if (Array.isArray(data)) {
+    return data.map(normalizeTransaction);
+  }
+
+  return normalizeTransaction(data);
+}
+
 export async function updateTransaction(id: string, payload: UpdateTransactionPayload) {
   const response = await apiClient.patch<ApiResponse<ApiTransaction>>(`/transactions/${id}`, payload);
   return normalizeTransaction(unwrapData(response.data));

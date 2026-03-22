@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { chatWithAiAdvisor } from '@/services/ai-advisor';
+import { confirmTransaction } from '@/services/transactions';
 import type { AiVisualization } from '@/types/finance';
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -41,6 +42,75 @@ type ChatMessage = {
 const CHART_COLORS = ['#10b981', '#0ea5e9', '#f97316', '#6366f1', '#ec4899', '#14b8a6'];
 
 function AiVisualizationRenderer({ visualization }: { visualization: AiVisualization }) {
+  const [confirmState, setConfirmState] = useState<'idle' | 'confirming' | 'confirmed' | 'cancelled'>('idle');
+
+  const requiresConfirmation = Boolean(visualization.payload?.requiresConfirmation);
+  const proposedTransactions = Array.isArray(visualization.payload?.proposedTransactions)
+    ? visualization.payload.proposedTransactions
+    : null;
+
+  const buildConfirmData = () => {
+    if (proposedTransactions) return proposedTransactions;
+
+    if (visualization.payload && typeof visualization.payload === 'object') {
+      const { requiresConfirmation: _req, proposedTransactions: _prop, ...rest } = visualization.payload as any;
+      return [rest];
+    }
+
+    return [];
+  };
+
+  const onConfirm = async () => {
+    if (!requiresConfirmation || confirmState === 'confirming' || confirmState === 'confirmed') return;
+
+    setConfirmState('confirming');
+    try {
+      const confirmed = await confirmTransaction(buildConfirmData());
+      toast.success('Confirmação realizada! ' + (Array.isArray(confirmed) ? `${confirmed.length} transações` : '1 transação'));
+      setConfirmState('confirmed');
+    } catch (error: any) {
+      toast.error(error?.message || 'Falha ao confirmar transação. Tente novamente.');
+      setConfirmState('idle');
+    }
+  };
+
+  const onCancel = () => {
+    if (!requiresConfirmation || confirmState === 'confirmed') return;
+    setConfirmState('cancelled');
+    toast('Operação cancelada.');
+  };
+
+  const renderConfirmationActions = () => {
+    if (!requiresConfirmation) return null;
+
+    if (confirmState === 'confirmed') {
+      return (
+        <div className="mt-3 rounded-md border border-emerald-200 bg-emerald-50 p-2 text-sm text-emerald-700">
+          Transação confirmada com sucesso.
+        </div>
+      );
+    }
+
+    if (confirmState === 'cancelled') {
+      return (
+        <div className="mt-3 rounded-md border border-rose-200 bg-rose-50 p-2 text-sm text-rose-700">
+          Transação cancelada. A ação não será realizada.
+        </div>
+      );
+    }
+
+    return (
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button size="sm" variant="secondary" onClick={onConfirm} disabled={confirmState === 'confirming'}>
+          {confirmState === 'confirming' ? 'Confirmando...' : 'Confirmar'}
+        </Button>
+        <Button size="sm" variant="outline" onClick={onCancel}>
+          Cancelar
+        </Button>
+      </div>
+    );
+  };
+
   if (visualization.type === 'chart_donut') {
     const items = Array.isArray(visualization.payload?.items) ? visualization.payload.items : [];
 
@@ -165,6 +235,7 @@ function AiVisualizationRenderer({ visualization }: { visualization: AiVisualiza
             <span className="font-medium text-slate-600">Tipo:</span> {transaction.type === 'income' ? 'Receita' : 'Despesa'}
           </div>
         </div>
+        {renderConfirmationActions()}
       </div>
     );
   }
@@ -257,6 +328,7 @@ function AiVisualizationRenderer({ visualization }: { visualization: AiVisualiza
             <p className="text-[11px] text-slate-500">+ {items.length - 12} transações não exibidas</p>
           ) : null}
         </div>
+        {renderConfirmationActions()}
       </div>
     );
   }
@@ -291,6 +363,7 @@ function AiVisualizationRenderer({ visualization }: { visualization: AiVisualiza
           </a>
         </div>
       )}
+      {renderConfirmationActions()}
     </div>
   );
 }
