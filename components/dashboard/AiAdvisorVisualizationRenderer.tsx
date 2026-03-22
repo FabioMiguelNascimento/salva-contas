@@ -221,12 +221,9 @@ export default function AiAdvisorVisualizationRenderer({
           </div>
         </div>
 
-        <div className="space-y-1 max-h-56 overflow-y-auto overflow-x-hidden overflow-hidden pr-1">
+        <div className="space-y-1 max-h-56 overflow-y-auto overflow-x-hidden pr-1">
           {allItems.map((item, idx) => {
-            const displayDate =
-              (item as any).createdAt ||
-              (item as any).paymentDate ||
-              (item as any).dueDate;
+            const displayDate = (item as any).paymentDate
 
             const isSelected = !deselectedIndices.has(idx);
 

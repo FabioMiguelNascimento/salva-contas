@@ -1,119 +1,38 @@
 "use client";
 
-import AiAdvisorCard from "@/components/dashboard/AiAdvisorCard";
-import SettingsContent from "@/components/settings-content";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Sheet, SheetBody, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useAuth } from "@/contexts/auth-context";
 import { TopbarActionProvider, useTopbarAction } from "@/contexts/topbar-action-context";
 import { useFinance } from "@/hooks/use-finance";
-import { cn } from "@/lib/utils";
-import {
-  Bell,
-  CalendarClock,
-  CreditCard,
-  LayoutDashboard,
-  LogOut,
-  Palette,
-  PiggyBank,
-  ReceiptText,
-  Repeat,
-  Settings,
-  Shield,
-  Sparkles,
-  User,
-  Users
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import type { ComponentType, SVGProps } from "react";
+import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { NewTransactionDialog } from "./new-transaction-sheet";
-import { NotificationsDropdown } from "./notifications-dropdown";
-import { Topbar } from "./topbar";
 
+import { Button } from "@/components/ui/button";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuBadge,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarProvider,
-  SidebarTrigger
+  SidebarTrigger,
+  useSidebar
 } from "@/components/ui/sidebar";
 
-interface NavItem {
-  label: string;
-  href: string;
-  icon: ComponentType<SVGProps<SVGSVGElement>>;
-  description: string;
-}
-
-const baseNavItems: NavItem[] = [
-  {
-    label: "Dashboard",
-    href: "/",
-    icon: LayoutDashboard,
-    description: "Resumo financeiro, KPIs e alertas",
-  },
-  {
-    label: "Contas a Pagar",
-    href: "/contas",
-    icon: CalendarClock,
-    description: "Boletos, obrigações e agendamentos",
-  },
-  {
-    label: "Assinaturas",
-    href: "/assinaturas",
-    icon: Repeat,
-    description: "Compras recorrentes automatizadas",
-  },
-  {
-    label: "Cartões",
-    href: "/cartoes",
-    icon: CreditCard,
-    description: "Gerencie seus cartões de crédito",
-  },
-  {
-    label: "Orçamentos",
-    href: "/orcamentos",
-    icon: PiggyBank,
-    description: "Limites por categoria",
-  },
-  {
-    label: "Extrato / Transações",
-    href: "/extrato",
-    icon: ReceiptText,
-    description: "Histórico completo e filtros",
-  },
-];
+import { AiAdvisorSheet } from "./ai-advisor-sheet";
+import { AppSidebar } from "./app-sidebar";
+import { NewTransactionDialog } from "./new-transaction-sheet";
+import { NotificationsDropdown } from "./notifications-dropdown";
+import { SettingsDialog } from "./settings-dialog";
+import { Topbar } from "./topbar";
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { user, logout, isAuthenticated } = useAuth();
-  const { pendingBills, refresh, isSyncing } = useFinance();
+  const { isAuthenticated } = useAuth();
   const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/update-password";
+  
   if (isAuthPage || !isAuthenticated) {
     return <>{children}</>;
   }
 
-  const [showSyncing, setShowSyncing] = useState(false);
-
   return (
     <SidebarProvider>
       <TopbarActionProvider>
-        <AppShellContent 
-          refresh={refresh} 
-          isSyncing={isSyncing} 
-          logout={logout}
-        >
+        <AppShellContent>
           {children}
         </AppShellContent>
       </TopbarActionProvider>
@@ -121,42 +40,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function AppShellContent({ 
-  children, 
-  refresh, 
-  isSyncing,
-  logout,
-}: { 
-  children: React.ReactNode;
-  refresh: () => void;
-  isSyncing: boolean;
-  logout: () => void;
-}) {
+function AppShellContent({ children }: { children: React.ReactNode }) {
   const { actionNode } = useTopbarAction();
-  const pathname = usePathname();
-  const router = useRouter();
-  const { user } = useAuth();
-  const { pendingBills, filters } = useFinance();
+  const { toggleSidebar } = useSidebar();
+  const { user, logout } = useAuth();
+  const { pendingBills, refresh, isSyncing } = useFinance();
+  
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsSelectedTab, setSettingsSelectedTab] = useState<string>('profile');
   const [aiAdvisorOpen, setAiAdvisorOpen] = useState(false);
 
-  const userInitials = user?.name
-    ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .slice(0, 2)
-        .join("")
-        .toUpperCase()
-    : "??";
-
-  const navItems = baseNavItems.map((item) => ({
-    ...item,
-    badge:
-      item.href === "/contas" && pendingBills.length > 0
-        ? `${pendingBills.length}`
-        : undefined,
-  }));
+  const handleOpenSettings = (tab?: string) => {
+    if (tab) setSettingsSelectedTab(tab);
+    setSettingsOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-muted/30 overflow-x-hidden w-full">
@@ -167,153 +64,28 @@ function AppShellContent({
         isSyncing={isSyncing}
         actionNode={actionNode}
         logout={logout}
+        onBrandClick={toggleSidebar}
       />
 
-      <div className="flex min-h-screen w-full overflow-x-hidden">
-        <Sidebar className="px-4" >
-          <SidebarHeader>
-            <div className="lg:hidden flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-emerald-500 to-emerald-600 text-white overflow-hidden">
-                <Image src="/app-icon.svg" alt="Salva Contas" width={24} height={24} className="h-6 w-6" />
-              </div>
-              <div>
-                <p className="text-sm uppercase tracking-widest text-muted-foreground">Salva Contas</p>
-              </div>
-            </div>
-          </SidebarHeader>
+      <div className="flex min-h-screen w-full min-w-0">
+        <AppSidebar 
+          onOpenSettings={handleOpenSettings}
+          onOpenAiAdvisor={() => setAiAdvisorOpen(true)}
+        />
 
-          <SidebarContent>
-            <SidebarMenu>
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = pathname === item.href;
-                return (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton asChild isActive={isActive}>
-                      <Link href={item.href} className="flex items-center gap-3">
-                        <span
-                          className={cn(
-                            "flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition-colors",
-                            isActive && "text-emerald-600"
-                          )}
-                        >
-                          <Icon className="h-4 w-4" />
-                        </span>
-                        <span className="flex-1 text-sm font-medium">{item.label}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                    {item.badge && <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>}
-                  </SidebarMenuItem>
-                );
-              })}
+        <SettingsDialog 
+          open={settingsOpen} 
+          onOpenChange={setSettingsOpen} 
+          selectedTab={settingsSelectedTab}
+          onTabChange={setSettingsSelectedTab}
+        />
 
-              <SidebarMenuItem>
-                <SidebarMenuButton onClick={() => setAiAdvisorOpen(true)} className="cursor-pointer">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition-colors">
-                    <Sparkles className="h-4 w-4" />
-                  </span>
-                  <span className="flex-1 text-sm font-medium">Assistente Boletinho</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarContent>
+        <AiAdvisorSheet
+          open={aiAdvisorOpen}
+          onOpenChange={setAiAdvisorOpen}
+        />
 
-          <SidebarFooter className="lg:mb-14">
-            <div className="w-full">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="flex w-full items-center gap-3 rounded-md p-2 text-sm hover:bg-sidebar-accent" title={user?.name ?? 'Usuário'}>
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-emerald-500/15 text-emerald-600">{userInitials}</AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate font-medium">{user?.name ?? 'Usuário'}</div>
-                      <div className="truncate text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">{user?.email}</div>
-                    </div>
-                  </button>
-                </DropdownMenuTrigger>
-
-                <DropdownMenuContent align="start" className="w-56">
-                  <DropdownMenuLabel className="truncate">{user?.name}</DropdownMenuLabel>
-                  <DropdownMenuItem onClick={() => router.push('/perfil')}>
-                    <User className="h-4 w-4 mr-2" />
-                    Perfil
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => { setSettingsOpen(true); setSettingsSelectedTab('profile'); }}>
-                    <Settings className="h-4 w-4 mr-2" />
-                    Configurações
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => { setSettingsOpen(true); setSettingsSelectedTab('family'); }}>
-                    <Users className="h-4 w-4 mr-2" />
-                    Partilha Familiar
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout} variant="destructive">
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sair
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          </SidebarFooter>
-        </Sidebar>
-
-        <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
-          <DialogContent className="max-w-7xl w-[95vw] h-[calc(100vh-4rem)] p-0 overflow-hidden sm:max-w-none">
-            <div className="flex h-full bg-background">
-              <nav className="w-64 border-r border-border p-4">
-                <div className="mb-4">
-                  <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Configurações</p>
-                </div>
-                <div className="flex flex-col gap-1">
-                  <button className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", settingsSelectedTab === 'profile' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")} onClick={() => setSettingsSelectedTab('profile')}>
-                    <User className="h-4 w-4" />
-                    <span>Perfil</span>
-                  </button>
-                  <button className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", settingsSelectedTab === 'appearance' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")} onClick={() => setSettingsSelectedTab('appearance')}>
-                    <Palette className="h-4 w-4" />
-                    <span>Aparência</span>
-                  </button>
-                  <button className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", settingsSelectedTab === 'notifications' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")} onClick={() => setSettingsSelectedTab('notifications')}>
-                    <Bell className="h-4 w-4" />
-                    <span>Notificações</span>
-                  </button>
-                  <button className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", settingsSelectedTab === 'security' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")} onClick={() => setSettingsSelectedTab('security')}>
-                    <Shield className="h-4 w-4" />
-                    <span>Segurança</span>
-                  </button>
-                  <button className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", settingsSelectedTab === 'family' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")} onClick={() => setSettingsSelectedTab('family')}>
-                    <Users className="h-4 w-4" />
-                    <span>Partilha Familiar</span>
-                  </button>
-                  <hr className="my-3 border-border/60" />
-                </div>
-              </nav>
-
-              <div className="flex-1 overflow-auto p-6">
-                <div className="max-w-full">
-                  <SettingsContent selectedTab={settingsSelectedTab} onTabChange={setSettingsSelectedTab} />
-                </div>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        <Sheet open={aiAdvisorOpen} onOpenChange={setAiAdvisorOpen}>
-          <SheetContent className="w-full h-[100dvh] sm:w-[96vw] sm:max-w-[860px] p-0 gap-0">
-            <SheetHeader className="border-b border-border bg-white/95 px-5 py-4">
-              <SheetTitle>Boletinho</SheetTitle>
-              <SheetDescription>
-                Converse com o Boletinho e visualize graficos e tabelas dentro do chat.
-              </SheetDescription>
-            </SheetHeader>
-            <SheetBody className="flex-1 min-h-0 p-4">
-              <AiAdvisorCard month={filters.month} year={filters.year} />
-            </SheetBody>
-          </SheetContent>
-        </Sheet>
-
-        <div className="flex-1 lg:pt-16 overflow-x-hidden w-full">
+        <div className="flex-1 min-w-0 lg:pt-16 w-full">
           <header className="flex items-center gap-3 border-b bg-card px-4 py-3 shadow-sm lg:hidden">
             <SidebarTrigger />
             <div className="ml-auto flex items-center gap-2">
@@ -326,7 +98,7 @@ function AppShellContent({
             </div>
           </header>
 
-          <main className="relative p-4 overflow-x-hidden w-full">
+          <main className="relative p-4 w-full min-w-0">
             {children}
           </main>
         </div>
