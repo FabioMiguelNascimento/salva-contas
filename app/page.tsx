@@ -154,30 +154,43 @@ export default function DashboardPage() {
         title="Dashboard Financeiro"
         description={lastSync ? `Atualizado ${format(new Date(lastSync), "dd 'de' MMMM, HH:mm", { locale: ptBR })}` : "Sincronizando dados..."}
       >
-        <Select value={String(filters.month)} onValueChange={handleMonthChange}>
-          <SelectTrigger className="w-full sm:w-[110px]">
-            <SelectValue placeholder="Mês" />
-          </SelectTrigger>
-          <SelectContent>
-            {monthsShort.map((month) => (
-              <SelectItem key={month.value} value={String(month.value)}>
-                {month.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={String(filters.year)} onValueChange={handleYearChange}>
-          <SelectTrigger className="w-full sm:w-[110px]">
-            <SelectValue placeholder="Ano" />
-          </SelectTrigger>
-          <SelectContent>
-            {years.map((year) => (
-              <SelectItem key={year} value={String(year)}>
-                {year}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-end">
+          <div className="col-span-1">
+            <label htmlFor="dashboard-filter-month" className="mb-1 block text-xs font-medium text-muted-foreground">
+              Mês
+            </label>
+            <Select value={String(filters.month)} onValueChange={handleMonthChange}>
+              <SelectTrigger id="dashboard-filter-month" aria-label="Filtrar dashboard por mês" className="w-full sm:w-[110px]">
+                <SelectValue placeholder="Mês" />
+              </SelectTrigger>
+              <SelectContent>
+                {monthsShort.map((month) => (
+                  <SelectItem key={month.value} value={String(month.value)}>
+                    {month.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="col-span-1">
+            <label htmlFor="dashboard-filter-year" className="mb-1 block text-xs font-medium text-muted-foreground">
+              Ano
+            </label>
+            <Select value={String(filters.year)} onValueChange={handleYearChange}>
+              <SelectTrigger id="dashboard-filter-year" aria-label="Filtrar dashboard por ano" className="w-full sm:w-[110px]">
+                <SelectValue placeholder="Ano" />
+              </SelectTrigger>
+              <SelectContent>
+                {years.map((year) => (
+                  <SelectItem key={year} value={String(year)}>
+                    {year}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
       </PageHeader>
 
       <section className="grid gap-4 grid-cols-1 sm:grid-cols-3">

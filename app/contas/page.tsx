@@ -159,18 +159,20 @@ export default function ContasPage() {
         />
       </SummaryCardsGrid>
 
-      <div className="flex flex-wrap gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3" role="group" aria-label="Filtros de contas">
         {filterTabs.map((filter) => (
           <Button
             key={filter.value}
             variant={activeFilter === filter.value ? "default" : "outline"}
             onClick={() => setActiveFilter(filter.value)}
             size="sm"
+            className="w-full sm:w-auto"
+            aria-pressed={activeFilter === filter.value}
           >
             {filter.label}
           </Button>
         ))}
-        <Button variant="ghost" className="ml-auto text-sm" asChild>
+        <Button variant="ghost" className="col-span-2 w-full text-sm sm:ml-auto sm:w-auto" asChild>
           <Link href="/extrato">Ver extrato</Link>
         </Button>
       </div>

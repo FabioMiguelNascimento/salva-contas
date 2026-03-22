@@ -72,8 +72,14 @@ export default function SubscriptionsPage() {
             <CardTitle>Assinaturas configuradas</CardTitle>
             <CardDescription>Gerencie e acompanhe todas as recorrências automatizadas.</CardDescription>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <Button variant={activeFilter === "all" ? "default" : "outline"} size="sm" onClick={() => setActiveFilter("all")}>
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Filtros de assinaturas">
+            <Button
+              variant={activeFilter === "all" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setActiveFilter("all")}
+              className="min-h-10"
+              aria-pressed={activeFilter === "all"}
+            >
               Todas
             </Button>
             {frequencyOptions.map((option) => (
@@ -82,6 +88,8 @@ export default function SubscriptionsPage() {
                 variant={activeFilter === option.value ? "default" : "outline"}
                 size="sm"
                 onClick={() => setActiveFilter(option.value)}
+                className="min-h-10"
+                aria-pressed={activeFilter === option.value}
               >
                 {option.label}
               </Button>
