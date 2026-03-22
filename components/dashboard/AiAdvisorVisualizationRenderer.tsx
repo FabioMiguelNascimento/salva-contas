@@ -66,6 +66,35 @@ const formatDate = (value?: string | Date | null) => {
   }
 };
 
+const parseAmount = (value: unknown): number => {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const normalized = value
+      .trim()
+      .replace(/\s/g, "")
+      .replace(/R\$/gi, "")
+      .replace(/\.(?=\d{3}(?:\D|$))/g, "")
+      .replace(/,/g, ".");
+
+    const parsed = Number(normalized);
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return 0;
+};
+
+const formatCurrency = (value: unknown): string => {
+  return new Intl.NumberFormat("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  }).format(parseAmount(value));
+};
+
 export default function AiAdvisorVisualizationRenderer({
   visualization,
   status,
@@ -130,7 +159,7 @@ export default function AiAdvisorVisualizationRenderer({
 
           <div className="flex items-center gap-2">
             <div className="text-right">
-              <p className="text-base font-semibold text-emerald-700">R$ {Number(transaction.amount || 0).toFixed(2)}</p>
+              <p className="text-base font-semibold text-emerald-700">{formatCurrency(transaction.amount)}</p>
               <p className="text-xs text-slate-500">{transaction.status === "paid" ? "Liquidado" : "Pendente"}</p>
             </div>
           </div>
@@ -156,6 +185,37 @@ export default function AiAdvisorVisualizationRenderer({
     );
   }
 
+  if (visualization.type === "chart_line") {
+    const points = Array.isArray((payload as any).points)
+      ? ((payload as any).points as Array<{ date?: string; total?: number | string }>)
+      : [];
+
+    const total = points.reduce((sum, point) => sum + parseAmount(point.total), 0);
+    const peak = points.reduce((max, point) => Math.max(max, parseAmount(point.total)), 0);
+
+    return (
+      <div className="mt-3 w-full min-w-0 overflow-x-hidden rounded-xl border border-gray-100 bg-white p-3">
+        <p className="mb-2 text-xs font-semibold text-gray-600">{visualization.title}</p>
+        <div className="mb-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
+          <div className="rounded-lg bg-emerald-50 p-2">
+            <p className="text-xs text-emerald-700">Periodo</p>
+            <p className="font-semibold text-emerald-800">{points.length} dias</p>
+          </div>
+          <div className="rounded-lg bg-slate-100 p-2">
+            <p className="text-xs text-slate-600">Total no periodo</p>
+            <p className="font-semibold text-slate-800">{formatCurrency(total)}</p>
+          </div>
+          <div className="rounded-lg bg-rose-50 p-2">
+            <p className="text-xs text-rose-700">Pico diario</p>
+            <p className="font-semibold text-rose-800">{formatCurrency(peak)}</p>
+          </div>
+        </div>
+
+        {requiresConfirmation && renderConfirmationActions(status, onConfirm, onCancel)}
+      </div>
+    );
+  }
+
   if (
     visualization.type === "table_summary" &&
     visualization.payload &&
@@ -174,7 +234,7 @@ export default function AiAdvisorVisualizationRenderer({
             <p className="text-sm font-semibold text-slate-900">{t.description || "Transação"}</p>
             <p className="text-xs text-slate-500">{t.categoryName ?? t.category ?? "Sem categoria"}</p>
           </div>
-          <p className="text-base font-semibold text-emerald-700">R$ {Number(t.amount || 0).toFixed(2)}</p>
+          <p className="text-base font-semibold text-emerald-700">{formatCurrency(t.amount)}</p>
         </div>
 
         <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3 text-xs text-slate-500">
@@ -202,7 +262,7 @@ export default function AiAdvisorVisualizationRenderer({
   if (Array.isArray(payload.items)) {
     const allItems = payload.items as Array<{ description?: string; amount?: number; category?: string; createdByName?: string | null }>;
     const selectedItems = allItems.filter((_, idx) => !deselectedIndices.has(idx));
-    const total = selectedItems.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+    const total = selectedItems.reduce((sum, item) => sum + parseAmount(item.amount), 0);
 
     return (
       <div className="mt-3 w-full min-w-0 overflow-x-hidden rounded-xl border border-gray-100 bg-white p-3">
@@ -212,69 +272,72 @@ export default function AiAdvisorVisualizationRenderer({
             <p className="text-xs text-emerald-700">Transações</p>
             <p className="font-semibold text-emerald-800">
               {selectedItems.length}
-              {deselectedIndices.size > 0 && <span className="text-[10px] font-normal text-emerald-600/70 ml-1">/ {allItems.length}</span>}
+              {deselectedIndices.size > 0 && <span className="ml-1 text-[10px] font-normal text-emerald-600/70">/ {allItems.length}</span>}
             </p>
           </div>
           <div className="rounded-lg bg-slate-100 p-2">
             <p className="text-xs text-slate-600">Valor total</p>
-            <p className="font-semibold text-slate-800">R$ {total.toFixed(2)}</p>
+            <p className="font-semibold text-slate-800">{formatCurrency(total)}</p>
           </div>
         </div>
 
-        <div className="space-y-1 max-h-56 overflow-y-auto overflow-x-hidden pr-1">
+        <div className="max-h-56 space-y-1 overflow-y-auto overflow-x-hidden pr-1">
           {allItems.map((item, idx) => {
-            const displayDate = (item as any).paymentDate
-
+            const displayDate = (item as any).paymentDate;
             const isSelected = !deselectedIndices.has(idx);
 
             return (
-              <div 
-                key={`${item.description || "item"}-${idx}`} 
-                className={`w-full min-w-0 flex items-start gap-2 overflow-hidden rounded-md border px-2 py-1.5 transition-colors ${
+              <div
+                key={`${item.description || "item"}-${idx}`}
+                className={`w-full min-w-0 overflow-hidden rounded-md border px-2 py-1.5 transition-colors ${
                   isSelected ? "border-slate-100 bg-white" : "border-slate-100 bg-slate-50 opacity-60"
                 }`}
               >
-                <div className="flex h-full items-center pt-0.5">
-                  <input
-                    type="checkbox"
-                    checked={isSelected}
-                    disabled={status !== "idle"}
-                    onChange={() => {
-                      setDeselectedIndices(prev => {
-                        const next = new Set(prev);
-                        if (isSelected) next.add(idx);
-                        else next.delete(idx);
-                        return next;
-                      });
-                    }}
-                    className="h-3.5 w-3.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-600 disabled:opacity-50 cursor-pointer accent-emerald-600"
-                  />
-                </div>
-                <div className="min-w-0 flex-1 flex-col">
+                <div className="flex items-start gap-2">
+                  <div className="flex h-full items-center pt-0.5">
+                    <input
+                      type="checkbox"
+                      checked={isSelected}
+                      disabled={status !== "idle"}
+                      onChange={() => {
+                        setDeselectedIndices((prev) => {
+                          const next = new Set(prev);
+                          if (isSelected) next.add(idx);
+                          else next.delete(idx);
+                          return next;
+                        });
+                      }}
+                      className="h-3.5 w-3.5 cursor-pointer rounded border-slate-300 text-emerald-600 accent-emerald-600 focus:ring-emerald-600 disabled:opacity-50"
+                    />
+                  </div>
+
+                  <div className="min-w-0 flex-1 flex-col">
                   <div className="flex w-full min-w-0 items-center justify-between gap-2">
-                    <p className={`w-0 flex-1 truncate text-xs font-medium ${isSelected ? 'text-slate-800' : 'text-slate-500 line-through'}`}>
+                    <p className={`w-0 flex-1 truncate text-xs font-medium ${isSelected ? "text-slate-800" : "text-slate-500 line-through"}`}>
                       {item.description || "Sem descricao"}
                     </p>
-                    <p className={`shrink-0 whitespace-nowrap text-sm font-bold ${isSelected ? 'text-emerald-700' : 'text-slate-400 line-through'}`}>
-                      R$ {Number(item.amount || 0).toFixed(2)}
+                    <p className={`shrink-0 whitespace-nowrap text-sm font-bold ${isSelected ? "text-emerald-700" : "text-slate-400 line-through"}`}>
+                      {formatCurrency(item.amount)}
                     </p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500 mt-1">
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
                     <span className="flex items-center gap-1">
                       <DynamicIcon name={item.category || "tag"} className="h-3 w-3 text-slate-500" />
-                      <span className="truncate max-w-[100px]">{item.category || "Sem categoria"}</span>
+                      <span className="max-w-[100px] truncate">{item.category || "Sem categoria"}</span>
                     </span>
                     {displayDate ? (
-                      <span className="text-slate-500 whitespace-nowrap">{formatDate(displayDate)}</span>
+                      <span className="whitespace-nowrap text-slate-500">{formatDate(displayDate)}</span>
                     ) : (
                       <span className="text-slate-400">Sem data</span>
                     )}
                   </div>
                 </div>
+                </div>
               </div>
             );
           })}
         </div>
+
         {requiresConfirmation && renderConfirmationActions(status, onConfirm, onCancel)}
       </div>
     );
@@ -286,15 +349,15 @@ export default function AiAdvisorVisualizationRenderer({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-sm">
         <div className="rounded-lg bg-emerald-50 p-2">
           <p className="text-xs text-emerald-700">Receitas</p>
-          <p className="font-semibold text-emerald-800">R$ {Number(payload.totalIncome || 0).toFixed(2)}</p>
+          <p className="font-semibold text-emerald-800">{formatCurrency((payload as any).totalIncome)}</p>
         </div>
         <div className="rounded-lg bg-rose-50 p-2">
           <p className="text-xs text-rose-700">Despesas</p>
-          <p className="font-semibold text-rose-800">R$ {Number(payload.totalExpenses || 0).toFixed(2)}</p>
+          <p className="font-semibold text-rose-800">{formatCurrency((payload as any).totalExpenses)}</p>
         </div>
         <div className="rounded-lg bg-slate-100 p-2">
           <p className="text-xs text-slate-600">Saldo</p>
-          <p className="font-semibold text-slate-800">R$ {Number(payload.balance || 0).toFixed(2)}</p>
+          <p className="font-semibold text-slate-800">{formatCurrency((payload as any).balance)}</p>
         </div>
       </div>
       {payload.attachmentUrl && (
