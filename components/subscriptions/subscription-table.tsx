@@ -24,7 +24,7 @@ interface SubscriptionTableProps {
 
 export function SubscriptionTable({ subscriptions, onEdit, onDelete }: SubscriptionTableProps) {
   return (
-    <Table>
+    <Table className="min-w-[1100px]">
       <TableHeader>
         <TableRow>
           <TableHead>Descrição</TableHead>
@@ -40,10 +40,10 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
       <TableBody>
         {subscriptions.map((subscription) => (
           <TableRow key={subscription.id}>
-            <TableCell>
-              <div>
-                <p className="font-semibold">{subscription.description}</p>
-                <p className="text-xs text-muted-foreground">
+            <TableCell className="max-w-[320px]">
+              <div className="min-w-0">
+                <p className="truncate font-semibold">{subscription.description}</p>
+                <p className="truncate text-xs text-muted-foreground">
                   {subscription.createdAt ? `Criado em ${dateFormatter.format(new Date(subscription.createdAt))}` : "—"}
                 </p>
               </div>

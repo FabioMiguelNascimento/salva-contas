@@ -32,7 +32,7 @@ export function CreditCardTable({ creditCards, onEdit, onDelete }: CreditCardTab
   }
 
   return (
-    <Table>
+    <Table className="min-w-[920px]">
       <TableHeader>
         <TableRow>
           <TableHead>Cartão</TableHead>
@@ -53,9 +53,9 @@ export function CreditCardTable({ creditCards, onEdit, onDelete }: CreditCardTab
           return (
             <TableRow key={card.id}>
               <TableCell>
-                <div>
-                  <p className="font-semibold">{card.name}</p>
-                  <p className="text-xs text-muted-foreground">{formatCardNumber(card.lastFourDigits)}</p>
+                <div className="max-w-[220px] min-w-0">
+                  <p className="truncate font-semibold">{card.name}</p>
+                  <p className="truncate text-xs text-muted-foreground">{formatCardNumber(card.lastFourDigits)}</p>
                 </div>
               </TableCell>
               <TableCell>

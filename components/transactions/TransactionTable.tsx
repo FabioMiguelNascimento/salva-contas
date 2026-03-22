@@ -48,7 +48,7 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
   };
 
   return (
-    <Table>
+    <Table className="min-w-[1100px]">
       <TableHeader>
         <TableRow>
           <TableHead>Data</TableHead>
@@ -73,20 +73,17 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
         ) : transactions.length ? (
           transactions.map((transaction) => (
             <TableRow key={transaction.id}>
-              <TableCell>{formatDate(transaction)}</TableCell>
-              <TableCell>
+              <TableCell className="text-xs text-muted-foreground">{formatDate(transaction)}</TableCell>
+              <TableCell className="max-w-[420px]">
                 <div className="min-w-0">
                   <button
                     type="button"
                     onClick={() => copyTransactionId(transaction)}
-                    className="font-semibold text-left hover:underline decoration-dotted break-words whitespace-normal max-w-full"
+                    className="block w-full truncate text-left font-semibold hover:underline decoration-dotted"
                     title="Clique para copiar o ID da transação"
                   >
                     {transaction.description}
                   </button>
-                  <p className="text-xs text-muted-foreground">
-                    {transaction.status === "paid" ? "Liquidado" : "Pendente"}
-                  </p>
                 </div>
               </TableCell>
               <TableCell>

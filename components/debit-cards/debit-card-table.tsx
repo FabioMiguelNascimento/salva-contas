@@ -31,7 +31,7 @@ export function DebitCardTable({ debitCards, onEdit, onDelete }: DebitCardTableP
   }
 
   return (
-    <Table>
+    <Table className="min-w-[760px]">
       <TableHeader>
         <TableRow>
           <TableHead>Cartão</TableHead>
@@ -44,9 +44,9 @@ export function DebitCardTable({ debitCards, onEdit, onDelete }: DebitCardTableP
         {debitCards.map((card) => (
           <TableRow key={card.id}>
             <TableCell>
-              <div>
-                <p className="font-semibold">{card.name}</p>
-                <p className="text-xs text-muted-foreground">{formatDebitCardNumber(card.lastFourDigits)}</p>
+              <div className="max-w-[240px] min-w-0">
+                <p className="truncate font-semibold">{card.name}</p>
+                <p className="truncate text-xs text-muted-foreground">{formatDebitCardNumber(card.lastFourDigits)}</p>
               </div>
             </TableCell>
             <TableCell>

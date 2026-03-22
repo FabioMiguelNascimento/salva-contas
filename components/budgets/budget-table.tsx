@@ -42,7 +42,7 @@ export function BudgetTable({ budgetProgress, onEdit, onDelete }: BudgetTablePro
   }
 
   return (
-    <Table>
+    <Table className="min-w-[940px]">
       <TableHeader>
         <TableRow>
           <TableHead>Categoria</TableHead>
@@ -63,7 +63,7 @@ export function BudgetTable({ budgetProgress, onEdit, onDelete }: BudgetTablePro
             <TableRow key={budget.id}>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <span className="flex items-center gap-2 min-w-0">
+                  <span className="flex items-center gap-2 min-w-0 max-w-[260px]">
                     <DynamicIcon
                       name={budget.category?.icon ?? "tag"}
                       className="h-4 w-4 shrink-0 text-muted-foreground"

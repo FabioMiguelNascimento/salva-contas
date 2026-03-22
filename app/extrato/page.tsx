@@ -22,7 +22,6 @@ import { useTransactionFilters } from "@/hooks/use-transaction-filters";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 
 
@@ -101,7 +100,7 @@ export default function ExtratoPage() {
           />
         </CardHeader>
         <CardContent>
-          <ScrollArea className="hidden md:block">
+          <div className="hidden overflow-x-auto md:block">
             <TransactionTable
               transactions={paginatedTransactions}
               isLoading={isLoading}
@@ -109,7 +108,7 @@ export default function ExtratoPage() {
               onDelete={(tx) => setDeleteDialog({ open: true, transaction: tx })}
               onViewAttachment={(tx) => setAttachmentViewer({ open: true, transaction: tx })}
             />
-          </ScrollArea>
+          </div>
 
           <div className="flex flex-col gap-3 md:hidden">
             {isLoading ? (
