@@ -1,6 +1,8 @@
 "use client";
 
+import AiAdvisorAttachmentButton from '@/components/dashboard/AiAdvisorAttachmentButton';
 import AiAdvisorMessageBubble from '@/components/dashboard/AiAdvisorMessageBubble';
+import AiAdvisorToolsDropdown from '@/components/dashboard/AiAdvisorToolsDropdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -66,7 +68,6 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
   const [status, setStatus] = useState<'idle' | 'sending' | 'waiting'>('idle');
   const listRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -163,6 +164,15 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
     toast('Operação cancelada.');
   };
 
+  const handleSelectToolPrompt = (prompt: string) => {
+    setInput(prompt);
+    setTimeout(() => inputRef.current?.focus(), 0);
+  };
+
+  const handleAttachFiles = (files: File[]) => {
+    setAttachedFiles((prev) => [...prev, ...files]);
+  };
+
   const sendMessage = async () => {
     const trimmed = input.trim();
     if (!trimmed && attachedFiles.length === 0) return;
@@ -254,28 +264,15 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
               </div>
 
               <div className="relative flex items-center rounded-full border border-slate-200 bg-white/80 px-3 py-2 shadow-sm">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  multiple
-                  onChange={(event) => {
-                    const files = Array.from(event.target.files ?? []);
-                    if (files.length === 0) return;
-                    setAttachedFiles((prev) => [...prev, ...files]);
-                    event.target.value = '';
-                  }}
+                <AiAdvisorAttachmentButton
+                  disabled={isLoading}
+                  onSelectFiles={handleAttachFiles}
                 />
 
-                <button
-                  type="button"
-                  className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100"
-                  onClick={() => fileInputRef.current?.click()}
-                  title="Adicionar imagem"
-                >
-                  <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </button>
+                <AiAdvisorToolsDropdown
+                  disabled={isLoading}
+                  onSelectPrompt={handleSelectToolPrompt}
+                />
 
                 <Input
                   ref={inputRef}
