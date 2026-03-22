@@ -50,7 +50,7 @@ export default function ExtratoPage() {
   const { paginated: paginatedTransactions, totalPages } = usePaginatedList(
     filteredTransactions,
     urlFilters.page,
-    8
+    15
   );
 
   const editor = useTransactionEditor();

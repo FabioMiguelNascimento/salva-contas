@@ -25,10 +25,11 @@ export function useTransactionFilters(pageSize = 8) {
   const paramCategoryId = searchParams.get("categoryId") ?? null;
 
   useEffect(() => {
-    if (paramCategoryId !== (filters as any).categoryId) {
+    const currentCategoryId = filters.categoryId ?? null;
+    if (paramCategoryId !== currentCategoryId) {
       setFilters({ ...filters, categoryId: paramCategoryId ?? undefined });
     }
-  }, [paramCategoryId]);
+  }, [paramCategoryId, filters, setFilters]);
 
   const updateQuery = useCallback(
     (

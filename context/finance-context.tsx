@@ -2,54 +2,59 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import {
-    createBudget,
-    deleteBudget,
-    updateBudget
+  createBudget,
+  deleteBudget,
+  updateBudget
 } from "@/services/budgets";
+import { fetchCategories } from "@/services/categories";
 import {
-    createCreditCard,
-    deleteCreditCard,
-    updateCreditCard
+  createCreditCard,
+  deleteCreditCard,
+  fetchCreditCards,
+  updateCreditCard
 } from "@/services/credit-cards";
 import { fetchDashboardSnapshot } from "@/services/dashboard";
 import {
-    createDebitCard,
-    deleteDebitCard,
-    updateDebitCard
+  createDebitCard,
+  deleteDebitCard,
+  fetchDebitCards,
+  updateDebitCard
 } from "@/services/debit-cards";
 import { createSubscription, deleteSubscription, updateSubscription } from "@/services/subscriptions";
 import {
-    deleteTransaction,
-    processTransaction,
-    updateTransaction
+  deleteTransaction,
+  fetchTransactions,
+  processTransaction,
+  updateTransaction
 } from "@/services/transactions";
 import type {
-    Budget,
-    BudgetProgress,
-    CreateBudgetPayload,
-    CreateCreditCardPayload,
-    CreateDebitCardPayload,
-    CreateSubscriptionPayload,
-    CreditCard,
-    DashboardMetrics,
-    DebitCard,
-    ProcessTransactionClientPayload,
-    Subscription,
-    Transaction,
-    TransactionCategory,
-    TransactionFilters,
-    UpdateBudgetPayload,
-    UpdateCreditCardPayload,
-    UpdateDebitCardPayload,
-    UpdateSubscriptionPayload,
-    UpdateTransactionPayload,
+  Budget,
+  BudgetProgress,
+  CreateBudgetPayload,
+  CreateCreditCardPayload,
+  CreateDebitCardPayload,
+  CreateSubscriptionPayload,
+  CreditCard,
+  DashboardMetrics,
+  DebitCard,
+  ProcessTransactionClientPayload,
+  Subscription,
+  Transaction,
+  TransactionCategory,
+  TransactionFilters,
+  UpdateBudgetPayload,
+  UpdateCreditCardPayload,
+  UpdateDebitCardPayload,
+  UpdateSubscriptionPayload,
+  UpdateTransactionPayload,
 } from "@/types/finance";
+import { usePathname } from "next/navigation";
 import {
-    createContext,
-    useCallback,
-    useEffect,
-    useMemo,
-    useState,
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
 } from "react";
 
 interface FinanceContextValue {
@@ -97,6 +102,8 @@ const initialFilters: TransactionFilters = {
 
 export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const pathname = usePathname();
+  const isTransactionsRoute = pathname.startsWith("/extrato");
   const [filters, setFilters] = useState<TransactionFilters>(initialFilters);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
@@ -114,16 +121,31 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const loadData = useCallback(async () => {
     setIsSyncing(true);
     try {
-      const snapshot = await fetchDashboardSnapshot(filters);
+      if (isTransactionsRoute) {
+        const [allTransactions, allCategories, allCreditCards, allDebitCards] = await Promise.all([
+          fetchTransactions({ ...filters, limit: 1000 }),
+          fetchCategories(),
+          fetchCreditCards(),
+          fetchDebitCards(),
+        ]);
 
-      setTransactions(snapshot.transactions);
-      setMetrics(snapshot.metrics);
-      setSubscriptions(snapshot.subscriptions);
-      setBudgets(snapshot.budgets);
-      setBudgetProgress(snapshot.budgetProgress);
-      setCategories(snapshot.categories);
-      setCreditCards(snapshot.creditCards);
-      setDebitCards(snapshot.debitCards);
+        setTransactions(allTransactions);
+        setCategories(allCategories);
+        setCreditCards(allCreditCards);
+        setDebitCards(allDebitCards);
+      } else {
+        const snapshot = await fetchDashboardSnapshot(filters);
+
+        setTransactions(snapshot.transactions);
+        setMetrics(snapshot.metrics);
+        setSubscriptions(snapshot.subscriptions);
+        setBudgets(snapshot.budgets);
+        setBudgetProgress(snapshot.budgetProgress);
+        setCategories(snapshot.categories);
+        setCreditCards(snapshot.creditCards);
+        setDebitCards(snapshot.debitCards);
+      }
+
       setLastSync(new Date().toISOString());
       setError(null);
     } catch (err) {
@@ -133,7 +155,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
       setIsSyncing(false);
     }
-  }, [filters]);
+  }, [filters, isTransactionsRoute]);
 
   useEffect(() => {
     if (isAuthenticated && !authLoading) {

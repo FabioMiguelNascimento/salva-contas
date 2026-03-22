@@ -162,6 +162,8 @@ export interface TransactionFilters {
   status?: TransactionStatus;
   type?: TransactionType;
   categoryId?: string;
+  limit?: number;
+  page?: number;
 }
 
 export interface UpdateTransactionPayload {

@@ -36,7 +36,7 @@ function formatDate(tx: Transaction) {
 }
 
 export function TransactionTable({ transactions, isLoading, onEdit, onDelete, onViewAttachment }: Props) {
-  const pageSize = 8;
+  const pageSize = 15;
 
   const copyTransactionId = async (transaction: Transaction) => {
     try {
