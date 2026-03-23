@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useFinance } from "@/hooks/use-finance";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { currencyFormatter, getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
 import { cn, parseDateOnly } from "@/lib/utils";
 import { differenceInCalendarDays, eachDayOfInterval, endOfMonth, format, isSameMonth, subDays } from "date-fns";
@@ -36,6 +37,7 @@ import type { DateRange } from "react-day-picker";
 export default function DashboardPage() {
   const { metrics, transactions, pendingBills, subscriptions, creditCards, budgets, categories, filters, setFilters, isLoading, lastSync } =
     useFinance();
+  const isMobile = useIsMobile();
 
   const years = getAvailableYears();
   const hasDateRange = Boolean(filters.startDate && filters.endDate);
@@ -228,12 +230,12 @@ export default function DashboardPage() {
         title="Dashboard Financeiro"
         description={lastSync ? `Atualizado ${format(new Date(lastSync), "dd 'de' MMMM, HH:mm", { locale: ptBR })}` : "Sincronizando dados..."}
       >
-        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-end">
+        <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 lg:flex lg:w-auto lg:items-end">
           <div className="col-span-1">
             <label htmlFor="dashboard-filter-range" className="mb-1 block text-xs font-medium text-muted-foreground">
               Período
             </label>
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -253,7 +255,7 @@ export default function DashboardPage() {
                     mode="range"
                     selected={selectedRange}
                     onSelect={handleRangeChange}
-                    numberOfMonths={2}
+                    numberOfMonths={isMobile ? 1 : 2}
                     initialFocus
                   />
                 </PopoverContent>
