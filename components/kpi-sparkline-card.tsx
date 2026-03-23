@@ -119,10 +119,10 @@ export function KpiSparklineCard({
             <p className="text-sm font-medium text-gray-500 leading-snug">{title}</p>
             <InfoPopover content={
               variant === 'expense' 
-                ? "Mostra o total de despesas do mês atual com um gráfico dos últimos 7 dias. O percentual indica a variação em relação ao mês anterior."
+                ? "Mostra o total de despesas do período atual com um gráfico do intervalo selecionado. O percentual indica a variação em relação ao período anterior."
                 : variant === 'income'
-                ? "Mostra o total de receitas do mês atual com um gráfico dos últimos 7 dias. O percentual indica a variação em relação ao mês anterior."
-                : "Mostra o saldo atual (receitas - despesas) do mês com um gráfico dos últimos 7 dias. O percentual indica a variação em relação ao mês anterior."
+                ? "Mostra o total de receitas do período atual com um gráfico do intervalo selecionado. O percentual indica a variação em relação ao período anterior."
+                : "Mostra o saldo atual (receitas - despesas) do período com um gráfico do intervalo selecionado. O percentual indica a variação em relação ao período anterior."
             } />
           </div>
           <div className={cn("rounded-xl p-2 shrink-0", cfg.iconBg)}>

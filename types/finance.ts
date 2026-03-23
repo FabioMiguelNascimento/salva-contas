@@ -159,6 +159,8 @@ export interface DashboardMetrics {
 export interface TransactionFilters {
   month: number;
   year: number;
+  startDate?: string;
+  endDate?: string;
   status?: TransactionStatus;
   type?: TransactionType;
   categoryId?: string;
