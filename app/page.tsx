@@ -229,20 +229,22 @@ export default function DashboardPage() {
         tag="Visão geral"
         title="Dashboard Financeiro"
         description={lastSync ? `Atualizado ${format(new Date(lastSync), "dd 'de' MMMM, HH:mm", { locale: ptBR })}` : "Sincronizando dados..."}
-      >
-        <div className="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 lg:flex lg:w-auto lg:items-end">
-          <div className="col-span-1">
+      />
+
+      <section className="rounded-xl border bg-card p-3 sm:p-4">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:flex xl:items-end xl:justify-end">
+          <div>
             <label htmlFor="dashboard-filter-range" className="mb-1 block text-xs font-medium text-muted-foreground">
               Período
             </label>
-            <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     id="dashboard-filter-range"
                     variant="outline"
                     className={cn(
-                      "w-full sm:w-[260px] justify-start text-left font-normal",
+                      "w-full justify-start text-left font-normal",
                       !hasDateRange && "text-muted-foreground"
                     )}
                   >
@@ -250,7 +252,7 @@ export default function DashboardPage() {
                     <span className="truncate">{rangeLabel}</span>
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="end">
+                <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
                     mode="range"
                     selected={selectedRange}
@@ -261,52 +263,54 @@ export default function DashboardPage() {
                 </PopoverContent>
               </Popover>
               {hasDateRange && (
-                <Button variant="outline" onClick={clearDateRange} className="shrink-0">
+                <Button variant="outline" onClick={clearDateRange} className="w-full sm:w-auto">
                   Limpar
                 </Button>
               )}
             </div>
           </div>
 
-          <div className="col-span-1">
-            <label htmlFor="dashboard-filter-month" className="mb-1 block text-xs font-medium text-muted-foreground">
-              Mês
-            </label>
-            <Select value={String(filters.month)} onValueChange={handleMonthChange}>
-              <SelectTrigger id="dashboard-filter-month" aria-label="Filtrar dashboard por mês" className="w-full sm:w-[110px]">
-                <SelectValue placeholder="Mês" />
-              </SelectTrigger>
-              <SelectContent>
-                {monthsShort.map((month) => (
-                  <SelectItem key={month.value} value={String(month.value)}>
-                    {month.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-2">
+            <div>
+              <label htmlFor="dashboard-filter-month" className="mb-1 block text-xs font-medium text-muted-foreground">
+                Mês
+              </label>
+              <Select value={String(filters.month)} onValueChange={handleMonthChange}>
+                <SelectTrigger id="dashboard-filter-month" aria-label="Filtrar dashboard por mês" className="w-full">
+                  <SelectValue placeholder="Mês" />
+                </SelectTrigger>
+                <SelectContent>
+                  {monthsShort.map((month) => (
+                    <SelectItem key={month.value} value={String(month.value)}>
+                      {month.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="col-span-1">
-            <label htmlFor="dashboard-filter-year" className="mb-1 block text-xs font-medium text-muted-foreground">
-              Ano
-            </label>
-            <Select value={String(filters.year)} onValueChange={handleYearChange}>
-              <SelectTrigger id="dashboard-filter-year" aria-label="Filtrar dashboard por ano" className="w-full sm:w-[110px]">
-                <SelectValue placeholder="Ano" />
-              </SelectTrigger>
-              <SelectContent>
-                {years.map((year) => (
-                  <SelectItem key={year} value={String(year)}>
-                    {year}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div>
+              <label htmlFor="dashboard-filter-year" className="mb-1 block text-xs font-medium text-muted-foreground">
+                Ano
+              </label>
+              <Select value={String(filters.year)} onValueChange={handleYearChange}>
+                <SelectTrigger id="dashboard-filter-year" aria-label="Filtrar dashboard por ano" className="w-full">
+                  <SelectValue placeholder="Ano" />
+                </SelectTrigger>
+                <SelectContent>
+                  {years.map((year) => (
+                    <SelectItem key={year} value={String(year)}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
-      </PageHeader>
+      </section>
 
-      <section className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+      <section className="grid gap-4 grid-cols-1 md:grid-cols-3">
         <KpiSparklineCard
           variant="expense"
           icon={ArrowDownRight}
