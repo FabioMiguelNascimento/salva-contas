@@ -84,6 +84,7 @@ export interface Transaction {
   creditCardId?: string | null;
   debitCard?: DebitCard | null;
   debitCardId?: string | null;
+  vaultId?: string | null;
   status: TransactionStatus;
   type: TransactionType;
   dueDate: string | null;
@@ -128,6 +129,8 @@ export interface DashboardFinancialSummary {
   income: number;
   expenses: number;
   balance: number;
+  availableBalance?: number;
+  savedAmount?: number;
   incomeChangePercent?: number;
   expensesChangePercent?: number;
   balanceChangePercent?: number;
@@ -154,6 +157,36 @@ export interface DashboardMetrics {
   pendingBills: DashboardPendingBillsSummary;
   categoryBreakdown: CategoryBreakdownItem[];
   lastUpdated?: string;
+}
+
+export interface Vault {
+  id: string;
+  userId?: string | null;
+  name: string;
+  targetAmount?: number | null;
+  currentAmount: number;
+  color?: string | null;
+  icon?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface CreateVaultPayload {
+  name: string;
+  targetAmount?: number;
+  color?: string;
+  icon?: string;
+}
+
+export interface UpdateVaultPayload {
+  name?: string;
+  targetAmount?: number | null;
+  color?: string | null;
+  icon?: string | null;
+}
+
+export interface VaultAmountPayload {
+  amount: number;
 }
 
 export interface TransactionFilters {

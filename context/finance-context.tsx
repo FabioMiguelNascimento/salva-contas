@@ -2,59 +2,71 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import {
-  createBudget,
-  deleteBudget,
-  updateBudget
+    createBudget,
+    deleteBudget,
+    updateBudget
 } from "@/services/budgets";
 import { fetchCategories } from "@/services/categories";
 import {
-  createCreditCard,
-  deleteCreditCard,
-  fetchCreditCards,
-  updateCreditCard
+    createCreditCard,
+    deleteCreditCard,
+    fetchCreditCards,
+    updateCreditCard
 } from "@/services/credit-cards";
 import { fetchDashboardSnapshot } from "@/services/dashboard";
 import {
-  createDebitCard,
-  deleteDebitCard,
-  fetchDebitCards,
-  updateDebitCard
+    createDebitCard,
+    deleteDebitCard,
+    fetchDebitCards,
+    updateDebitCard
 } from "@/services/debit-cards";
 import { createSubscription, deleteSubscription, updateSubscription } from "@/services/subscriptions";
 import {
-  deleteTransaction,
-  fetchTransactions,
-  processTransaction,
-  updateTransaction
+    deleteTransaction,
+    fetchTransactions,
+    processTransaction,
+    updateTransaction
 } from "@/services/transactions";
+import {
+    addVaultYield,
+    createVault,
+    deleteVault,
+    depositToVault,
+    updateVault,
+    withdrawFromVault,
+} from "@/services/vaults";
 import type {
-  Budget,
-  BudgetProgress,
-  CreateBudgetPayload,
-  CreateCreditCardPayload,
-  CreateDebitCardPayload,
-  CreateSubscriptionPayload,
-  CreditCard,
-  DashboardMetrics,
-  DebitCard,
-  ProcessTransactionClientPayload,
-  Subscription,
-  Transaction,
-  TransactionCategory,
-  TransactionFilters,
-  UpdateBudgetPayload,
-  UpdateCreditCardPayload,
-  UpdateDebitCardPayload,
-  UpdateSubscriptionPayload,
-  UpdateTransactionPayload,
+    Budget,
+    BudgetProgress,
+    CreateBudgetPayload,
+    CreateCreditCardPayload,
+    CreateDebitCardPayload,
+    CreateSubscriptionPayload,
+    CreateVaultPayload,
+    CreditCard,
+    DashboardMetrics,
+    DebitCard,
+    ProcessTransactionClientPayload,
+    Subscription,
+    Transaction,
+    TransactionCategory,
+    TransactionFilters,
+    UpdateBudgetPayload,
+    UpdateCreditCardPayload,
+    UpdateDebitCardPayload,
+    UpdateSubscriptionPayload,
+    UpdateTransactionPayload,
+    UpdateVaultPayload,
+    Vault,
+    VaultAmountPayload,
 } from "@/types/finance";
 import { usePathname } from "next/navigation";
 import {
-  createContext,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
+    createContext,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
 } from "react";
 
 interface FinanceContextValue {
@@ -73,6 +85,7 @@ interface FinanceContextValue {
   categories: TransactionCategory[];
   creditCards: CreditCard[];
   debitCards: DebitCard[];
+  vaults: Vault[];
   refresh: () => Promise<void>;
   processUnstructuredTransaction: (payload: ProcessTransactionClientPayload) => Promise<Transaction | void>;
   updateExistingTransaction: (id: string, payload: UpdateTransactionPayload) => Promise<Transaction | void>;
@@ -90,6 +103,12 @@ interface FinanceContextValue {
   createDebitCardEntry: (payload: CreateDebitCardPayload) => Promise<DebitCard | void>;
   updateDebitCardEntry: (id: string, payload: UpdateDebitCardPayload) => Promise<DebitCard | void>;
   deleteDebitCardEntry: (id: string) => Promise<void>;
+  createVaultEntry: (payload: CreateVaultPayload) => Promise<Vault | void>;
+  updateVaultEntry: (id: string, payload: UpdateVaultPayload) => Promise<Vault | void>;
+  deleteVaultEntry: (id: string) => Promise<void>;
+  depositVaultAmount: (id: string, payload: VaultAmountPayload) => Promise<Vault | void>;
+  withdrawVaultAmount: (id: string, payload: VaultAmountPayload) => Promise<Vault | void>;
+  addVaultYieldAmount: (id: string, payload: VaultAmountPayload) => Promise<Vault | void>;
 }
 
 const FinanceContext = createContext<FinanceContextValue | null>(null);
@@ -113,6 +132,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [categories, setCategories] = useState<TransactionCategory[]>([]);
   const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
   const [debitCards, setDebitCards] = useState<DebitCard[]>([]);
+  const [vaults, setVaults] = useState<Vault[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -144,6 +164,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         setCategories(snapshot.categories);
         setCreditCards(snapshot.creditCards);
         setDebitCards(snapshot.debitCards);
+        setVaults(snapshot.vaults ?? []);
       }
 
       setLastSync(new Date().toISOString());
@@ -173,6 +194,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setCategories([]);
       setCreditCards([]);
       setDebitCards([]);
+      setVaults([]);
       setIsLoading(false);
       setError(null);
       setLastSync(null);
@@ -377,6 +399,77 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const createVaultEntry = async (payload: CreateVaultPayload) => {
+    try {
+      const vault = await createVault(payload);
+      setVaults((prev) => [vault, ...prev]);
+      await loadData();
+      return vault;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao criar cofrinho");
+      throw err;
+    }
+  };
+
+  const updateVaultEntry = async (id: string, payload: UpdateVaultPayload) => {
+    try {
+      const vault = await updateVault(id, payload);
+      setVaults((prev) => prev.map((item) => (item.id === id ? vault : item)));
+      await loadData();
+      return vault;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao atualizar cofrinho");
+      throw err;
+    }
+  };
+
+  const deleteVaultEntry = async (id: string) => {
+    try {
+      await deleteVault(id);
+      setVaults((prev) => prev.filter((item) => item.id !== id));
+      await loadData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao remover cofrinho");
+      throw err;
+    }
+  };
+
+  const depositVaultAmount = async (id: string, payload: VaultAmountPayload) => {
+    try {
+      const vault = await depositToVault(id, payload);
+      setVaults((prev) => prev.map((item) => (item.id === id ? vault : item)));
+      await loadData();
+      return vault;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao guardar valor");
+      throw err;
+    }
+  };
+
+  const withdrawVaultAmount = async (id: string, payload: VaultAmountPayload) => {
+    try {
+      const vault = await withdrawFromVault(id, payload);
+      setVaults((prev) => prev.map((item) => (item.id === id ? vault : item)));
+      await loadData();
+      return vault;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao resgatar valor");
+      throw err;
+    }
+  };
+
+  const addVaultYieldAmount = async (id: string, payload: VaultAmountPayload) => {
+    try {
+      const vault = await addVaultYield(id, payload);
+      setVaults((prev) => prev.map((item) => (item.id === id ? vault : item)));
+      await loadData();
+      return vault;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao registrar rendimento");
+      throw err;
+    }
+  };
+
   const value: FinanceContextValue = {
     filters,
     setFilters,
@@ -393,6 +486,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     categories,
     creditCards,
     debitCards,
+    vaults,
     refresh: loadData,
     processUnstructuredTransaction,
     updateExistingTransaction,
@@ -410,6 +504,12 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     createDebitCardEntry,
     updateDebitCardEntry,
     deleteDebitCardEntry,
+    createVaultEntry,
+    updateVaultEntry,
+    deleteVaultEntry,
+    depositVaultAmount,
+    withdrawVaultAmount,
+    addVaultYieldAmount,
   };
 
   return <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>;

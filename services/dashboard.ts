@@ -9,12 +9,15 @@ import type {
     Transaction,
     TransactionCategory,
     TransactionFilters,
+    Vault,
 } from "@/types/finance";
 
 type ApiDashboardData = {
   totalIncome?: number | string;
   totalExpenses?: number | string;
   netBalance?: number | string;
+  availableBalance?: number | string;
+  savedAmount?: number | string;
   incomeChangePercent?: number | string;
   expensesChangePercent?: number | string;
   balanceChangePercent?: number | string;
@@ -76,6 +79,12 @@ type DashboardSnapshot = {
   categories: TransactionCategory[];
   creditCards: CreditCard[];
   debitCards: DebitCard[];
+  vaults: Vault[];
+};
+
+type ApiVault = Omit<Vault, "targetAmount" | "currentAmount"> & {
+  targetAmount?: number | string | null;
+  currentAmount: number | string;
 };
 
 type ApiDashboardSnapshot = {
@@ -87,6 +96,7 @@ type ApiDashboardSnapshot = {
   categories: TransactionCategory[];
   creditCards: ApiCreditCard[];
   debitCards: DebitCard[];
+  vaults: ApiVault[];
 };
 
 const toNumber = (value: number | string): number => {
@@ -155,11 +165,20 @@ const normalizeBudgetProgress = (progress: ApiBudgetProgress): BudgetProgress =>
   percentage: toNumber(progress.percentage),
 });
 
+const normalizeVault = (vault: ApiVault): Vault => ({
+  ...vault,
+  currentAmount: toNumber(vault.currentAmount),
+  targetAmount:
+    vault.targetAmount == null ? null : toNumber(vault.targetAmount),
+});
+
 const normalizeMetrics = (metrics: ApiDashboardData): DashboardMetrics => ({
   financials: {
     income: toNumber(metrics.totalIncome ?? 0),
     expenses: toNumber(metrics.totalExpenses ?? 0),
     balance: toNumber(metrics.netBalance ?? 0),
+    availableBalance: toNumber(metrics.availableBalance ?? metrics.netBalance ?? 0),
+    savedAmount: toNumber(metrics.savedAmount ?? 0),
     incomeChangePercent: metrics.incomeChangePercent ? toNumber(metrics.incomeChangePercent) : undefined,
     expensesChangePercent: metrics.expensesChangePercent ? toNumber(metrics.expensesChangePercent) : undefined,
     balanceChangePercent: metrics.balanceChangePercent ? toNumber(metrics.balanceChangePercent) : undefined,
@@ -206,5 +225,6 @@ export async function fetchDashboardSnapshot(filters: TransactionFilters): Promi
     categories: payload.categories ?? [],
     creditCards: (payload.creditCards ?? []).map(normalizeCreditCard),
     debitCards: payload.debitCards ?? [],
+    vaults: (payload.vaults ?? []).map(normalizeVault),
   };
 }

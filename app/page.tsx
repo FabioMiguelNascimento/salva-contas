@@ -9,6 +9,7 @@ import SubscriptionsCard from "@/components/dashboard/SubscriptionsCard";
 import UpcomingBillsCard from "@/components/dashboard/UpcomingBillsCard";
 import { KpiSparklineCard } from "@/components/kpi-sparkline-card";
 import { PageHeader } from "@/components/page-header";
+import { SummaryCard } from "@/components/summary-card";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -29,6 +30,7 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   CalendarIcon,
+  PiggyBank,
   Wallet2
 } from "lucide-react";
 import { useMemo } from "react";
@@ -310,7 +312,7 @@ export default function DashboardPage() {
         </div>
       </section>
 
-      <section className="grid gap-4 grid-cols-1 md:grid-cols-3">
+      <section className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
         <KpiSparklineCard
           variant="expense"
           icon={ArrowDownRight}
@@ -332,10 +334,18 @@ export default function DashboardPage() {
         <KpiSparklineCard
           variant="balance"
           icon={Wallet2}
-          title={hasDateRange ? "Saldo no período" : "Saldo atual"}
-          value={currencyFormatter.format(metrics?.financials.balance ?? 0)}
+          title={hasDateRange ? "Saldo disponível no período" : "Saldo disponível"}
+          value={currencyFormatter.format(metrics?.financials.availableBalance ?? metrics?.financials.balance ?? 0)}
           change={`${(metrics?.financials.balanceChangePercent ?? 0) > 0 ? '+' : ''}${metrics?.financials.balanceChangePercent ?? 0}% ${comparisonLabel}`}
           sparklineData={sparklineBalance}
+          isLoading={isLoading}
+        />
+        <SummaryCard
+          icon={PiggyBank}
+          title="Dinheiro guardado"
+          value={currencyFormatter.format(metrics?.financials.savedAmount ?? 0)}
+          helper="Total em cofrinhos"
+          variant="success"
           isLoading={isLoading}
         />
       </section>

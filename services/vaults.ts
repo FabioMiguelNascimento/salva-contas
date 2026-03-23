@@ -1,0 +1,67 @@
+import { apiClient } from '@/lib/api-client';
+import type {
+    CreateVaultPayload,
+    UpdateVaultPayload,
+    Vault,
+    VaultAmountPayload,
+} from '@/types/finance';
+
+type ApiResponse<T> = T | { data: T };
+
+type ApiVault = Omit<Vault, 'targetAmount' | 'currentAmount'> & {
+  targetAmount?: string | number | null;
+  currentAmount: string | number;
+};
+
+const toNumber = (value: string | number | null | undefined): number => {
+  if (value == null) return 0;
+  const parsed = typeof value === 'string' ? Number(value) : value;
+  return Number.isFinite(parsed) ? parsed : 0;
+};
+
+const unwrapData = <T>(payload: ApiResponse<T>): T => {
+  if (payload && typeof payload === 'object' && 'data' in payload) {
+    return (payload as { data: T }).data;
+  }
+  return payload as T;
+};
+
+const normalizeVault = (vault: ApiVault): Vault => ({
+  ...vault,
+  targetAmount: vault.targetAmount == null ? null : toNumber(vault.targetAmount),
+  currentAmount: toNumber(vault.currentAmount),
+});
+
+export async function fetchVaults(): Promise<Vault[]> {
+  const response = await apiClient.get<ApiResponse<ApiVault[]>>('/vaults');
+  return (unwrapData(response.data) ?? []).map(normalizeVault);
+}
+
+export async function createVault(payload: CreateVaultPayload): Promise<Vault> {
+  const response = await apiClient.post<ApiResponse<ApiVault>>('/vaults', payload);
+  return normalizeVault(unwrapData(response.data));
+}
+
+export async function updateVault(id: string, payload: UpdateVaultPayload): Promise<Vault> {
+  const response = await apiClient.patch<ApiResponse<ApiVault>>(`/vaults/${id}`, payload);
+  return normalizeVault(unwrapData(response.data));
+}
+
+export async function deleteVault(id: string): Promise<void> {
+  await apiClient.delete(`/vaults/${id}`);
+}
+
+export async function depositToVault(id: string, payload: VaultAmountPayload): Promise<Vault> {
+  const response = await apiClient.post<ApiResponse<ApiVault>>(`/vaults/${id}/deposit`, payload);
+  return normalizeVault(unwrapData(response.data));
+}
+
+export async function withdrawFromVault(id: string, payload: VaultAmountPayload): Promise<Vault> {
+  const response = await apiClient.post<ApiResponse<ApiVault>>(`/vaults/${id}/withdraw`, payload);
+  return normalizeVault(unwrapData(response.data));
+}
+
+export async function addVaultYield(id: string, payload: VaultAmountPayload): Promise<Vault> {
+  const response = await apiClient.post<ApiResponse<ApiVault>>(`/vaults/${id}/yield`, payload);
+  return normalizeVault(unwrapData(response.data));
+}
