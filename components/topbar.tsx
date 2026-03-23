@@ -33,7 +33,7 @@ export function Topbar({
         <button
           type="button"
           onClick={onBrandClick}
-          className="flex items-center gap-2 rounded-md px-1 py-0.5 hover:bg-muted/60"
+          className="flex items-center gap-2 rounded-md px-1 py-0.5 hover:bg-muted/60 cursor-pointer"
           aria-label="Alternar sidebar"
         >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-emerald-500 to-emerald-600 text-white overflow-hidden">
