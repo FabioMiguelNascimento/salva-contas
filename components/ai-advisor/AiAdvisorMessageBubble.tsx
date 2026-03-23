@@ -1,6 +1,7 @@
 "use client";
 
-import AiAdvisorVisualizationRenderer, { VisualizationStatus } from "@/components/dashboard/AiAdvisorVisualizationRenderer";
+import AiAdvisorVisualizationRenderer from "@/components/ai-advisor/AiAdvisorVisualizationRenderer";
+import { VisualizationStatus } from "@/components/ai-advisor/visualizations/types";
 import { AiVisualization } from "@/types/finance";
 import ReactMarkdown from "react-markdown";
 

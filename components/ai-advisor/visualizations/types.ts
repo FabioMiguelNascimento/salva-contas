@@ -1,0 +1,1 @@
+export type VisualizationStatus = "idle" | "confirming" | "confirmed" | "cancelled";

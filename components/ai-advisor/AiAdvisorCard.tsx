@@ -1,8 +1,8 @@
 "use client";
 
-import AiAdvisorAttachmentButton from '@/components/dashboard/AiAdvisorAttachmentButton';
-import AiAdvisorMessageBubble from '@/components/dashboard/AiAdvisorMessageBubble';
-import AiAdvisorToolsDropdown from '@/components/dashboard/AiAdvisorToolsDropdown';
+import AiAdvisorAttachmentButton from '@/components/ai-advisor/AiAdvisorAttachmentButton';
+import AiAdvisorMessageBubble from '@/components/ai-advisor/AiAdvisorMessageBubble';
+import AiAdvisorToolsDropdown from '@/components/ai-advisor/AiAdvisorToolsDropdown';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';

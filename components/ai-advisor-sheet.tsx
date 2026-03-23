@@ -1,6 +1,6 @@
 "use client";
 
-import AiAdvisorCard from "@/components/dashboard/AiAdvisorCard";
+import AiAdvisorCard from "@/components/ai-advisor/AiAdvisorCard";
 import { Sheet, SheetBody, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useFinance } from "@/hooks/use-finance";
 
