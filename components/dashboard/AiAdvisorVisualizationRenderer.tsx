@@ -96,6 +96,28 @@ const formatCurrency = (value: unknown): string => {
   }).format(parseAmount(value));
 };
 
+const formatStatusLabel = (status?: string | null): string => {
+  if (!status) return "";
+
+  const normalized = String(status).toLowerCase().trim();
+
+  switch (normalized) {
+    case "paid":
+      return "Pago";
+    case "pending":
+      return "Pendente";
+    case "overdue":
+      return "Atrasado";
+    case "cancelled":
+    case "canceled":
+      return "Cancelado";
+    case "received":
+      return "Recebido";
+    default:
+      return status;
+  }
+};
+
 export default function AiAdvisorVisualizationRenderer({
   visualization,
   status,
@@ -161,7 +183,7 @@ export default function AiAdvisorVisualizationRenderer({
           <div className="flex items-center gap-2">
             <div className="text-right">
               <p className="text-base font-semibold text-emerald-700">{formatCurrency(transaction.amount)}</p>
-              <p className="text-xs text-slate-500">{transaction.status === "paid" ? "Liquidado" : "Pendente"}</p>
+              <p className="text-xs text-slate-500">{formatStatusLabel(transaction.status)}</p>
             </div>
           </div>
         </div>
@@ -241,6 +263,84 @@ export default function AiAdvisorVisualizationRenderer({
 
   if (
     visualization.type === "table_summary" &&
+    visualization.toolName === "get_transaction_details" &&
+    Array.isArray((payload as any).items)
+  ) {
+    const items = (payload as any).items as Array<{
+      id?: string;
+      description?: string;
+      amount?: number | string;
+      type?: "income" | "expense";
+      category?: string;
+      status?: string;
+      paymentDate?: string | null;
+      dueDate?: string | null;
+    }>;
+
+    const totalTransactions = Number((payload as any).totalTransactions || items.length || 0);
+    const totalAmount =
+      typeof (payload as any).totalAmount === "number"
+        ? Number((payload as any).totalAmount)
+        : items.reduce((sum, item) => sum + parseAmount(item.amount), 0);
+
+    return (
+      <div className="mt-3 w-full min-w-0 overflow-x-hidden rounded-xl border border-gray-100 bg-white p-3">
+        <p className="mb-2 text-xs font-semibold text-gray-600">{visualization.title}</p>
+        <div className="mb-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
+          <div className="rounded-lg bg-emerald-50 p-2">
+            <p className="text-xs text-emerald-700">Transações encontradas</p>
+            <p className="font-semibold text-emerald-800">{totalTransactions}</p>
+          </div>
+          <div className="rounded-lg bg-slate-100 p-2 sm:col-span-2">
+            <p className="text-xs text-slate-600">Valor total encontrado</p>
+            <p className="font-semibold text-slate-800">{formatCurrency(totalAmount)}</p>
+          </div>
+        </div>
+
+        {items.length > 0 ? (
+          <div className="max-h-56 space-y-1 overflow-y-auto overflow-x-hidden pr-1">
+            {items.map((item, idx) => (
+              <div
+                key={`${item.id || item.description || "transaction"}-${idx}`}
+                className="w-full min-w-0 overflow-hidden rounded-md border border-slate-100 bg-white px-2 py-1.5"
+              >
+                <div className="flex w-full min-w-0 items-center justify-between gap-2">
+                  <p className="w-0 flex-1 truncate text-xs font-medium text-slate-800">
+                    {item.description || "Sem descrição"}
+                  </p>
+                  <p className={`shrink-0 whitespace-nowrap text-sm font-bold ${item.type === "income" ? "text-emerald-700" : "text-rose-700"}`}>
+                    {item.type === "income" ? "+" : "-"}
+                    {formatCurrency(item.amount)}
+                  </p>
+                </div>
+                <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
+                  <span className="flex items-center gap-1">
+                    <DynamicIcon name={item.category || "tag"} className="h-3 w-3 text-slate-500" />
+                    <span className="max-w-[120px] truncate">{item.category || "Sem categoria"}</span>
+                  </span>
+                  {item.paymentDate ? (
+                    <span className="whitespace-nowrap text-slate-500">Pago: {formatDate(item.paymentDate)}</span>
+                  ) : item.dueDate ? (
+                    <span className="whitespace-nowrap text-slate-500">Vence: {formatDate(item.dueDate)}</span>
+                  ) : null}
+                  {item.status ? <span className="whitespace-nowrap text-slate-400">{formatStatusLabel(item.status)}</span> : null}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-md border border-dashed border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-500">
+            Nenhuma transação encontrada para este termo.
+          </div>
+        )}
+
+        {requiresConfirmation && renderConfirmationActions(status, onConfirm, onCancel)}
+      </div>
+    );
+  }
+
+  if (
+    visualization.type === "table_summary" &&
     visualization.payload &&
     typeof visualization.payload === "object" &&
     "description" in visualization.payload &&
@@ -248,7 +348,6 @@ export default function AiAdvisorVisualizationRenderer({
   ) {
     const t = visualization.payload as any;
 
-    const items = Array.isArray(payload.items) ? payload.items as any[] : [];
 
     return (
       <div className="mt-3 w-full min-w-0 overflow-x-hidden rounded-xl border border-gray-100 bg-white p-4 shadow-sm">

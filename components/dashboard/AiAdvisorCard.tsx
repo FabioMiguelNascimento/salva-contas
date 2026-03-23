@@ -223,8 +223,8 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
     <div className="h-full min-h-0 flex flex-col rounded-xl bg-linear-to-b from-emerald-50/60 to-white">
       <div className="flex flex-1 min-h-0 flex-col lg:flex-row">
         <div className="flex-1 min-h-0 flex flex-col">
-          <div className="flex-1 min-h-0 p-3 sm:p-4">
-            <ScrollArea ref={listRef} className="h-full overflow-x-hidden rounded-xl bg-emerald-50/40 p-3 sm:p-4">
+          <div className="flex-1 min-h-0 p-2 sm:p-3">
+            <ScrollArea ref={listRef} className="h-full overflow-x-hidden rounded-xl bg-emerald-50/40 p-2 sm:p-3">
               <div className="min-w-0 space-y-3 overflow-x-hidden">
                 {messages.map((message) => (
                   <AiAdvisorMessageBubble
@@ -249,7 +249,7 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
             </ScrollArea>
           </div>
 
-          <div className="bg-white/70 p-3 sm:p-4">
+          <div className="bg-white/70 p-2 sm:p-3">
             <div className="flex flex-col gap-2">
               <div className="flex justify-end">
                 <Button

@@ -39,18 +39,18 @@ export default function AiAdvisorMessageBubble({
           isAssistant
             ? "w-full min-w-0 max-w-[86%]"
             : "w-auto max-w-[72%] sm:max-w-[68%]"
-        } overflow-x-hidden rounded-2xl px-3.5 py-3 ${
+              } overflow-x-hidden rounded-2xl px-3 py-3 ${
           isAssistant
             ? "bg-white border border-emerald-100 shadow-sm text-slate-800"
             : "bg-emerald-600 text-white shadow-sm"
         }`}
       >
         {isAssistant ? (
-          <div className="prose prose-sm max-w-none break-words prose-p:my-1.5 prose-li:my-0.5 prose-headings:my-1 text-slate-800">
+          <div className="prose prose-sm max-w-none wrap-break-word prose-p:my-1.5 prose-li:my-0.5 prose-headings:my-1 text-slate-800">
             <ReactMarkdown>{message.content}</ReactMarkdown>
           </div>
         ) : (
-          <p className="break-words text-sm leading-relaxed">{message.content}</p>
+          <p className="wrap-break-word text-sm leading-relaxed">{message.content}</p>
         )}
 
         {message.attachments?.length ? (
