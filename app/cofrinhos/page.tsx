@@ -5,15 +5,15 @@ import { SummaryCard } from "@/components/summary-card";
 import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { VaultAmountDialog } from "@/components/vaults/vault-amount-dialog";
+import { VaultAmountSheet } from "@/components/vaults/vault-amount-sheet";
 import { VaultCard } from "@/components/vaults/vault-card";
-import { VaultFormDialog } from "@/components/vaults/vault-form-dialog";
+import { VaultFormSheet } from "@/components/vaults/vault-form-sheet";
 import { VaultTable } from "@/components/vaults/vault-table";
 import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useFinance } from "@/hooks/use-finance";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import type { Vault } from "@/types/finance";
-import { CheckCircle2, PiggyBank, PlusCircle, Target, Wallet2 } from "lucide-react";
+import { PiggyBank, PlusCircle, Target, Wallet2 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
@@ -115,7 +115,7 @@ export default function VaultsPage() {
         description="Separe dinheiro para metas, registre depósitos, resgates e rendimentos manuais."
       />
 
-      <SummaryCardsGrid>
+      <SummaryCardsGrid className="sm:grid-cols-3!">
         <SummaryCard
           icon={Target}
           title="Objetivos ativos"
@@ -127,13 +127,6 @@ export default function VaultsPage() {
           title="Dinheiro guardado"
           value={currencyFormatter.format(savedAmount)}
           helper="Total alocado em cofrinhos"
-          variant="success"
-        />
-        <SummaryCard
-          icon={CheckCircle2}
-          title="Com meta definida"
-          value={withTargetCount}
-          helper="Cofrinhos com progresso"
           variant="success"
         />
         <SummaryCard
@@ -192,7 +185,7 @@ export default function VaultsPage() {
         </CardContent>
       </Card>
 
-      <VaultFormDialog
+      <VaultFormSheet
         open={createOpen}
         onOpenChange={setCreateOpen}
         onCreate={async (payload) => {
@@ -202,7 +195,7 @@ export default function VaultsPage() {
         onUpdate={async () => undefined}
       />
 
-      <VaultFormDialog
+      <VaultFormSheet
         open={Boolean(editingVault)}
         onOpenChange={(open) => {
           if (!open) setEditingVault(null);
@@ -216,7 +209,7 @@ export default function VaultsPage() {
         }}
       />
 
-      <VaultAmountDialog
+      <VaultAmountSheet
         open={Boolean(actionState && actionConfig)}
         onOpenChange={(open) => {
           if (!open) setActionState(null);

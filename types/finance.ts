@@ -189,6 +189,45 @@ export interface VaultAmountPayload {
   amount: number;
 }
 
+export type VaultHistoryEventType = "deposit" | "withdraw" | "yield";
+
+export interface VaultHistoryEvent {
+  id: string;
+  type: VaultHistoryEventType;
+  amount: number;
+  balanceAfter: number;
+  happenedAt: string;
+}
+
+export interface VaultHistoryGroup {
+  date: string;
+  items: VaultHistoryEvent[];
+}
+
+export interface VaultHistoryResponse {
+  month: string;
+  summary: {
+    totalDeposited: number;
+    totalWithdrawn: number;
+    totalYield: number;
+    totalNetSaved: number;
+    totalEvents: number;
+  };
+  groups: VaultHistoryGroup[];
+  pagination: {
+    limit: number;
+    nextCursor: string | null;
+    hasNextPage: boolean;
+  };
+}
+
+export interface VaultHistoryQuery {
+  month?: number;
+  year?: number;
+  limit?: number;
+  cursor?: string;
+}
+
 export interface TransactionFilters {
   month: number;
   year: number;

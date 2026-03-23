@@ -9,13 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-    Sheet,
-    SheetBody,
-    SheetContent,
-    SheetDescription,
-    SheetFooter,
-    SheetHeader,
-    SheetTitle,
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
 } from "@/components/ui/sheet";
 
 const amountSchema = z.object({
@@ -27,7 +27,7 @@ const amountSchema = z.object({
 type AmountFormInput = z.input<typeof amountSchema>;
 type AmountFormValues = z.output<typeof amountSchema>;
 
-interface VaultAmountDialogProps {
+interface VaultAmountSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
@@ -36,14 +36,14 @@ interface VaultAmountDialogProps {
   onSubmit: (value: number) => Promise<void>;
 }
 
-export function VaultAmountDialog({
+export function VaultAmountSheet({
   open,
   onOpenChange,
   title,
   description,
   submitLabel,
   onSubmit,
-}: VaultAmountDialogProps) {
+}: VaultAmountSheetProps) {
   const {
     register,
     handleSubmit,

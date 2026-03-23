@@ -4,6 +4,8 @@ import type {
     UpdateVaultPayload,
     Vault,
     VaultAmountPayload,
+    VaultHistoryQuery,
+    VaultHistoryResponse,
 } from '@/types/finance';
 
 type ApiResponse<T> = T | { data: T };
@@ -11,6 +13,26 @@ type ApiResponse<T> = T | { data: T };
 type ApiVault = Omit<Vault, 'targetAmount' | 'currentAmount'> & {
   targetAmount?: string | number | null;
   currentAmount: string | number;
+};
+
+type ApiVaultHistoryResponse = Omit<VaultHistoryResponse, 'groups' | 'summary'> & {
+  groups: Array<{
+    date: string;
+    items: Array<{
+      id: string;
+      type: 'deposit' | 'withdraw' | 'yield';
+      amount: string | number;
+      balanceAfter: string | number;
+      happenedAt: string;
+    }>;
+  }>;
+  summary: {
+    totalDeposited: string | number;
+    totalWithdrawn: string | number;
+    totalYield: string | number;
+    totalNetSaved: string | number;
+    totalEvents: number;
+  };
 };
 
 const toNumber = (value: string | number | null | undefined): number => {
@@ -64,4 +86,37 @@ export async function withdrawFromVault(id: string, payload: VaultAmountPayload)
 export async function addVaultYield(id: string, payload: VaultAmountPayload): Promise<Vault> {
   const response = await apiClient.post<ApiResponse<ApiVault>>(`/vaults/${id}/yield`, payload);
   return normalizeVault(unwrapData(response.data));
+}
+
+export async function fetchVaultHistory(
+  id: string,
+  query: VaultHistoryQuery = {},
+): Promise<VaultHistoryResponse> {
+  const response = await apiClient.get<ApiResponse<ApiVaultHistoryResponse>>(
+    `/vaults/${id}/history`,
+    {
+      params: query,
+    },
+  );
+
+  const payload = unwrapData(response.data);
+
+  return {
+    ...payload,
+    summary: {
+      ...payload.summary,
+      totalDeposited: toNumber(payload.summary.totalDeposited),
+      totalWithdrawn: toNumber(payload.summary.totalWithdrawn),
+      totalYield: toNumber(payload.summary.totalYield),
+      totalNetSaved: toNumber(payload.summary.totalNetSaved),
+    },
+    groups: payload.groups.map((group) => ({
+      ...group,
+      items: group.items.map((item) => ({
+        ...item,
+        amount: toNumber(item.amount),
+        balanceAfter: toNumber(item.balanceAfter),
+      })),
+    })),
+  };
 }

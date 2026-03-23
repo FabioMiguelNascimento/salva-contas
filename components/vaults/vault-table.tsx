@@ -71,13 +71,14 @@ export function VaultTable({
           return (
             <TableRow key={vault.id}>
               <TableCell>
-                <div className="flex items-center">
+                <div className="flex items-center gap-2">
                   <span
                     className="flex size-7 items-center justify-center rounded-md border"
                     style={{ backgroundColor: vault.color || undefined }}
                   >
                     <DynamicIcon name={vault.icon || "target"} className="h-4 w-4" />
                   </span>
+                  <span className="text-sm font-medium text-foreground">{vault.name}</span>
                 </div>
               </TableCell>
 

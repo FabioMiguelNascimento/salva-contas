@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/auth-context";
 import { useFinance } from "@/hooks/use-finance";
-import { CalendarClock, CreditCard, LayoutDashboard, LogOut, PiggyBank, ReceiptText, Repeat, Settings, Sparkles, Target, User, Users } from "lucide-react";
+import { CalendarClock, CreditCard, HandCoins, LayoutDashboard, LogOut, PiggyBank, ReceiptText, Repeat, Settings, Sparkles, Target, User, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -57,13 +57,13 @@ const baseNavItems: NavItem[] = [
   {
     label: "Orçamentos",
     href: "/orcamentos",
-    icon: PiggyBank,
+    icon: HandCoins,
     description: "Limites por categoria",
   },
   {
     label: "Cofrinhos",
     href: "/cofrinhos",
-    icon: Target,
+    icon: PiggyBank,
     description: "Objetivos e reservas financeiras",
   },
   {
