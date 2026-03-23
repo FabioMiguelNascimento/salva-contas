@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InfoPopover } from "@/components/ui/info-popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import { cn, parseDateOnly } from "@/lib/utils";
@@ -109,6 +110,7 @@ export default function UpcomingBillsCard({ urgentBills, nextBills, isLoading }:
           <CardTitle className="text-base font-semibold text-gray-800">
             {allClear ? "Próximas contas" : "Contas vencendo"}
           </CardTitle>
+          <InfoPopover content="Aqui você pode acompanhar as contas que estão vencendo ou próximas do vencimento. As contas em vermelho já estão vencidas, as em amarelo vencem em breve. Priorize o pagamento das contas vencidas para manter seu fluxo de caixa saudável." />
         </div>
         <p className="text-sm text-gray-400">
           {allClear

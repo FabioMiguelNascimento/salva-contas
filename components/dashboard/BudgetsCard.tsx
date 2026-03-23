@@ -3,6 +3,7 @@
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InfoPopover } from "@/components/ui/info-popover";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
@@ -30,9 +31,12 @@ export default function BudgetsCard({ budgetsWithUsage, isLoading }: BudgetsCard
           <CardTitle className="text-base font-semibold text-gray-800">Orçamentos do Mês</CardTitle>
           <p className="text-sm text-gray-400">Acompanhe seus limites por categoria</p>
         </div>
-        <Button variant="ghost" size="sm" className="self-start sm:self-auto shrink-0" asChild>
-          <Link href="/orcamentos">Gerenciar</Link>
-        </Button>
+        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+          <InfoPopover content="Aqui você pode acompanhar o progresso dos seus orçamentos mensais. Cada orçamento mostra quanto já foi gasto em relação ao limite definido, com uma barra de progresso colorida (verde para dentro do orçamento, vermelho quando excedido)." />
+          <Button variant="ghost" size="sm" asChild>
+            <Link href="/orcamentos">Gerenciar</Link>
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         {isLoading ? (

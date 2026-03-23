@@ -3,6 +3,7 @@
 import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InfoPopover } from "@/components/ui/info-popover";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
@@ -24,6 +25,7 @@ export default function CreditCardsCard({ activeCards, totalCreditLimit, totalCr
       <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <CardTitle className="text-base">Cartões de Crédito</CardTitle>
+          <InfoPopover content="Aqui você pode ver o resumo dos seus cartões de crédito ativos, incluindo o limite total disponível, quanto já foi utilizado e o percentual de uso. Cada cartão mostra seu limite individual e bandeira." />
         </div>
         <Button variant="ghost" size="sm" className="self-start sm:self-auto" asChild>
           <Link href="/cartoes">Ver todos</Link>

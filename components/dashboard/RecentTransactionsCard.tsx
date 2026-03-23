@@ -3,6 +3,7 @@
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InfoPopover } from "@/components/ui/info-popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
@@ -58,7 +59,10 @@ export default function RecentTransactionsCard({ transactions, isLoading, title 
   return (
     <Card className="bg-white shadow-sm border border-gray-100 min-h-[220px] h-full">
       <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <CardTitle className="text-base font-semibold text-gray-800">{title}</CardTitle>
+        <div className="flex items-center gap-2">
+          <CardTitle className="text-base font-semibold text-gray-800">{title}</CardTitle>
+          <InfoPopover content="Aqui você pode ver as suas transações mais recentes, incluindo receitas e despesas. Cada transação mostra a descrição, categoria, data e valor. As receitas aparecem em verde e as despesas em vermelho." />
+        </div>
         <Button variant="ghost" size="sm" className="self-start sm:self-auto" asChild>
           <Link href="/extrato">Ver extrato completo</Link>
         </Button>

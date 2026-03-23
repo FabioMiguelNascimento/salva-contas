@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { InfoPopover } from "@/components/ui/info-popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { ComponentType, SVGProps } from "react";
@@ -114,7 +115,16 @@ export function KpiSparklineCard({
       <CardContent className="p-5 pb-0">
         {/* Header row */}
         <div className="flex items-start justify-between gap-2 mb-3">
-          <p className="text-sm font-medium text-gray-500 leading-snug">{title}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-sm font-medium text-gray-500 leading-snug">{title}</p>
+            <InfoPopover content={
+              variant === 'expense' 
+                ? "Mostra o total de despesas do mês atual com um gráfico dos últimos 7 dias. O percentual indica a variação em relação ao mês anterior."
+                : variant === 'income'
+                ? "Mostra o total de receitas do mês atual com um gráfico dos últimos 7 dias. O percentual indica a variação em relação ao mês anterior."
+                : "Mostra o saldo atual (receitas - despesas) do mês com um gráfico dos últimos 7 dias. O percentual indica a variação em relação ao mês anterior."
+            } />
+          </div>
           <div className={cn("rounded-xl p-2 shrink-0", cfg.iconBg)}>
             <Icon className={cn("h-4 w-4", cfg.iconColor)} />
           </div>

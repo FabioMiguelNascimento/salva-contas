@@ -3,6 +3,7 @@
 import CategoryDonut from "@/components/category-donut";
 import ChartCard from "@/components/chart-card";
 import { DynamicIcon } from "@/components/dynamic-icon";
+import { InfoPopover } from "@/components/ui/info-popover";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import type { CategoryBreakdownItem, TransactionCategory } from "@/types/finance";
 import Link from "next/link";
@@ -25,7 +26,14 @@ const chartColors = [
 
 export default function CategoryBreakdownCard({ breakdown, total, categoriesMeta, topN = 4, isLoading }: CategoryBreakdownCardProps) {
   return (
-    <ChartCard title="Gastos por categoria">
+    <ChartCard
+      title={
+        <div className="flex items-center gap-2">
+          <span>Gastos por categoria</span>
+          <InfoPopover content="Este gráfico mostra a distribuição dos seus gastos por categoria no período atual. As categorias são exibidas em um gráfico de rosca com as principais categorias destacadas e o restante agrupado em 'Outros'." />
+        </div>
+      }
+    >
       {isLoading ? (
         <div className="flex items-center justify-center p-6">
           <div className="h-32 w-32 sm:h-44 sm:w-44 rounded-full bg-muted/30" />

@@ -1,6 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { InfoPopover } from "@/components/ui/info-popover";
 import { Skeleton } from "@/components/ui/skeleton";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import React from "react";
@@ -19,6 +20,7 @@ export default function SpendingCard({ data, isLoading, title = "Gastos dos últ
           <CardTitle className="text-base font-semibold text-gray-800">{title}</CardTitle>
           <p className="text-sm text-gray-400">Somente despesas pagas</p>
         </div>
+        <InfoPopover content="Este gráfico mostra os gastos dos últimos 7 dias, incluindo apenas despesas que já foram pagas. Os valores são exibidos em reais (R$) e representam o total diário de gastos." />
       </CardHeader>
       <CardContent className="overflow-hidden p-3 sm:p-6">
         {isLoading ? <Skeleton className="h-48 w-full" /> : <SpendingBarChart data={data} />}
