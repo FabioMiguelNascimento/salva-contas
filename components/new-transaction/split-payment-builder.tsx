@@ -71,77 +71,77 @@ export function SplitPaymentBuilder({
   return (
     <div className="space-y-2">
       {splits.map((split, index) => (
-        <div key={index} className="flex items-start gap-2">
-          {/* Amount */}
-          <div className="w-28 shrink-0">
-            <Input
-              type="number"
-              min={0}
-              step={0.01}
-              placeholder="0,00"
-              value={split.amount || ""}
-              onChange={(e) =>
-                updateRow(index, { amount: parseFloat(e.target.value) || 0 })
-              }
-              className="text-sm"
-            />
-          </div>
+        <div key={index} className="rounded-xl border border-border/50 bg-muted/10 p-2">
+          <div className="grid gap-2 sm:grid-cols-[7rem_minmax(0,1fr)_auto] items-start">
+            {/* Amount */}
+            <div className="min-w-0">
+              <Input
+                type="number"
+                min={0}
+                step={0.01}
+                placeholder="0,00"
+                value={split.amount || ""}
+                onChange={(e) =>
+                  updateRow(index, { amount: parseFloat(e.target.value) || 0 })
+                }
+                className="text-sm"
+              />
+            </div>
 
-          {/* Payment method */}
-          <div className="flex-1 min-w-0">
-            <Select
-              value={split.paymentMethod}
-              onValueChange={(v) =>
-                updateRow(index, { paymentMethod: v as PaymentMethod })
-              }
+            {/* Payment method */}
+            <div className="min-w-0">
+              <Select
+                value={split.paymentMethod}
+                onValueChange={(v) =>
+                  updateRow(index, { paymentMethod: v as PaymentMethod })
+                }
+              >
+                <SelectTrigger className="text-sm w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {PAYMENT_METHODS.map(([value, label]) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Remove button */}
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-muted-foreground hover:text-destructive"
+              onClick={() => removeRow(index)}
+              disabled={splits.length <= 1}
             >
-              <SelectTrigger className="text-sm w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PAYMENT_METHODS.map(([value, label]) => (
-                  <SelectItem key={value} value={value}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Trash2 className="h-4 w-4" />
+            </Button>
           </div>
 
-          {/* Credit card picker (only for credit_card method) */}
-          {split.paymentMethod === "credit_card" && (
-            <div className="flex-1 min-w-0">
-              <CreditCardSelect
-                value={split.creditCardId ?? null}
-                onValueChange={(v) => updateRow(index, { creditCardId: v })}
-                placeholder="Selecione o cartão"
-                allowClear={false}
-              />
+          {(split.paymentMethod === "credit_card" || split.paymentMethod === "debit") && (
+            <div className="mt-2 min-w-0">
+              {split.paymentMethod === "credit_card" && (
+                <CreditCardSelect
+                  value={split.creditCardId ?? null}
+                  onValueChange={(v) => updateRow(index, { creditCardId: v })}
+                  placeholder="Selecione o cartão"
+                  allowClear={false}
+                />
+              )}
+              {split.paymentMethod === "debit" && (
+                <DebitCardSelect
+                  value={(split as any).debitCardId ?? null}
+                  onValueChange={(v) => updateRow(index, { debitCardId: v } as any)}
+                  placeholder="Selecione o cartão de débito"
+                  allowClear={false}
+                />
+              )}
             </div>
           )}
-
-          {split.paymentMethod === "debit" && (
-            <div className="flex-1 min-w-0">
-              <DebitCardSelect
-                value={(split as any).debitCardId ?? null}
-                onValueChange={(v) => updateRow(index, { debitCardId: v } as any)}
-                placeholder="Selecione o débito"
-                allowClear={false}
-              />
-            </div>
-          )}
-
-          {/* Remove button */}
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="shrink-0 text-muted-foreground hover:text-destructive"
-            onClick={() => removeRow(index)}
-            disabled={splits.length <= 1}
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
         </div>
       ))}
 

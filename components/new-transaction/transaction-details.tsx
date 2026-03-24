@@ -79,9 +79,9 @@ export function TransactionDetails({
   return (
     <div className={className}>
       <div className="space-y-3">
-        <Label className="text-sm font-semibold">Detalhes do lançamento</Label>
+        <Label className="text-base font-semibold">Detalhes do lançamento</Label>
 
-        <label className="flex items-center gap-2 rounded-xl border border-border/60 p-4 cursor-pointer">
+        <label className="flex flex-col gap-2 rounded-xl border border-border/60 bg-muted/20 p-2 sm:flex-row sm:items-center">
           <Checkbox id="schedule" checked={isScheduled} onCheckedChange={(value) => onIsScheduledChange(Boolean(value))} />
           <div className="space-y-0.5">
             <div className="font-medium">É uma conta a pagar/agendamento?</div>
@@ -91,16 +91,22 @@ export function TransactionDetails({
           </div>
         </label>
 
-        <div className="grid gap-3 sm:grid-cols-1">
-          <div className="space-y-2">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="space-y-2 sm:col-span-3">
             <Label>{isScheduled ? "Data de vencimento" : "Data da compra"}</Label>
-            <DatePicker date={date} onChange={onDateChange} placeholder={isScheduled ? "Quando vence?" : "Quando aconteceu?"} />
+            <div className="w-full">
+              <DatePicker
+                date={date}
+                onChange={onDateChange}
+                placeholder={isScheduled ? "Quando vence?" : "Quando aconteceu?"}
+              />
+            </div>
           </div>
         </div>
 
         {/* Payment section */}
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <Label>Forma de pagamento</Label>
             <Button
               type="button"

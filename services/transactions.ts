@@ -1,8 +1,11 @@
 import { apiClient } from "@/lib/api-client";
 import type {
+    PaymentMethod,
     ProcessTransactionClientPayload,
     Transaction,
     TransactionFilters,
+    TransactionStatus,
+    TransactionType,
     UpdateTransactionPayload,
 } from "@/types/finance";
 
@@ -14,6 +17,24 @@ type ApiTransaction = Omit<Transaction, "amount" | "category"> & {
 };
 
 type ApiResponse<T> = T | { data: T };
+
+export type ManualTransactionPayload = {
+  amount: number;
+  description: string;
+  category: string;
+  type: TransactionType;
+  status: TransactionStatus;
+  dueDate?: string;
+  paymentDate?: string;
+  creditCardId?: string;
+  debitCardId?: string;
+  splits?: Array<{
+    amount: number;
+    paymentMethod: PaymentMethod;
+    creditCardId?: string | null;
+    debitCardId?: string | null;
+  }>;
+};
 
 const toNumber = (value: string | number): number => {
   const parsed = typeof value === "string" ? Number(value) : value;
@@ -103,6 +124,20 @@ export async function confirmTransaction(payload: Record<string, any> | Record<s
 
   if (Array.isArray(data)) {
     return data.map(normalizeTransaction);
+  }
+
+  return normalizeTransaction(data);
+}
+
+export async function createManualTransaction(payload: ManualTransactionPayload) {
+  const response = await apiClient.post<ApiResponse<ApiTransaction | ApiTransaction[]>>('/transactions/confirm', payload);
+  const data = unwrapData(response.data);
+
+  if (Array.isArray(data)) {
+    if (data.length === 0) {
+      throw new Error("Não foi possível criar a transação manual.");
+    }
+    return normalizeTransaction(data[0]);
   }
 
   return normalizeTransaction(data);

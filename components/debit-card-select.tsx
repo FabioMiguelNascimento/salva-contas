@@ -50,7 +50,7 @@ export function DebitCardSelect({
           role="combobox"
           aria-expanded={open}
           disabled={disabled}
-          className="w-full justify-between font-normal"
+          className="w-full max-w-full justify-between font-normal truncate"
         >
           {selectedCard ? (
             <span className="flex items-center gap-2 truncate">
