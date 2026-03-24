@@ -2,74 +2,74 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import {
-  createBudget,
-  deleteBudget,
-  updateBudget
+    createBudget,
+    deleteBudget,
+    updateBudget
 } from "@/services/budgets";
 import { fetchCategories } from "@/services/categories";
 import {
-  createCreditCard,
-  deleteCreditCard,
-  fetchCreditCards,
-  updateCreditCard
+    createCreditCard,
+    deleteCreditCard,
+    fetchCreditCards,
+    updateCreditCard
 } from "@/services/credit-cards";
 import { fetchDashboardSnapshot } from "@/services/dashboard";
 import {
-  createDebitCard,
-  deleteDebitCard,
-  fetchDebitCards,
-  updateDebitCard
+    createDebitCard,
+    deleteDebitCard,
+    fetchDebitCards,
+    updateDebitCard
 } from "@/services/debit-cards";
 import { createSubscription, deleteSubscription, updateSubscription } from "@/services/subscriptions";
 import {
-  deleteTransaction,
-  fetchTransactions,
-  processTransaction,
-  updateTransaction
+    deleteTransaction,
+    fetchTransactions,
+    processTransaction,
+    updateTransaction
 } from "@/services/transactions";
 import {
-  addVaultYield,
-  aiActionOnVault,
-  aiCommand,
-  createVault,
-  deleteVault,
-  depositToVault,
-  updateVault,
-  withdrawFromVault,
+    addVaultYield,
+    aiActionOnVault,
+    aiCommand,
+    createVault,
+    deleteVault,
+    depositToVault,
+    updateVault,
+    withdrawFromVault,
 } from "@/services/vaults";
 import type {
-  Budget,
-  BudgetProgress,
-  CreateBudgetPayload,
-  CreateCreditCardPayload,
-  CreateDebitCardPayload,
-  CreateSubscriptionPayload,
-  CreateVaultPayload,
-  CreditCard,
-  DashboardMetrics,
-  DebitCard,
-  ProcessTransactionClientPayload,
-  Subscription,
-  Transaction,
-  TransactionCategory,
-  TransactionFilters,
-  UpdateBudgetPayload,
-  UpdateCreditCardPayload,
-  UpdateDebitCardPayload,
-  UpdateSubscriptionPayload,
-  UpdateTransactionPayload,
-  UpdateVaultPayload,
-  Vault,
-  VaultAiActionPayload,
-  VaultAmountPayload,
+    Budget,
+    BudgetProgress,
+    CreateBudgetPayload,
+    CreateCreditCardPayload,
+    CreateDebitCardPayload,
+    CreateSubscriptionPayload,
+    CreateVaultPayload,
+    CreditCard,
+    DashboardMetrics,
+    DebitCard,
+    ProcessTransactionClientPayload,
+    Subscription,
+    Transaction,
+    TransactionCategory,
+    TransactionFilters,
+    UpdateBudgetPayload,
+    UpdateCreditCardPayload,
+    UpdateDebitCardPayload,
+    UpdateSubscriptionPayload,
+    UpdateTransactionPayload,
+    UpdateVaultPayload,
+    Vault,
+    VaultAiActionPayload,
+    VaultAmountPayload,
 } from "@/types/finance";
 import { usePathname } from "next/navigation";
 import {
-  createContext,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
+    createContext,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
 } from "react";
 
 interface FinanceContextValue {
@@ -128,6 +128,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading: authLoading } = useAuth();
   const pathname = usePathname();
   const isTransactionsRoute = pathname.startsWith("/extrato");
+  const isCardsRoute = pathname.startsWith("/cartoes");
   const [filters, setFilters] = useState<TransactionFilters>(initialFilters);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
@@ -158,6 +159,21 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
         setCategories(allCategories);
         setCreditCards(allCreditCards);
         setDebitCards(allDebitCards);
+      } else if (isCardsRoute) {
+        const [allCreditCards, allDebitCards] = await Promise.all([
+          fetchCreditCards(),
+          fetchDebitCards(),
+        ]);
+
+        setTransactions([]);
+        setCategories([]);
+        setMetrics(null);
+        setSubscriptions([]);
+        setBudgets([]);
+        setBudgetProgress([]);
+        setCreditCards(allCreditCards);
+        setDebitCards(allDebitCards);
+        setVaults([]);
       } else {
         const snapshot = await fetchDashboardSnapshot(filters);
 
