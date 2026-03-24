@@ -54,8 +54,8 @@ export function AttachmentViewer({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-full! h-full flex flex-col">
-        <DialogHeader className="pb-4 flex flex-row justify-between pr-6 flex-wrap">
+      <DialogContent className="w-screen h-screen min-h-screen min-w-screen p-0 m-0 rounded-none max-w-none max-h-none flex flex-col">
+        <DialogHeader className="pb-4 flex flex-row justify-between pr-6 flex-wrap relative z-20">
             <DialogTitle className="flex gap-2 items-center ">
               {isImage && <ImageIcon className="h-4 w-4 shrink-0" />}
               {isPdf && <FileText className="h-4 w-4 shrink-0" />}
@@ -66,7 +66,7 @@ export function AttachmentViewer({
               </span>
             </DialogTitle>
 
-            <div className="flex gap-2 ml-auto">
+            <div className="flex gap-2 ml-auto mr-12 z-30">
               <ShareButton
                 title={attachmentOriginalName || "Anexo"}
                 text="Confira este anexo"
@@ -85,14 +85,14 @@ export function AttachmentViewer({
             </div>
         </DialogHeader>
         
-        <div className="flex-1">
+        <div className="flex-1 overflow-auto min-h-0">
           {isImage && (
-            <div className="w-full h-full flex items-start justify-center relative">
+            <div className="w-full h-full overflow-auto flex items-center justify-center p-4">
               {!imageLoaded && <Skeleton className="absolute inset-0 w-full h-full" />}
               <img
                 src={attachmentUrl}
                 alt={attachmentOriginalName || "Anexo"}
-                className="max-w-full max-h-full object-contain"
+                className="max-w-full max-h-[80vh] h-auto object-contain"
                 onLoad={() => setImageLoaded(true)}
                 onError={() => setImageLoaded(true)}
               />
