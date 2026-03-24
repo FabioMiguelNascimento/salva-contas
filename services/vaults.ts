@@ -1,19 +1,20 @@
 import { apiClient } from '@/lib/api-client';
 import type {
-    CreateVaultPayload,
-    UpdateVaultPayload,
-    Vault,
-    VaultAmountPayload,
-    VaultHistoryQuery,
-    VaultHistoryResponse,
+  CreateVaultPayload,
+  UpdateVaultPayload,
+  Vault,
+  VaultAiActionPayload,
+  VaultAmountPayload,
+  VaultHistoryQuery,
+  VaultHistoryResponse,
 } from '@/types/finance';
-
-type ApiResponse<T> = T | { data: T };
 
 type ApiVault = Omit<Vault, 'targetAmount' | 'currentAmount'> & {
   targetAmount?: string | number | null;
   currentAmount: string | number;
 };
+
+type ApiResponse<T> = T | { data: T };
 
 type ApiVaultHistoryResponse = Omit<VaultHistoryResponse, 'groups' | 'summary'> & {
   groups: Array<{
@@ -85,6 +86,16 @@ export async function withdrawFromVault(id: string, payload: VaultAmountPayload)
 
 export async function addVaultYield(id: string, payload: VaultAmountPayload): Promise<Vault> {
   const response = await apiClient.post<ApiResponse<ApiVault>>(`/vaults/${id}/yield`, payload);
+  return normalizeVault(unwrapData(response.data));
+}
+
+export async function aiActionOnVault(id: string, payload: VaultAiActionPayload): Promise<Vault> {
+  const response = await apiClient.post<ApiResponse<ApiVault>>(`/vaults/${id}/ai-action`, payload);
+  return normalizeVault(unwrapData(response.data));
+}
+
+export async function aiCommand(text: string): Promise<Vault> {
+  const response = await apiClient.post<ApiResponse<ApiVault>>('/vaults/ai-command', { text });
   return normalizeVault(unwrapData(response.data));
 }
 

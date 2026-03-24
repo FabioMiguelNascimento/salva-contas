@@ -2,71 +2,74 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import {
-    createBudget,
-    deleteBudget,
-    updateBudget
+  createBudget,
+  deleteBudget,
+  updateBudget
 } from "@/services/budgets";
 import { fetchCategories } from "@/services/categories";
 import {
-    createCreditCard,
-    deleteCreditCard,
-    fetchCreditCards,
-    updateCreditCard
+  createCreditCard,
+  deleteCreditCard,
+  fetchCreditCards,
+  updateCreditCard
 } from "@/services/credit-cards";
 import { fetchDashboardSnapshot } from "@/services/dashboard";
 import {
-    createDebitCard,
-    deleteDebitCard,
-    fetchDebitCards,
-    updateDebitCard
+  createDebitCard,
+  deleteDebitCard,
+  fetchDebitCards,
+  updateDebitCard
 } from "@/services/debit-cards";
 import { createSubscription, deleteSubscription, updateSubscription } from "@/services/subscriptions";
 import {
-    deleteTransaction,
-    fetchTransactions,
-    processTransaction,
-    updateTransaction
+  deleteTransaction,
+  fetchTransactions,
+  processTransaction,
+  updateTransaction
 } from "@/services/transactions";
 import {
-    addVaultYield,
-    createVault,
-    deleteVault,
-    depositToVault,
-    updateVault,
-    withdrawFromVault,
+  addVaultYield,
+  aiActionOnVault,
+  aiCommand,
+  createVault,
+  deleteVault,
+  depositToVault,
+  updateVault,
+  withdrawFromVault,
 } from "@/services/vaults";
 import type {
-    Budget,
-    BudgetProgress,
-    CreateBudgetPayload,
-    CreateCreditCardPayload,
-    CreateDebitCardPayload,
-    CreateSubscriptionPayload,
-    CreateVaultPayload,
-    CreditCard,
-    DashboardMetrics,
-    DebitCard,
-    ProcessTransactionClientPayload,
-    Subscription,
-    Transaction,
-    TransactionCategory,
-    TransactionFilters,
-    UpdateBudgetPayload,
-    UpdateCreditCardPayload,
-    UpdateDebitCardPayload,
-    UpdateSubscriptionPayload,
-    UpdateTransactionPayload,
-    UpdateVaultPayload,
-    Vault,
-    VaultAmountPayload,
+  Budget,
+  BudgetProgress,
+  CreateBudgetPayload,
+  CreateCreditCardPayload,
+  CreateDebitCardPayload,
+  CreateSubscriptionPayload,
+  CreateVaultPayload,
+  CreditCard,
+  DashboardMetrics,
+  DebitCard,
+  ProcessTransactionClientPayload,
+  Subscription,
+  Transaction,
+  TransactionCategory,
+  TransactionFilters,
+  UpdateBudgetPayload,
+  UpdateCreditCardPayload,
+  UpdateDebitCardPayload,
+  UpdateSubscriptionPayload,
+  UpdateTransactionPayload,
+  UpdateVaultPayload,
+  Vault,
+  VaultAiActionPayload,
+  VaultAmountPayload,
 } from "@/types/finance";
 import { usePathname } from "next/navigation";
 import {
-    createContext,
-    useCallback,
-    useEffect,
-    useMemo,
-    useState,
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
 } from "react";
 
 interface FinanceContextValue {
@@ -109,6 +112,8 @@ interface FinanceContextValue {
   depositVaultAmount: (id: string, payload: VaultAmountPayload) => Promise<Vault | void>;
   withdrawVaultAmount: (id: string, payload: VaultAmountPayload) => Promise<Vault | void>;
   addVaultYieldAmount: (id: string, payload: VaultAmountPayload) => Promise<Vault | void>;
+  aiActionOnVault: (id: string, payload: VaultAiActionPayload) => Promise<Vault | void>;
+  aiCommand: (text: string) => Promise<Vault | void>;
 }
 
 const FinanceContext = createContext<FinanceContextValue | null>(null);
@@ -470,6 +475,30 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const performAiActionOnVault = async (id: string, payload: VaultAiActionPayload) => {
+    try {
+      const vault = await aiActionOnVault(id, payload);
+      setVaults((prev) => prev.map((item) => (item.id === id ? vault : item)));
+      await loadData();
+      return vault;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao executar ação de IA no cofrinho");
+      throw err;
+    }
+  };
+
+  const aiCommandText = async (text: string) => {
+    try {
+      const vault = await aiCommand(text);
+      setVaults((prev) => prev.map((item) => (item.id === vault.id ? vault : item)));
+      await loadData();
+      return vault;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erro ao processar comando de IA");
+      throw err;
+    }
+  };
+
   const value: FinanceContextValue = {
     filters,
     setFilters,
@@ -510,6 +539,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     depositVaultAmount,
     withdrawVaultAmount,
     addVaultYieldAmount,
+    aiActionOnVault: performAiActionOnVault,
+    aiCommand: aiCommandText,
   };
 
   return <FinanceContext.Provider value={value}>{children}</FinanceContext.Provider>;

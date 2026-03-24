@@ -189,6 +189,12 @@ export interface VaultAmountPayload {
   amount: number;
 }
 
+export interface VaultAiActionPayload {
+  type: "deposit" | "withdraw" | "yield";
+  amount: number;
+  note?: string;
+}
+
 export type VaultHistoryEventType = "deposit" | "withdraw" | "yield";
 
 export interface VaultHistoryEvent {

@@ -10,6 +10,7 @@ import SummaryVisualization from "./visualizations/SummaryVisualization";
 import TransactionDetailsVisualization from "./visualizations/TransactionDetailsVisualization";
 import TransactionVisualization from "./visualizations/TransactionVisualization";
 import { VisualizationStatus } from "./visualizations/types";
+import VaultActionSummaryVisualization from "./visualizations/VaultActionSummaryVisualization";
 
 
 interface AiAdvisorVisualizationRendererProps {
@@ -135,6 +136,19 @@ export default function AiAdvisorVisualizationRenderer({
   if (requiresConfirmation && Array.isArray(payload.items)) {
     return (
       <ConfirmationListVisualization
+        visualization={visualization}
+        status={status}
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+        requiresConfirmation={requiresConfirmation}
+      />
+    );
+  }
+
+  // Vault action summary (AI tool)
+  if (visualization.type === "table_summary" && visualization.toolName === "vault_ai_action") {
+    return (
+      <VaultActionSummaryVisualization
         visualization={visualization}
         status={status}
         onConfirm={onConfirm}
