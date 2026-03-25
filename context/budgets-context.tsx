@@ -3,6 +3,7 @@
 import {
     createBudget,
     deleteBudget,
+    fetchBudgetMetrics,
     fetchBudgetProgress,
     fetchBudgets,
     updateBudget,
@@ -10,18 +11,31 @@ import {
 import type {
     Budget,
     BudgetFilters,
+    BudgetMetrics,
     BudgetProgress,
     CreateBudgetPayload,
     UpdateBudgetPayload,
 } from "@/types/finance";
 import { usePathname } from "next/navigation";
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+
+interface BudgetStats {
+  totalBudgets: number;
+  totalBudgeted: number;
+  totalSpent: number;
+  totalRemaining: number;
+  overBudgetCount: number;
+  onTrackCount: number;
+  averagePercentage: number;
+}
 
 interface BudgetsContextValue {
   filters: BudgetFilters;
   setFilters: (filters: BudgetFilters) => void;
   budgets: Budget[];
   budgetProgress: BudgetProgress[];
+  budgetMetrics: BudgetMetrics | null;
+  stats: BudgetStats;
   isLoading: boolean;
   isSyncing: boolean;
   error: string | null;
@@ -46,6 +60,7 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
   const [filters, setFilters] = useState<BudgetFilters>(initialFilters);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [budgetProgress, setBudgetProgress] = useState<BudgetProgress[]>([]);
+  const [budgetMetrics, setBudgetMetrics] = useState<BudgetMetrics | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,13 +74,15 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
       const month = filters.month ?? new Date().getMonth() + 1;
       const year = filters.year ?? new Date().getFullYear();
 
-      const [allBudgets, progress] = await Promise.all([
+      const [allBudgets, progress, metrics] = await Promise.all([
         fetchBudgets(filters),
         fetchBudgetProgress(month, year),
+        fetchBudgetMetrics(month, year),
       ]);
 
       setBudgets(allBudgets);
       setBudgetProgress(progress);
+      setBudgetMetrics(metrics);
       setError(null);
       setLastSync(new Date().toISOString());
     } catch (err) {
@@ -103,6 +120,37 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
     return budget;
   }, [refresh]);
 
+  const stats = useMemo<BudgetStats>(() => {
+    if (budgetProgress.length === 0) {
+      return {
+        totalBudgets: 0,
+        totalBudgeted: budgetMetrics?.totalBudgeted ?? 0,
+        totalSpent: budgetMetrics?.totalSpent ?? 0,
+        totalRemaining: budgetMetrics?.remaining ?? 0,
+        overBudgetCount: 0,
+        onTrackCount: 0,
+        averagePercentage: budgetMetrics?.percentage ?? 0,
+      };
+    }
+
+    const totalBudgeted = budgetMetrics?.totalBudgeted ?? budgetProgress.reduce((sum, p) => sum + p.budget.amount, 0);
+    const totalSpent = budgetMetrics?.totalSpent ?? budgetProgress.reduce((sum, p) => sum + p.spent, 0);
+    const totalRemaining = budgetMetrics?.remaining ?? budgetProgress.reduce((sum, p) => sum + Math.max(0, p.remaining), 0);
+    const overBudgetCount = budgetProgress.filter((p) => p.percentage > 100).length;
+    const onTrackCount = budgetProgress.filter((p) => p.percentage <= 100).length;
+    const averagePercentage = budgetMetrics?.percentage ?? (budgetProgress.reduce((sum, p) => sum + p.percentage, 0) / budgetProgress.length);
+
+    return {
+      totalBudgets: budgetProgress.length,
+      totalBudgeted,
+      totalSpent,
+      totalRemaining,
+      overBudgetCount,
+      onTrackCount,
+      averagePercentage,
+    };
+  }, [budgetProgress, budgetMetrics]);
+
   const updateBudgetRule = useCallback(async (id: string, payload: UpdateBudgetPayload) => {
     const budget = await updateBudget(id, payload);
     setBudgets((prev) => prev.map((item) => (item.id === id ? budget : item)));
@@ -123,6 +171,8 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
         setFilters,
         budgets,
         budgetProgress,
+        budgetMetrics,
+        stats,
         isLoading,
         isSyncing,
         error,

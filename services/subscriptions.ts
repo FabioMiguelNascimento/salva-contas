@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api-client";
-import type { CreateSubscriptionPayload, Subscription, UpdateSubscriptionPayload } from "@/types/finance";
+import type { CreateSubscriptionPayload, Subscription, SubscriptionMetrics, UpdateSubscriptionPayload } from "@/types/finance";
 
 interface ApiSubscription
   extends Omit<Subscription, "amount" | "category"> {
@@ -49,4 +49,9 @@ export async function updateSubscription(id: string, payload: UpdateSubscription
 
 export async function deleteSubscription(id: string) {
   await apiClient.delete(`/subscriptions/${id}`);
+}
+
+export async function fetchSubscriptionMetrics(): Promise<SubscriptionMetrics> {
+  const response = await apiClient.get<{ data: SubscriptionMetrics }>("/subscriptions/metrics");
+  return response.data?.data ?? response.data;
 }

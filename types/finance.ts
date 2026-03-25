@@ -57,6 +57,36 @@ export interface CreditCardSummary {
   nextDueDate: string;
 }
 
+export interface CreditCardMetrics {
+  totalLimit: number;
+  totalUsed: number;
+  availableLimit: number;
+  activeCardsCount: number;
+}
+
+export interface DebitCardMetrics {
+  totalBalance: number;
+  activeCardsCount: number;
+}
+
+export interface SubscriptionMetrics {
+  totalMonthly: number;
+  activeCount: number;
+  upcomingTotal: number;
+  byFrequency: {
+    weekly: number;
+    monthly: number;
+    yearly: number;
+  };
+}
+
+export interface BudgetMetrics {
+  totalBudgeted: number;
+  totalSpent: number;
+  remaining: number;
+  percentage: number;
+}
+
 export interface DebitCard {
   id: string;
   userId?: string | null;

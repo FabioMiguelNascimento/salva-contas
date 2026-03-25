@@ -14,7 +14,6 @@ import { BudgetsProvider } from "@/context/budgets-context";
 import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useBudgetEditor } from "@/hooks/use-budget-editor";
 import { useBudgetForm } from "@/hooks/use-budget-form";
-import { useBudgetStats } from "@/hooks/use-budget-stats";
 import { useBudgetsHook } from "@/hooks/use-budgets";
 import { AlertTriangle, CheckCircle2, PiggyBank, TrendingDown } from "lucide-react";
 
@@ -24,9 +23,8 @@ const currencyFormatter = new Intl.NumberFormat("pt-BR", {
 });
 
 function BudgetsPageContent() {
-  const { budgetProgress, isLoading, createBudgetRule, updateBudgetRule, deleteBudgetRule, filters } = useBudgetsHook();
+  const { budgetProgress, stats, isLoading, createBudgetRule, updateBudgetRule, deleteBudgetRule, filters } = useBudgetsHook();
 
-  const stats = useBudgetStats(budgetProgress);
   const form = useBudgetForm({
     onCreate: createBudgetRule,
     defaultMonth: filters.month,

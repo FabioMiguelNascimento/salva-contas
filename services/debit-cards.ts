@@ -3,6 +3,7 @@ import type {
     CreateDebitCardPayload,
     DebitCard,
     DebitCardFilters,
+    DebitCardMetrics,
     UpdateDebitCardPayload,
 } from '@/types/finance';
 
@@ -36,4 +37,9 @@ export async function updateDebitCard(id: string, payload: UpdateDebitCardPayloa
 
 export async function deleteDebitCard(id: string): Promise<void> {
   await apiClient.delete(`/debit-cards/${id}`);
+}
+
+export async function fetchDebitCardMetrics(): Promise<DebitCardMetrics> {
+  const response = await apiClient.get<{ data: DebitCardMetrics }>("/debit-cards/metrics");
+  return response.data?.data ?? response.data;
 }

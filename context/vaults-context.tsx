@@ -7,21 +7,29 @@ import {
     depositToVault,
     fetchVaultsSummary,
     updateVault,
-    withdrawFromVault
+    withdrawFromVault,
+    type VaultsSummaryResponse
 } from "@/services/vaults";
 import type {
     CreateVaultPayload,
-    DashboardMetrics,
     UpdateVaultPayload,
     Vault,
     VaultAmountPayload,
 } from "@/types/finance";
 import { usePathname } from "next/navigation";
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+
+interface VaultsStats {
+  savedAmount: number;
+  availableBalance: number;
+  withTargetCount: number;
+  withoutTargetCount: number;
+}
 
 interface VaultsContextValue {
   vaults: Vault[];
-  metrics: DashboardMetrics | null;
+  metrics: VaultsSummaryResponse["metrics"] | null;
+  stats: VaultsStats;
   isLoading: boolean;
   isSyncing: boolean;
   error: string | null;
@@ -55,7 +63,7 @@ export function VaultsProvider({ children }: { children: React.ReactNode }) {
     try {
       const summary = await fetchVaultsSummary();
       setVaults(summary.vaults);
-      setMetrics(summary.metrics as any);
+      setMetrics(summary.metrics);
       setError(null);
       setLastSync(new Date().toISOString());
     } catch (err) {
@@ -127,11 +135,25 @@ export function VaultsProvider({ children }: { children: React.ReactNode }) {
     return vault;
   }, [refresh]);
 
+  const stats = useMemo<VaultsStats>(() => {
+    const savedAmount = metrics?.financials.savedAmount ?? 0;
+    const availableBalance = metrics?.financials.availableBalance ?? metrics?.financials.balance ?? 0;
+    const withTargetCount = vaults.filter((vault) => (vault.targetAmount ?? 0) > 0).length;
+
+    return {
+      savedAmount,
+      availableBalance,
+      withTargetCount,
+      withoutTargetCount: Math.max(vaults.length - withTargetCount, 0),
+    };
+  }, [metrics, vaults]);
+
   return (
     <VaultsContext.Provider
       value={{
         vaults,
         metrics,
+        stats,
         isLoading,
         isSyncing,
         error,

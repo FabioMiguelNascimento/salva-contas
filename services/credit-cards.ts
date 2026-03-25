@@ -3,6 +3,7 @@ import type {
     CreateCreditCardPayload,
     CreditCard,
     CreditCardFilters,
+    CreditCardMetrics,
     CreditCardSummary,
     UpdateCreditCardPayload,
 } from "@/types/finance";
@@ -76,4 +77,9 @@ export async function updateCreditCard(id: string, payload: UpdateCreditCardPayl
 
 export async function deleteCreditCard(id: string): Promise<void> {
   await apiClient.delete(`/credit-cards/${id}`);
+}
+
+export async function fetchCreditCardMetrics(): Promise<CreditCardMetrics> {
+  const response = await apiClient.get<{ data: CreditCardMetrics }>("/credit-cards/metrics");
+  return response.data?.data ?? response.data;
 }

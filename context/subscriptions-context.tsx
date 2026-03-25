@@ -1,21 +1,31 @@
 "use client";
 
 import {
-    createSubscription,
-    deleteSubscription,
-    fetchSubscriptions,
-    updateSubscription,
+  createSubscription,
+  deleteSubscription,
+  fetchSubscriptionMetrics,
+  fetchSubscriptions,
+  updateSubscription,
 } from "@/services/subscriptions";
 import type {
-    CreateSubscriptionPayload,
-    Subscription,
-    UpdateSubscriptionPayload,
+  CreateSubscriptionPayload,
+  Subscription,
+  SubscriptionMetrics,
+  UpdateSubscriptionPayload,
 } from "@/types/finance";
 import { usePathname } from "next/navigation";
-import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+
+interface SubscriptionStats {
+  totalActive: number;
+  totalAmount: number;
+  byFrequency: Record<string, number>;
+}
 
 interface SubscriptionsContextValue {
   subscriptions: Subscription[];
+  subscriptionMetrics: SubscriptionMetrics | null;
+  stats: SubscriptionStats;
   isLoading: boolean;
   isSyncing: boolean;
   error: string | null;
@@ -33,6 +43,7 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
   const isSubscriptionsRoute = pathname === "/assinaturas" || pathname.startsWith("/assinaturas/");
 
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
+  const [subscriptionMetrics, setSubscriptionMetrics] = useState<SubscriptionMetrics | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -43,8 +54,12 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
     setIsSyncing(true);
     try {
-      const data = await fetchSubscriptions();
+      const [data, metrics] = await Promise.all([
+        fetchSubscriptions(),
+        fetchSubscriptionMetrics(),
+      ]);
       setSubscriptions(data);
+      setSubscriptionMetrics(metrics);
       setError(null);
       setLastSync(new Date().toISOString());
     } catch (err) {
@@ -77,25 +92,39 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
 
   const createSubscriptionRule = useCallback(async (payload: CreateSubscriptionPayload) => {
     const subscription = await createSubscription(payload);
-    setSubscriptions((prev) => [subscription, ...prev]);
+    await refresh();
     return subscription;
-  }, []);
+  }, [refresh]);
 
   const updateSubscriptionRule = useCallback(async (id: string, payload: UpdateSubscriptionPayload) => {
     const subscription = await updateSubscription(id, payload);
-    setSubscriptions((prev) => prev.map((item) => (item.id === id ? subscription : item)));
+    await refresh();
     return subscription;
-  }, []);
+  }, [refresh]);
 
   const deleteSubscriptionRule = useCallback(async (id: string) => {
     await deleteSubscription(id);
-    setSubscriptions((prev) => prev.filter((item) => item.id !== id));
-  }, []);
+    await refresh();
+  }, [refresh]);
+
+  const stats = useMemo<SubscriptionStats>(() => {
+    return {
+      totalActive: subscriptionMetrics?.activeCount ?? 0,
+      totalAmount: subscriptionMetrics?.totalMonthly ?? 0,
+      byFrequency: {
+        weekly: subscriptionMetrics?.byFrequency.weekly ?? 0,
+        monthly: subscriptionMetrics?.byFrequency.monthly ?? 0,
+        yearly: subscriptionMetrics?.byFrequency.yearly ?? 0,
+      },
+    };
+  }, [subscriptionMetrics]);
 
   return (
     <SubscriptionsContext.Provider
       value={{
         subscriptions,
+        subscriptionMetrics,
+        stats,
         isLoading,
         isSyncing,
         error,

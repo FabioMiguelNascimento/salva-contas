@@ -16,6 +16,7 @@ import { Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHea
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TransactionsProvider, useTransactions } from "@/context/transactions-context";
+import { usePendingBills } from "@/hooks/use-pending-bills";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
@@ -23,7 +24,7 @@ import { differenceInCalendarDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { AlertTriangle, Calendar, CheckCircle2, FileText, PencilLine, ShieldCheck } from "lucide-react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 const filterTabs = [
@@ -31,11 +32,11 @@ const filterTabs = [
   { value: "overdue", label: "Atrasadas" },
   { value: "today", label: "Vencem hoje" },
   { value: "upcoming", label: "Próximos 3 dias" },
-];
+] as const;
 
 function ContasPageContent() {
   const { pendingBills, markAsPaid, updateExistingTransaction, isLoading } = useTransactions();
-  const [activeFilter, setActiveFilter] = useState<string>("all");
+  const [activeFilter, setActiveFilter] = useState<(typeof filterTabs)[number]["value"]>("all");
   const [payDialog, setPayDialog] = useState<{ open: boolean; bill?: Transaction }>({ open: false });
   const [editSheet, setEditSheet] = useState<{ open: boolean; bill?: Transaction }>({ open: false });
   const [attachmentViewer, setAttachmentViewer] = useState<{ open: boolean; bill?: Transaction }>({ open: false });
@@ -44,34 +45,7 @@ function ContasPageContent() {
   const [amountInput, setAmountInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
 
-  const summary = useMemo(() => {
-    const overdue = pendingBills.filter((bill) => bill.dueDate && differenceInCalendarDays(parseDateOnly(bill.dueDate)!, new Date()) < 0);
-    const today = pendingBills.filter((bill) => bill.dueDate && differenceInCalendarDays(parseDateOnly(bill.dueDate)!, new Date()) === 0);
-    const soon = pendingBills.filter((bill) => {
-      if (!bill.dueDate) return false;
-      const diff = differenceInCalendarDays(parseDateOnly(bill.dueDate)!, new Date());
-      return diff > 0 && diff <= 3;
-    });
-
-    return {
-      total: pendingBills.reduce((sum, bill) => sum + bill.amount, 0),
-      overdueAmount: overdue.reduce((sum, bill) => sum + bill.amount, 0),
-      overdueCount: overdue.length,
-      todayCount: today.length,
-      upcomingCount: soon.length,
-    };
-  }, [pendingBills]);
-
-  const filteredBills = useMemo(() => {
-    return pendingBills.filter((bill) => {
-      if (!bill.dueDate) return activeFilter === "all";
-      const diff = differenceInCalendarDays(parseDateOnly(bill.dueDate)!, new Date());
-      if (activeFilter === "overdue") return diff < 0;
-      if (activeFilter === "today") return diff === 0;
-      if (activeFilter === "upcoming") return diff > 0 && diff <= 3;
-      return true;
-    });
-  }, [pendingBills, activeFilter]);
+  const { summary, filteredBills } = usePendingBills(pendingBills, activeFilter);
 
   const openEditSheet = (bill: Transaction) => {
     setEditSheet({ open: true, bill });

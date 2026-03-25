@@ -15,7 +15,7 @@ import { TopbarAction } from "@/contexts/topbar-action-context";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import type { Vault } from "@/types/finance";
 import { PiggyBank, PlusCircle, Target, Wallet2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
 type VaultActionType = "deposit" | "withdraw" | "yield";
@@ -29,7 +29,7 @@ function VaultsPageContent() {
   const {
     vaults,
     isLoading,
-    metrics,
+    stats,
     createVaultEntry,
     updateVaultEntry,
     deleteVaultEntry,
@@ -41,15 +41,6 @@ function VaultsPageContent() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editingVault, setEditingVault] = useState<Vault | null>(null);
   const [actionState, setActionState] = useState<VaultActionState | null>(null);
-
-  const savedAmount = metrics?.financials.savedAmount ?? 0;
-  const availableBalance = metrics?.financials.availableBalance ?? metrics?.financials.balance ?? 0;
-
-  const withTargetCount = useMemo(
-    () => vaults.filter((vault) => (vault.targetAmount ?? 0) > 0).length,
-    [vaults],
-  );
-  const withoutTargetCount = Math.max(vaults.length - withTargetCount, 0);
 
   const handleDelete = async (vault: Vault) => {
     const confirmed = window.confirm(
@@ -121,19 +112,19 @@ function VaultsPageContent() {
           icon={Target}
           title="Objetivos ativos"
           value={vaults.length}
-          helper={`${withoutTargetCount} sem meta definida`}
+          helper={`${stats.withoutTargetCount} sem meta definida`}
         />
         <SummaryCard
           icon={PiggyBank}
           title="Dinheiro guardado"
-          value={currencyFormatter.format(savedAmount)}
+          value={currencyFormatter.format(stats.savedAmount)}
           helper="Total alocado em cofrinhos"
           variant="success"
         />
         <SummaryCard
           icon={Wallet2}
           title="Saldo disponível"
-          value={currencyFormatter.format(availableBalance)}
+          value={currencyFormatter.format(stats.availableBalance)}
           helper="Saldo fora dos cofrinhos"
         />
       </SummaryCardsGrid>

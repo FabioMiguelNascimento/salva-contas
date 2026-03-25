@@ -2,6 +2,7 @@ import { apiClient } from "@/lib/api-client";
 import type {
     Budget,
     BudgetFilters,
+    BudgetMetrics,
     BudgetProgress,
     CreateBudgetPayload,
     UpdateBudgetPayload,
@@ -63,4 +64,11 @@ export async function updateBudget(
 
 export async function deleteBudget(id: string): Promise<void> {
   await apiClient.delete(`/budgets/${id}`);
+}
+
+export async function fetchBudgetMetrics(month: number, year: number): Promise<BudgetMetrics> {
+  const response = await apiClient.get<{ data: BudgetMetrics }>("/budgets/metrics", {
+    params: { month, year },
+  });
+  return response.data?.data ?? response.data;
 }

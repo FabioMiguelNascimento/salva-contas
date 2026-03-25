@@ -18,52 +18,30 @@ import { CardsProvider } from "@/context/cards-context";
 import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useCardsHook } from "@/hooks/use-cards";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
-import type { CreditCard, DebitCard } from "@/types/finance";
+import type {
+  CreditCard,
+  DebitCard,
+} from "@/types/finance";
 import { CreditCard as CreditCardIcon, TrendingDown, Wallet } from "lucide-react";
-import { useMemo, useState } from "react";
+import { useState } from "react";
+
+type SheetState<TCard> = {
+  open: boolean;
+  card: TCard | null;
+};
+
+const initialSheetState = <TCard,>(): SheetState<TCard> => ({
+  open: false,
+  card: null,
+});
 
 function CartoesPageContent() {
-  const { creditCards, debitCards, isLoading } = useCardsHook();
+  const { creditCards, debitCards, isLoading, stats } = useCardsHook();
 
-  const [editSheet, setEditSheet] = useState<{ open: boolean; card: CreditCard | null }>({
-    open: false,
-    card: null,
-  });
-  const [deleteSheet, setDeleteSheet] = useState<{ open: boolean; card: CreditCard | null }>({
-    open: false,
-    card: null,
-  });
-  const [editDebitSheet, setEditDebitSheet] = useState<{ open: boolean; card: DebitCard | null }>({
-    open: false,
-    card: null,
-  });
-  const [deleteDebitSheet, setDeleteDebitSheet] = useState<{ open: boolean; card: DebitCard | null }>({
-    open: false,
-    card: null,
-  });
-
-  const stats = useMemo(() => {
-    const activeCards = creditCards.filter((c) => c.status === "active");
-    const activeDebitCards = debitCards.filter((c) => c.status === "active");
-    const totalLimit = activeCards.reduce((acc, c) => acc + c.limit, 0);
-    const totalAvailable = activeCards.reduce((acc, c) => acc + c.availableLimit, 0);
-    const totalUsed = totalLimit - totalAvailable;
-    const highUsageCards = activeCards.filter((c) => {
-      const usedPercentage = ((c.limit - c.availableLimit) / c.limit) * 100;
-      return usedPercentage > 80;
-    }).length;
-
-    return {
-      totalCards: activeCards.length,
-      totalDebitCards: activeDebitCards.length,
-      totalLimit,
-      totalAvailable,
-      totalUsed,
-      totalPaymentCards: activeCards.length + activeDebitCards.length,
-      highUsageCards,
-      usagePercentage: totalLimit > 0 ? (totalUsed / totalLimit) * 100 : 0,
-    };
-  }, [creditCards, debitCards]);
+  const [editSheet, setEditSheet] = useState<SheetState<CreditCard>>(initialSheetState);
+  const [deleteSheet, setDeleteSheet] = useState<SheetState<CreditCard>>(initialSheetState);
+  const [editDebitSheet, setEditDebitSheet] = useState<SheetState<DebitCard>>(initialSheetState);
+  const [deleteDebitSheet, setDeleteDebitSheet] = useState<SheetState<DebitCard>>(initialSheetState);
 
   const openEdit = (card: CreditCard) => {
     setEditSheet({ open: true, card });
