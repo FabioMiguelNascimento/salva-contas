@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { DynamicIcon } from '@/components/dynamic-icon';
 import {
@@ -31,21 +31,21 @@ const TOOL_PROMPT_OPTIONS = [
   },
   {
     id: 'get_transaction_details',
-    label: 'Detalhes de transacao',
+    label: 'Detalhes de transação',
     icon: 'search',
-    prompt: 'Busque os detalhes da transacao com descricao: ',
+    prompt: 'Busque os detalhes da transação com descrição: ',
   },
   {
     id: 'process_transaction_receipt',
     label: 'Processar comprovante',
     icon: 'receipt',
-    prompt: 'Vou anexar um comprovante para voce processar automaticamente.',
+    prompt: 'Vou anexar um comprovante para você processar automaticamente.',
   },
   {
     id: 'create_transaction',
-    label: 'Criar transacao por texto',
+    label: 'Criar transação por texto',
     icon: 'plus-circle',
-    prompt: 'Registre esta transacao: ',
+    prompt: 'Registre está transação: ',
   },
 ] as const;
 
@@ -66,8 +66,8 @@ export default function AiAdvisorToolsDropdown({
           variant="ghost"
           disabled={disabled}
           className="flex h-9 w-9 items-center justify-center rounded-full text-slate-500 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50"
-          title="Sugestoes de ferramentas"
-          aria-label="Sugestoes de ferramentas"
+          title="Sugestões de ferramentas"
+          aria-label="Sugestões de ferramentas"
         >
          <Plus />
         </Button>
@@ -87,3 +87,6 @@ export default function AiAdvisorToolsDropdown({
     </DropdownMenu>
   );
 }
+
+
+

@@ -6,9 +6,9 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import {
-  SidebarProvider,
-  SidebarTrigger,
-  useSidebar
+    SidebarProvider,
+    SidebarTrigger,
+    useSidebar
 } from "@/components/ui/sidebar";
 
 import { useFinancePeriod } from "@/context/finance-period-context";
@@ -21,7 +21,7 @@ import { Topbar } from "./topbar";
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const { isAuthenticated } = useAuth();
-  const isAuthPage = pathname === "/login" || pathname === "/register" || pathname === "/forgot-password" || pathname === "/update-password";
+  const isAuthPage = pathname === "/entrar" || pathname === "/cadastro" || pathname === "/recuperar-senha" || pathname === "/recuperar-senha" || pathname === "/update-password";
   
   if (isAuthPage || !isAuthenticated) {
     return <>{children}</>;

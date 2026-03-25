@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AttachmentUploader } from "@/components/new-transaction/attachment-uploader";
 import { Label } from "@/components/ui/label";
@@ -25,13 +25,13 @@ export function AiTransactionTab({
 
         <div className="space-y-2">
           <Label htmlFor="upload-text-input" className="text-sm font-semibold text-muted-foreground">
-            Descricao / contexto (opcional)
+            Descrição / contexto (opcional)
           </Label>
           <Textarea
             id="upload-text-input"
             value={textInput}
             onChange={(e) => onTextInputChange(e.target.value)}
-            placeholder="Adicione uma observacao que sera enviada junto com o arquivo"
+            placeholder="Adicione uma observacao que será enviada junto com o arquivo"
             className="min-h-20 resize-none"
           />
           <p className="text-xs text-muted-foreground">
@@ -42,3 +42,5 @@ export function AiTransactionTab({
     </TabsContent>
   );
 }
+
+

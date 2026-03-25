@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { DynamicIcon } from "@/components/dynamic-icon";
 import type { AiVisualization } from "@/types/finance";
@@ -218,3 +218,4 @@ export default function TransactionDetailsVisualization({
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -40,7 +40,7 @@ export function BudgetDeleteSheet({ editor }: BudgetDeleteSheetProps) {
           <div className="flex items-center gap-3 rounded-lg border border-destructive/50 bg-destructive/10 p-4">
             <AlertTriangle className="h-5 w-5 text-destructive" />
             <div>
-              <p className="font-medium text-destructive">Confirmar exclusão</p>
+              <p className="font-medium text-destructive">Confirmar exclusao</p>
               <p className="text-sm text-muted-foreground">
                 O orçamento será removido permanentemente.
               </p>
@@ -86,3 +86,5 @@ export function BudgetDeleteSheet({ editor }: BudgetDeleteSheetProps) {
     </Sheet>
   );
 }
+
+

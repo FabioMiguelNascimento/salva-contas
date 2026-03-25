@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { Button } from "@/components/ui/button";
@@ -93,7 +93,7 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
               <Label htmlFor="edit-name">Nome do cartão</Label>
               <Input
                 id="edit-name"
-                placeholder="Ex: Nubank, Itaú Platinum"
+                placeholder="Ex: Nubank, Itau Platinum"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -120,7 +120,7 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-lastFourDigits">Últimos 4 dígitos</Label>
+                <Label htmlFor="edit-lastFourDigits">Ultimos 4 digitos</Label>
                 <Input
                   id="edit-lastFourDigits"
                   placeholder="1234"
@@ -193,7 +193,7 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
               Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting} className="flex-1">
-              {isSubmitting ? "Salvando..." : "Salvar alterações"}
+              {isSubmitting ? "Salvando..." : "Salvar alteracoes"}
             </Button>
           </SheetFooter>
         </form>
@@ -201,3 +201,4 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
     </Sheet>
   );
 }
+

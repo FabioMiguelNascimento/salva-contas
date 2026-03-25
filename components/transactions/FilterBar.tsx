@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+﻿import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
@@ -66,11 +66,11 @@ export function FilterBar({
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         <div className="col-span-1">
           <label htmlFor="transactions-filter-month" className="mb-1 block text-xs font-medium text-slate-600">
-            Mês
+            Mes
           </label>
           <Select value={String(month)} onValueChange={(v) => onMonthChange(Number(v))}>
-            <SelectTrigger id="transactions-filter-month" aria-label="Filtrar por mês" className="w-full">
-              <SelectValue placeholder="Mês" />
+            <SelectTrigger id="transactions-filter-month" aria-label="Filtrar por mes" className="w-full">
+              <SelectValue placeholder="Mes" />
             </SelectTrigger>
             <SelectContent>
               {monthsShort.map((m) => (
@@ -135,3 +135,4 @@ export function FilterBar({
     </div>
   );
 }
+

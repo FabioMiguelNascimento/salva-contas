@@ -67,7 +67,7 @@ const getHighUsageCards = (cards: CreditCard[]) =>
 
 export function CardsProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isCardsRoute = pathname.startsWith("/cartoes");
+  const isCardsRoute = pathname.startsWith("/app/cartoes");
 
   const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
   const [debitCards, setDebitCards] = useState<DebitCard[]>([]);

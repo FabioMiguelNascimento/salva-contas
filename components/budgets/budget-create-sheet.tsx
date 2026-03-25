@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { CategorySelect } from "@/components/category-select";
 import { Button } from "@/components/ui/button";
@@ -58,7 +58,7 @@ export function BudgetCreateSheet({ form, trigger }: BudgetCreateSheetProps) {
         <SheetHeader>
           <SheetTitle>Novo orçamento</SheetTitle>
           <SheetDescription>
-            Defina um limite de gastos para uma categoria específica.
+            Defina um limite de gastos para uma categoria especifica.
           </SheetDescription>
         </SheetHeader>
 
@@ -85,7 +85,7 @@ export function BudgetCreateSheet({ form, trigger }: BudgetCreateSheetProps) {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Mês</Label>
+                <Label>Mes</Label>
                 <Select
                   value={String(values.month)}
                   onValueChange={(value) => setValue("month", Number(value))}
@@ -140,3 +140,4 @@ export function BudgetCreateSheet({ form, trigger }: BudgetCreateSheetProps) {
     </Sheet>
   );
 }
+

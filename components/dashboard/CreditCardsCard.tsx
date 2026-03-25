@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { Button } from "@/components/ui/button";
@@ -28,7 +28,7 @@ export default function CreditCardsCard({ activeCards, totalCreditLimit, totalCr
           <InfoPopover content="Aqui você pode ver o resumo dos seus cartões de crédito ativos, incluindo o limite total disponível, quanto já foi utilizado e o percentual de uso. Cada cartão mostra seu limite individual e bandeira." />
         </div>
         <Button variant="ghost" size="sm" className="self-start sm:self-auto" asChild>
-          <Link href="/cartoes">Ver todos</Link>
+          <Link href="/app/cartoes">Ver todos</Link>
         </Button>
       </CardHeader>
       <CardContent>
@@ -76,3 +76,5 @@ export default function CreditCardsCard({ activeCards, totalCreditLimit, totalCr
     </Card>
   );
 }
+
+

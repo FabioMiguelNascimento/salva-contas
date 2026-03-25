@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import type { AiVisualization } from "@/types/finance";
 import type { VisualizationStatus } from "./types";
@@ -109,7 +109,7 @@ export default function LineChartVisualization({
           <p className="font-semibold text-slate-800">{formatCurrency(total)}</p>
         </div>
         <div className="rounded-lg bg-rose-50 p-2">
-          <p className="text-xs text-rose-700">Pico diário</p>
+          <p className="text-xs text-rose-700">Pico diario</p>
           <p className="font-semibold text-rose-800">{formatCurrency(peak)}</p>
         </div>
       </div>
@@ -118,3 +118,5 @@ export default function LineChartVisualization({
     </div>
   );
 }
+
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import CategoryDonut from "@/components/category-donut";
 import type { AiVisualization } from "@/types/finance";
@@ -104,3 +104,4 @@ export default function DonutChartVisualization({
     </div>
   );
 }
+

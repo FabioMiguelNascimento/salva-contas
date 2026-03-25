@@ -1,4 +1,4 @@
-import { CategorySelect } from "@/components/category-select";
+﻿import { CategorySelect } from "@/components/category-select";
 import { CreditCardSelect } from "@/components/credit-card-select";
 import { DatePicker } from "@/components/date-picker";
 import { DebitCardSelect } from "@/components/debit-card-select";
@@ -125,7 +125,7 @@ export function EditTransactionSheet({
                   onClick={toggleSplitMode}
                 >
                   <SplitSquareHorizontal className="h-3.5 w-3.5" />
-                  {editIsSplitMode ? "Pagamento único" : "Dividir pagamento"}
+                  {editIsSplitMode ? "Pagamento unico" : "Dividir pagamento"}
                 </Button>
               </div>
 
@@ -220,7 +220,7 @@ export function EditTransactionSheet({
               Cancelar
             </Button>
             <Button type="submit" disabled={isProcessing} className="flex-1">
-              {isProcessing ? "Salvando..." : "Salvar alterações"}
+              {isProcessing ? "Salvando..." : "Salvar alteracoes"}
             </Button>
           </SheetFooter>
         </form>
@@ -228,3 +228,5 @@ export function EditTransactionSheet({
     </Sheet>
   );
 }
+
+

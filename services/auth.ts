@@ -22,7 +22,7 @@ function unwrapData<T>(response: { data: ApiResponse<T> | T }): T {
   if (response.data && typeof response.data === "object" && "data" in response.data) {
     return (response.data as ApiResponse<T>).data;
   }
-  return response.data as T;
+return response.data as T;
 }
 
 export async function login(payload: LoginPayload): Promise<LoginResponse> {

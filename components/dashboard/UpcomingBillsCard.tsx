@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InfoPopover } from "@/components/ui/info-popover";
@@ -130,4 +130,6 @@ export default function UpcomingBillsCard({ urgentBills, nextBills, isLoading }:
     </Card>
   );
 }
+
+
 

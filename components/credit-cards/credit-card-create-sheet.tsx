@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { Button } from "@/components/ui/button";
@@ -92,7 +92,7 @@ export function CreditCardCreateSheet() {
               <Label htmlFor="name">Nome do cartão</Label>
               <Input
                 id="name"
-                placeholder="Ex: Nubank, Itaú Platinum"
+                placeholder="Ex: Nubank, Itau Platinum"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -119,7 +119,7 @@ export function CreditCardCreateSheet() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastFourDigits">Últimos 4 dígitos</Label>
+                <Label htmlFor="lastFourDigits">Ultimos 4 digitos</Label>
                 <Input
                   id="lastFourDigits"
                   placeholder="1234"
@@ -185,3 +185,4 @@ export function CreditCardCreateSheet() {
     </Sheet>
   );
 }
+

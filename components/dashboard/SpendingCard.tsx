@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InfoPopover } from "@/components/ui/info-popover";
@@ -17,8 +17,8 @@ export interface SpendingCardProps {
 export default function SpendingCard({
   data,
   isLoading,
-  title = "Gastos dos últimos 7 dias",
-  infoContent = "Este gráfico mostra os gastos dos últimos 7 dias, incluindo apenas despesas que já foram pagas. Os valores são exibidos em reais (R$) e representam o total diário de gastos.",
+  title = "Gastos dos ultimos 7 dias",
+  infoContent = "Este gráfico mostra os gastos dos ultimos 7 dias, incluindo apenas despesas que já foram pagas. Os valores são exibidos em reais (R$) e representam o total diario de gastos.",
 }: SpendingCardProps) {
   return (
     <Card className="lg:col-span-2 overflow-hidden bg-white shadow-sm border border-gray-100">
@@ -73,3 +73,5 @@ function SpendingBarChart({ data }: { data: { day: string; amount: number }[] })
     </div>
   );
 }
+
+

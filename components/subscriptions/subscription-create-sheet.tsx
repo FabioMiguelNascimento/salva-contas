@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { CategorySelect } from "@/components/category-select";
 import { CreditCardSelect } from "@/components/credit-card-select";
@@ -58,7 +58,7 @@ export function SubscriptionCreateSheet({ form, trigger }: SubscriptionCreateShe
         <SheetHeader>
           <SheetTitle>Nova assinatura</SheetTitle>
           <SheetDescription>
-            Informe os parâmetros para gerar o lançamento automaticamente.
+            Informe os parametros para gerar o lançamento automaticamente.
           </SheetDescription>
         </SheetHeader>
 
@@ -99,7 +99,7 @@ export function SubscriptionCreateSheet({ form, trigger }: SubscriptionCreateShe
               />
             </div>
             <div className="space-y-2">
-              <Label>Frequência</Label>
+              <Label>Frequencia</Label>
               <Select
                 value={values.frequency}
                 onValueChange={(value: SubscriptionFrequency) => setValue("frequency", value)}
@@ -118,7 +118,7 @@ export function SubscriptionCreateSheet({ form, trigger }: SubscriptionCreateShe
             </div>
             {(values.frequency === "monthly" || values.frequency === "yearly") && (
               <div className="space-y-2">
-                <Label>Dia do mês</Label>
+                <Label>Dia do mes</Label>
                 <Input
                   type="number"
                   min={1}
@@ -150,7 +150,7 @@ export function SubscriptionCreateSheet({ form, trigger }: SubscriptionCreateShe
             )}
             {values.frequency === "yearly" && (
               <div className="space-y-2">
-                <Label>Mês</Label>
+                <Label>Mes</Label>
                 <Select
                   value={String(values.month)}
                   onValueChange={(value) => setValue("month", Number(value))}
@@ -195,3 +195,5 @@ export function SubscriptionCreateSheet({ form, trigger }: SubscriptionCreateShe
     </Sheet>
   );
 }
+
+

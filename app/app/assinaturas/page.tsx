@@ -37,9 +37,9 @@ function SubscriptionsPageContent() {
       </TopbarAction>
 
       <PageHeader
-        tag="Recorrências"
-        title="Assinaturas e débitos automáticos"
-        description="Configure regras para Netflix, aluguel e outros serviços para que o Salva Contas gere as transações sem digitação."
+        tag="Recorrencias"
+        title="Assinaturas e debitos automaticos"
+        description="Configure regras para Netflix, aluguel e outros servicos para que o Salva Contas gere as transacoes sem digitacao."
       />
 
       <SummaryCardsGrid>
@@ -47,11 +47,11 @@ function SubscriptionsPageContent() {
           icon={Zap}
           title="Assinaturas ativas"
           value={stats.totalActive}
-          helper="Regras prontas para gerar lançamentos"
+          helper="Regras prontas para gerar lancamentos"
         />
         <SummaryCard
           icon={Shield}
-          title="Comprometido/mês"
+          title="Comprometido/mes"
           value={currencyFormatter.format(stats.totalAmount)}
           helper="Soma considerando valores atuais"
         />
@@ -59,7 +59,7 @@ function SubscriptionsPageContent() {
           <SummaryCard
             key={option.value}
             icon={PlusCircle}
-            title={`Frequência ${option.label}`}
+            title={`Frequencia ${option.label}`}
             value={stats.byFrequency[option.value] ?? 0}
             helper={option.helper}
           />
@@ -70,7 +70,7 @@ function SubscriptionsPageContent() {
         <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <CardTitle>Assinaturas configuradas</CardTitle>
-            <CardDescription>Gerencie e acompanhe todas as recorrências automatizadas.</CardDescription>
+            <CardDescription>Gerencie e acompanhe todas as recorrencias automatizadas.</CardDescription>
           </div>
           <div className="flex flex-wrap gap-2" role="group" aria-label="Filtros de assinaturas">
             <Button

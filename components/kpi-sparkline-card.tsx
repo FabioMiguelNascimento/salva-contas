@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { InfoPopover } from "@/components/ui/info-popover";
@@ -181,3 +181,5 @@ export function KpiSparklineCard({
     </Card>
   );
 }
+
+

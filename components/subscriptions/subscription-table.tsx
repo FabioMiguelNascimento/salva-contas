@@ -1,4 +1,4 @@
-import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
+﻿import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
           <TableHead>Vencimento</TableHead>
           <TableHead>Categoria</TableHead>
           <TableHead>Cartão</TableHead>
-          <TableHead>Frequência</TableHead>
+          <TableHead>Frequencia</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="w-12" />
         </TableRow>
@@ -112,3 +112,5 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
     </Table>
   );
 }
+
+

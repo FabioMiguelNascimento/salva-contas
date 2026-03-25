@@ -47,7 +47,7 @@ const VaultsContext = createContext<VaultsContextValue | null>(null);
 
 export function VaultsProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isVaultsRoute = pathname === "/cofrinhos" || pathname.startsWith("/cofrinhos/");
+  const isVaultsRoute = pathname === "/app/cofrinhos" || pathname.startsWith("/app/cofrinhos/");
 
   const [vaults, setVaults] = useState<Vault[]>([]);
   const [metrics, setMetrics] = useState<VaultsContextValue["metrics"]>(null);

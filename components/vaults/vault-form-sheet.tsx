@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
@@ -80,7 +80,7 @@ const VAULT_ICONS = [
 ];
 
 const vaultFormSchema = z.object({
-  name: z.string().trim().min(1, "Informe um nome").max(80, "Nome deve ter no máximo 80 caracteres"),
+  name: z.string().trim().min(1, "Informe um nome").max(80, "Nome deve ter no maximo 80 caracteres"),
   targetAmount: z.preprocess(
     (value) => {
       if (value === "" || value == null) {
@@ -97,9 +97,9 @@ const vaultFormSchema = z.object({
       .union([
         z.undefined(),
         z
-          .number({ message: "Informe um valor numérico válido" })
+          .number({ message: "Informe um valor numerico valido" })
           .refine((num) => Number.isFinite(num), {
-            message: "Informe um valor numérico válido",
+            message: "Informe um valor numerico valido",
           })
           .positive("Meta deve ser maior que zero"),
       ]),
@@ -379,7 +379,7 @@ export function VaultFormSheet({
                         variant="ghost"
                         size="icon-sm"
                         className="rounded-md"
-                        aria-label="Selecionar ícone e cor"
+                        aria-label="Selecionar icone e cor"
                       >
                         <span
                           className="flex size-7 items-center justify-center rounded-md border bg-background"
@@ -411,7 +411,7 @@ export function VaultFormSheet({
                         </div>
 
                         <div className="space-y-2">
-                          <p className="text-xs font-medium text-muted-foreground">Ícone</p>
+                          <p className="text-xs font-medium text-muted-foreground">Icone</p>
                           <div className="grid grid-cols-6 gap-2.5">
                             {VAULT_ICONS.map((iconName) => (
                               <button
@@ -421,7 +421,7 @@ export function VaultFormSheet({
                                   "flex size-10 items-center justify-center rounded-md border bg-background transition-colors hover:bg-muted",
                                   selectedIcon === iconName && "border-foreground",
                                 )}
-                                aria-label={`Selecionar ícone ${iconName}`}
+                                aria-label={`Selecionar icone ${iconName}`}
                                 onClick={() => setValue("icon", iconName, { shouldDirty: true })}
                               >
                                 <DynamicIcon name={iconName} />
@@ -433,7 +433,7 @@ export function VaultFormSheet({
                     </PopoverContent>
                   </Popover>
                 </InputGroupAddon>
-                <InputGroupInput id="vault-name" placeholder="Reserva de emergência" {...register("name")} />
+                <InputGroupInput id="vault-name" placeholder="Reserva de emergencia" {...register("name")} />
               </InputGroup>
               {errors.name ? <p className="text-sm text-destructive">{errors.name.message}</p> : null}
             </div>
@@ -446,7 +446,7 @@ export function VaultFormSheet({
 
             {vault ? (
               <div className="flex flex-col gap-4 min-h-0 flex-1">
-                <Label className="h-fit">Histórico do mês</Label>
+                <Label className="h-fit">Histórico do mes</Label>
                 <div className="flex flex-1 min-h-0 flex-col rounded-xl border bg-background p-3">
                   {isHistoryLoading ? (
                     <p className="text-sm text-muted-foreground">Carregando histórico...</p>
@@ -457,7 +457,7 @@ export function VaultFormSheet({
                       <div className="flex items-start justify-between border-b pb-2">
                         <div className="flex flex-col">
                           <p className="text-[11px] font-medium tracking-wide text-muted-foreground">
-                            TOTAL DO MÊS
+                            TOTAL DO MES
                           </p>
                           <p className="text-sm font-semibold capitalize text-foreground/90">
                             {getHistoryMonthLabel(history.month)}
@@ -544,7 +544,7 @@ export function VaultFormSheet({
                     </>
                   ) : (
                     <p className="text-sm text-muted-foreground">
-                      Sem movimentações para este mês.
+                      Sem movimentacoes para este mes.
                     </p>
                   )}
                 </div>
@@ -565,3 +565,4 @@ export function VaultFormSheet({
     </Sheet>
   );
 }
+

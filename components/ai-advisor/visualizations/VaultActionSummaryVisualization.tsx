@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
@@ -87,7 +87,7 @@ export default function VaultActionSummaryVisualization({
 
       <p className="mt-1 text-xs text-emerald-200">
         {targetAmount > 0
-          ? `${Math.min(100, (currentAmount / targetAmount) * 100).toFixed(0)}% Concluído`
+          ? `${Math.min(100, (currentAmount / targetAmount) * 100).toFixed(0)}% Concluido`
           : 'Sem meta definida'}
       </p>
 
@@ -113,3 +113,4 @@ export default function VaultActionSummaryVisualization({
     </div>
   );
 }
+

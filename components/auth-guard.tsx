@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 
 import { useAuth } from "@/contexts/auth-context";
 import { Loader2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, type ReactNode } from "react";
 
-const AUTH_ROUTES = ["/login", "/register", "/forgot-password", "/update-password"];
+const AUTH_ROUTES = ["/entrar", "/cadastrar", "/recuperar-senha"];
 
 export function AuthGuard({ children }: { children: ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -19,7 +19,7 @@ export function AuthGuard({ children }: { children: ReactNode }) {
     if (isLoading) return;
 
     if (!isAuthenticated && !isAuthRoute && !isInviteRoute) {
-      router.push("/login");
+      router.push("/entrar");
     }
 
     if (isAuthenticated && isAuthRoute) {
@@ -38,15 +38,17 @@ export function AuthGuard({ children }: { children: ReactNode }) {
     );
   }
 
-  // Se não está autenticado e não é rota pública, não renderiza nada (vai redirecionar)
+  // Se não está autenticado e não e rota publica, não renderiza nada (vai redirecionar)
   if (!isAuthenticated && !isAuthRoute && !isInviteRoute) {
     return null;
   }
 
-  // Se está autenticado e é rota de auth, não renderiza nada (vai redirecionar)
+  // Se está autenticado e e rota de auth, não renderiza nada (vai redirecionar)
   if (isAuthenticated && isAuthRoute) {
     return null;
   }
 
   return <>{children}</>;
 }
+
+

@@ -1,4 +1,4 @@
-import { CategorySelect } from "@/components/category-select";
+﻿import { CategorySelect } from "@/components/category-select";
 import { CreditCardSelect } from "@/components/credit-card-select";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -32,7 +32,7 @@ export function SubscriptionEditSheet({ editor }: SubscriptionEditSheetProps) {
       <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
           <SheetTitle>Editar assinatura</SheetTitle>
-          <SheetDescription>Ajuste valores ou frequência desta recorrência.</SheetDescription>
+          <SheetDescription>Ajuste valores ou frequencia desta recorrência.</SheetDescription>
         </SheetHeader>
         {editing && (
           <form className="flex flex-1 flex-col" onSubmit={handleEditSubmit}>
@@ -61,7 +61,7 @@ export function SubscriptionEditSheet({ editor }: SubscriptionEditSheetProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Frequência</Label>
+                <Label>Frequencia</Label>
                 <Select value={values.frequency} onValueChange={(value: SubscriptionFrequency) => setValue("frequency", value)}>
                   <SelectTrigger>
                     <SelectValue />
@@ -77,7 +77,7 @@ export function SubscriptionEditSheet({ editor }: SubscriptionEditSheetProps) {
               </div>
               {(values.frequency === "monthly" || values.frequency === "yearly") && (
                 <div className="space-y-2">
-                  <Label>Dia do mês</Label>
+                  <Label>Dia do mes</Label>
                   <Input
                     type="number"
                     min={1}
@@ -106,7 +106,7 @@ export function SubscriptionEditSheet({ editor }: SubscriptionEditSheetProps) {
               )}
               {values.frequency === "yearly" && (
                 <div className="space-y-2">
-                  <Label>Mês</Label>
+                  <Label>Mes</Label>
                   <Select value={String(values.month)} onValueChange={(value) => setValue("month", Number(value))}>
                     <SelectTrigger>
                       <SelectValue />
@@ -151,3 +151,5 @@ export function SubscriptionEditSheet({ editor }: SubscriptionEditSheetProps) {
     </Sheet>
   );
 }
+
+

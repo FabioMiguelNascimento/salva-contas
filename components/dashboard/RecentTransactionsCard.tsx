@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { Button } from "@/components/ui/button";
@@ -64,7 +64,7 @@ export default function RecentTransactionsCard({ transactions, isLoading, title 
           <InfoPopover content="Aqui você pode ver as suas transações mais recentes, incluindo receitas e despesas. Cada transação mostra a descrição, categoria, data e valor. As receitas aparecem em verde e as despesas em vermelho." />
         </div>
         <Button variant="ghost" size="sm" className="self-start sm:self-auto" asChild>
-          <Link href="/extrato">Ver extrato completo</Link>
+          <Link href="/app/extrato">Ver extrato completo</Link>
         </Button>
       </CardHeader>
       <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6 overflow-hidden flex-1">
@@ -81,3 +81,4 @@ export default function RecentTransactionsCard({ transactions, isLoading, title 
     </Card>
   );
 }
+

@@ -17,15 +17,15 @@ export default function AppearanceCard({ theme, setTheme, density, setDensity, o
   return (
     <Card id="appearance">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base"><Palette className="h-4 w-4" /> Aparência</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-base"><Palette className="h-4 w-4" /> Aparencia</CardTitle>
         <CardDescription>Defina o tema e densidade dos componentes.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="grid gap-2 md:grid-cols-2">
           <div>
-            <Label>Tema padrão</Label>
+            <Label>Tema padrao</Label>
             <select value={theme} onChange={(e) => setTheme(e.target.value as any)} className="rounded-lg border border-border bg-transparent px-3 py-2 text-sm w-full">
-              <option value="auto">Automático (sistema)</option>
+              <option value="auto">Automatico (sistema)</option>
               <option value="light">Claro</option>
               <option value="dark">Escuro</option>
             </select>
@@ -45,7 +45,7 @@ export default function AppearanceCard({ theme, setTheme, density, setDensity, o
           </div>
         </div>
         <div className="flex justify-end">
-          <Button size="sm" onClick={onSave}>Salvar preferências</Button>
+          <Button size="sm" onClick={onSave}>Salvar preferencias</Button>
         </div>
       </CardContent>
     </Card>

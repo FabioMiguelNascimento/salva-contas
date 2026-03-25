@@ -20,7 +20,7 @@ import {
 
 const amountSchema = z.object({
   amount: z.coerce.number().refine((value) => Number.isFinite(value), {
-    message: "Informe um valor numérico",
+    message: "Informe um valor numerico",
   }).positive("Informe um valor maior que zero"),
 });
 

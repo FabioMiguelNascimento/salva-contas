@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -39,7 +39,7 @@ export function BudgetEditSheet({ editor }: BudgetEditSheetProps) {
         <SheetHeader>
           <SheetTitle>Editar orçamento</SheetTitle>
           <SheetDescription>
-            {editing?.category?.name ?? "Categoria"} – Altere o valor limite para esta categoria.
+            {editing?.category?.name ?? "Categoria"} – Altere o valor limite para está categoria.
           </SheetDescription>
         </SheetHeader>
 
@@ -87,3 +87,6 @@ export function BudgetEditSheet({ editor }: BudgetEditSheetProps) {
     </Sheet>
   );
 }
+
+
+

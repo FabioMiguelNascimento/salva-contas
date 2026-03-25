@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { Button } from "@/components/ui/button";
@@ -21,10 +21,10 @@ export default function SubscriptionsCard({ subscriptions, monthlyTotal, isLoadi
       <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
           <CardTitle className="text-base font-semibold text-gray-800">Assinaturas Ativas</CardTitle>
-          <InfoPopover content="Aqui você pode ver todas as suas assinaturas ativas, incluindo o valor mensal de cada uma e o total mensal gasto com assinaturas. Cada assinatura mostra seu ícone, nome e valor." />
+          <InfoPopover content="Aqui você pode ver todas as suas assinaturas ativas, incluindo o valor mensal de cada uma e o total mensal gasto com assinaturas. Cada assinatura mostra seu icone, nome e valor." />
         </div>
         <Button variant="ghost" size="sm" className="self-start sm:self-auto" asChild>
-          <Link href="/assinaturas">Ver todas</Link>
+          <Link href="/app/assinaturas">Ver todas</Link>
         </Button>
       </CardHeader>
       <CardContent>
@@ -68,3 +68,4 @@ export default function SubscriptionsCard({ subscriptions, monthlyTotal, isLoadi
     </Card>
   );
 }
+

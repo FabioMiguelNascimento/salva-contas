@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -38,7 +38,7 @@ export function Topbar({
           className="flex items-center gap-2 rounded-md px-1 py-0.5 hover:bg-muted/60 cursor-pointer"
           aria-label="Alternar sidebar"
         >
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-linear-to-br from-emerald-500 to-emerald-600 text-white overflow-hidden">
+          <div className="flex h-8 w-8 items-center justify-center overflow-hidden">
             <Image src="/app-icon.svg" alt="Salva Contas" width={20} height={20} className="h-5 w-5" />
           </div>
           <div className="hidden lg:block">
@@ -65,3 +65,4 @@ export function Topbar({
     </header>
   );
 }
+

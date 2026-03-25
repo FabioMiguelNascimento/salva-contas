@@ -19,7 +19,7 @@ export default function SecurityCard({ newPassword, confirmPassword, setNewPassw
   return (
     <Card id="security">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-base"><Shield className="h-4 w-4" /> Segurança</CardTitle>
+        <CardTitle className="flex items-center gap-2 text-base"><Shield className="h-4 w-4" /> Seguranca</CardTitle>
         <CardDescription>Altere sua senha de acesso.</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 md:grid-cols-2">

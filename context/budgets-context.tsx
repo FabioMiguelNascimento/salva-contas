@@ -55,7 +55,7 @@ const initialFilters: BudgetFilters = {
 
 export function BudgetsProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isBudgetsRoute = pathname === "/orcamentos" || pathname.startsWith("/orcamentos/");
+  const isBudgetsRoute = pathname === "/app/orcamentos" || pathname.startsWith("/app/orcamentos/");
 
   const [filters, setFilters] = useState<BudgetFilters>(initialFilters);
   const [budgets, setBudgets] = useState<Budget[]>([]);

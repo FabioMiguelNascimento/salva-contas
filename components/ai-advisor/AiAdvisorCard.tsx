@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import AiAdvisorAttachmentButton from '@/components/ai-advisor/AiAdvisorAttachmentButton';
 import AiAdvisorMessageBubble from '@/components/ai-advisor/AiAdvisorMessageBubble';
@@ -80,7 +80,7 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
     if (typeof window !== 'undefined') {
       sessionStorage.removeItem(STORAGE_KEY);
     }
-    toast.success('Historico do assistente limpo para esta sessao.');
+    toast.success('Histórico do assistente limpo para está sessao.');
   };
 
   const history = useMemo(
@@ -115,7 +115,7 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
 
     try {
       const confirmed = await confirmTransaction(payload);
-      toast.success(`Confirmação realizada: ${Array.isArray(confirmed) ? confirmed.length : 1} transação(ões)`);
+      toast.success(`Confirmação realizada: ${Array.isArray(confirmed) ? confirmed.length : 1} transação(oes)`);
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === messageId
@@ -212,7 +212,7 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
       setMessages((prev) => [...prev, assistantMessage]);
       scrollToBottom();
     } catch (error: any) {
-      toast.error(error?.message || 'Nao foi possivel conversar com o assistente agora.');
+      toast.error(error?.message || 'Não foi possível conversar com o assistente agora.');
     } finally {
       setStatus('idle');
       setIsLoading(false);
@@ -259,7 +259,7 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
                   onClick={handleClearHistory}
                   disabled={messages.length <= 1 || isLoading}
                 >
-                  Limpar historico
+                  Limpar histórico
                 </Button>
               </div>
 
@@ -326,3 +326,6 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
     </div>
   );
 }
+
+
+

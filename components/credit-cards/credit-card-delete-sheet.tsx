@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -61,7 +61,7 @@ export function CreditCardDeleteSheet({ card, open, onOpenChange }: CreditCardDe
             </p>
           </div>
           <p className="text-sm text-muted-foreground">
-            Ao excluir este cartão, todas as transações associadas a ele perderão a referência.
+            Ao excluir este cartão, todas as transações associadas a ele perderao a referencia.
           </p>
         </SheetBody>
 
@@ -83,3 +83,4 @@ export function CreditCardDeleteSheet({ card, open, onOpenChange }: CreditCardDe
     </Sheet>
   );
 }
+

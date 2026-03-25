@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -171,7 +171,7 @@ export function NotificationsDropdown() {
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <Bell className="h-10 w-10 text-muted-foreground/40" />
             <p className="mt-2 text-sm text-muted-foreground">
-              Nenhuma notificação
+              Nenhuma notificacao
             </p>
           </div>
         ) : (
@@ -192,3 +192,4 @@ export function NotificationsDropdown() {
     </DropdownMenu>
   );
 }
+

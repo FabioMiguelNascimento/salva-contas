@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import AppearanceCard from "@/components/settings/appearance-card";
 import FamilyShareCard from "@/components/settings/family-share-card";
@@ -145,9 +145,9 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v)}>
           <TabsList className="mb-4">
             <TabsTrigger value="profile">Perfil</TabsTrigger>
-            <TabsTrigger value="appearance">Aparência</TabsTrigger>
+            <TabsTrigger value="appearance">Aparencia</TabsTrigger>
             <TabsTrigger value="notifications">Notificações</TabsTrigger>
-            <TabsTrigger value="security">Segurança</TabsTrigger>
+            <TabsTrigger value="security">Seguranca</TabsTrigger>
             <TabsTrigger value="family">Partilha Familiar</TabsTrigger>
           </TabsList>
 
@@ -170,3 +170,5 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
     </>
   );
 }
+
+

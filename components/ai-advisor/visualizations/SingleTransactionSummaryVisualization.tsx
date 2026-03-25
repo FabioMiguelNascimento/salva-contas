@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import type { AiVisualization } from "@/types/finance";
 import { format, parseISO } from "date-fns";
@@ -143,3 +143,4 @@ export default function SingleTransactionSummaryVisualization({
     </div>
   );
 }
+

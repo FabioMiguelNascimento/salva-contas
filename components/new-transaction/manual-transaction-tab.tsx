@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { CategorySelect } from "@/components/category-select";
 import { Button } from "@/components/ui/button";
@@ -39,7 +39,7 @@ export function ManualTransactionTab({
         <div className="grid gap-2 sm:grid-cols-3">
           <div className="space-y-1 sm:col-span-3">
             <Label htmlFor="manual-description" className="text-xs uppercase tracking-wider text-muted-foreground">
-              Descricao
+              Descrição
             </Label>
             <Input
               id="manual-description"
@@ -152,3 +152,4 @@ export function ManualTransactionTab({
     </TabsContent>
   );
 }
+

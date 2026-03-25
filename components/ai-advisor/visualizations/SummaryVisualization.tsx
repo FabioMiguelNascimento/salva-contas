@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import type { AiVisualization } from "@/types/finance";
 import type { VisualizationStatus } from "./types";
@@ -125,3 +125,4 @@ export default function SummaryVisualization({
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { CategorySelect } from "@/components/category-select";
 import { Button } from "@/components/ui/button";
@@ -50,7 +50,7 @@ export function SubscriptionForm({ form }: SubscriptionFormProps) {
         />
       </div>
       <div className="space-y-2">
-        <Label>Frequência</Label>
+        <Label>Frequencia</Label>
         <Select value={values.frequency} onValueChange={(value: SubscriptionFrequency) => setFrequency(value)}>
           <SelectTrigger>
             <SelectValue />
@@ -66,7 +66,7 @@ export function SubscriptionForm({ form }: SubscriptionFormProps) {
       </div>
       {(values.frequency === "monthly" || values.frequency === "yearly") && (
         <div className="space-y-2">
-          <Label>Dia do mês</Label>
+          <Label>Dia do mes</Label>
           <Input
             type="number"
             min={1}
@@ -95,7 +95,7 @@ export function SubscriptionForm({ form }: SubscriptionFormProps) {
       )}
       {values.frequency === "yearly" && (
         <div className="space-y-2">
-          <Label>Mês</Label>
+          <Label>Mes</Label>
           <Select value={String(values.month)} onValueChange={(value) => setValue("month", Number(value))}>
             <SelectTrigger>
               <SelectValue />
@@ -125,3 +125,4 @@ export function SubscriptionForm({ form }: SubscriptionFormProps) {
     </form>
   );
 }
+

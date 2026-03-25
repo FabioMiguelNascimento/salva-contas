@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -35,7 +35,7 @@ export function BudgetProgressCard({ progress, onEdit, onDelete }: BudgetProgres
             )}
             {isWarning && !isOverBudget && (
               <span className="rounded-full bg-yellow-500/10 px-2 py-0.5 text-xs font-medium text-yellow-600 dark:text-yellow-400">
-                Atenção
+                Atencao
               </span>
             )}
           </div>
@@ -91,3 +91,4 @@ export function BudgetProgressCard({ progress, onEdit, onDelete }: BudgetProgres
     </div>
   );
 }
+

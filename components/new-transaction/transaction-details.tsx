@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { CreditCardSelect } from "@/components/credit-card-select"
 import { DatePicker } from "@/components/date-picker"
@@ -84,9 +84,9 @@ export function TransactionDetails({
         <label className="flex flex-col gap-2 rounded-xl border border-border/60 bg-muted/20 p-2 sm:flex-row sm:items-center">
           <Checkbox id="schedule" checked={isScheduled} onCheckedChange={(value) => onIsScheduledChange(Boolean(value))} />
           <div className="space-y-0.5">
-            <div className="font-medium">É uma conta a pagar/agendamento?</div>
+            <div className="font-medium">E uma conta a pagar/agendamento?</div>
             <p className="text-xs text-muted-foreground">
-              Se marcado, definimos data de vencimento. Caso contrário, consideramos como compra já realizada.
+              Se marcado, definimos data de vencimento. Caso contrario, consideramos como compra já realizada.
             </p>
           </div>
         </label>
@@ -116,7 +116,7 @@ export function TransactionDetails({
               onClick={toggleSplitMode}
             >
               <SplitSquareHorizontal className="h-3.5 w-3.5" />
-              {isSplitMode ? "Pagamento único" : "Dividir pagamento"}
+              {isSplitMode ? "Pagamento unico" : "Dividir pagamento"}
             </Button>
           </div>
 
@@ -167,3 +167,4 @@ export function TransactionDetails({
 }
 
 export default TransactionDetails
+

@@ -11,7 +11,7 @@ export function PaginationControls({ currentPage, totalPages, onPageChange, disa
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <p className="text-sm text-muted-foreground">
-        Página {currentPage} de {totalPages}
+        Pagina {currentPage} de {totalPages}
       </p>
       <div className="flex gap-2">
         <Button
@@ -28,7 +28,7 @@ export function PaginationControls({ currentPage, totalPages, onPageChange, disa
           disabled={disabled || currentPage === totalPages}
           onClick={() => onPageChange(Math.min(totalPages, currentPage + 1))}
         >
-          Próxima
+          Proxima
         </Button>
       </div>
     </div>

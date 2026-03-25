@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,7 +15,7 @@ type Props = {
 
 export default function NotificationsCard({ notifications, setNotifications, onSave }: Props) {
   const items: { key: keyof NotificationsState; label: string; description: string }[] = [
-    { key: 'vencimentos', label: 'Contas prestes a vencer', description: 'Receba 1 e-mail diário com o resumo.' },
+    { key: 'vencimentos', label: 'Contas prestes a vencer', description: 'Receba 1 e-mail diario com o resumo.' },
     { key: 'insights', label: 'Insights de gastos', description: 'Alertas sobre picos ou categorias incomuns.' },
     { key: 'propostas', label: 'Propostas da IA', description: 'Sugestões de parcelamento, renegociação e ajustes.' },
   ];
@@ -43,3 +43,5 @@ export default function NotificationsCard({ notifications, setNotifications, onS
     </Card>
   );
 }
+
+

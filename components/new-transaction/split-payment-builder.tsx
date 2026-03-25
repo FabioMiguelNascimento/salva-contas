@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { CreditCardSelect } from "@/components/credit-card-select";
 import { DebitCardSelect } from "@/components/debit-card-select";
@@ -149,7 +149,7 @@ export function SplitPaymentBuilder({
       <div className="flex items-center justify-between text-xs px-1">
         <span className={isBalanced ? "text-emerald-600" : "text-destructive"}>
           {isBalanced
-            ? "✓ Total distribuído corretamente"
+            ? "✓ Total distribuido corretamente"
             : remaining > 0
               ? `Faltam ${formatCurrency(remaining)} para distribuir`
               : `Excedendo ${formatCurrency(Math.abs(remaining))}`}
@@ -173,3 +173,4 @@ export function SplitPaymentBuilder({
     </div>
   );
 }
+

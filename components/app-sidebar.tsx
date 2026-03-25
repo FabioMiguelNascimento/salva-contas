@@ -1,18 +1,17 @@
-"use client";
+﻿"use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuBadge,
-  SidebarMenuButton,
-  SidebarMenuItem,
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/auth-context";
 import { CalendarClock, CreditCard, HandCoins, LayoutDashboard, LogOut, PiggyBank, ReceiptText, Repeat, Settings, Sparkles, User, Users } from "lucide-react";
@@ -31,43 +30,43 @@ interface NavItem {
 const baseNavItems: NavItem[] = [
   {
     label: "Dashboard",
-    href: "/",
+    href: "/app/dashboard",
     icon: LayoutDashboard,
     description: "Resumo financeiro, KPIs e alertas",
   },
   {
     label: "Contas a Pagar",
-    href: "/contas",
+    href: "/app/contas",
     icon: CalendarClock,
-    description: "Boletos, obrigações e agendamentos",
+    description: "Boletos, obrigacoes e agendamentos",
   },
   {
     label: "Assinaturas",
-    href: "/assinaturas",
+    href: "/app/assinaturas",
     icon: Repeat,
     description: "Compras recorrentes automatizadas",
   },
   {
     label: "Cartões",
-    href: "/cartoes",
+    href: "/app/cartoes",
     icon: CreditCard,
     description: "Gerencie seus cartões de crédito",
   },
   {
     label: "Orçamentos",
-    href: "/orcamentos",
+    href: "/app/orcamentos",
     icon: HandCoins,
     description: "Limites por categoria",
   },
   {
     label: "Cofrinhos",
-    href: "/cofrinhos",
+    href: "/app/cofrinhos",
     icon: PiggyBank,
     description: "Objetivos e reservas financeiras",
   },
   {
     label: "Extrato / Transações",
-    href: "/extrato",
+    href: "/app/extrato",
     icon: ReceiptText,
     description: "Histórico completo e filtros",
   },
@@ -108,7 +107,7 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
           <SidebarMenuItem>
             <SidebarMenuButton asChild size="lg" tooltip="Salva Contas">
               <Link href="/">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-linear-to-br from-emerald-500 to-emerald-600 text-white overflow-hidden">
+                <div className="flex aspect-square size-8 items-center justify-center overflow-hidden">
                   <Image src="/app-icon.svg" alt="Salva Contas" width={20} height={20} className="size-5" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
@@ -157,12 +156,12 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton size="lg" tooltip={user?.name ?? "Usuário"}>
+                <SidebarMenuButton size="lg" tooltip={user?.name ?? "Usuario"}>
                   <Avatar className="size-8 group-data-[collapsible=icon]:translate-x-0.5">
                     <AvatarFallback className="bg-emerald-500/15 text-emerald-600">{userInitials}</AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                    <span className="truncate font-medium">{user?.name ?? "Usuário"}</span>
+                    <span className="truncate font-medium">{user?.name ?? "Usuario"}</span>
                     <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
                   </div>
                 </SidebarMenuButton>
@@ -195,3 +194,4 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
     </Sidebar>
   );
 }
+

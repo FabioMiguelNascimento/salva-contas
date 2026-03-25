@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import SettingsContent from "@/components/settings-content";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
@@ -34,7 +34,7 @@ export function SettingsDialog({ open, onOpenChange, selectedTab, onTabChange }:
                 onClick={() => onTabChange('appearance')}
               >
                 <Palette className="h-4 w-4" />
-                <span>Aparência</span>
+                <span>Aparencia</span>
               </button>
               <button 
                 className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", selectedTab === 'notifications' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")} 
@@ -48,7 +48,7 @@ export function SettingsDialog({ open, onOpenChange, selectedTab, onTabChange }:
                 onClick={() => onTabChange('security')}
               >
                 <Shield className="h-4 w-4" />
-                <span>Segurança</span>
+                <span>Seguranca</span>
               </button>
               <button 
                 className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", selectedTab === 'family' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")} 

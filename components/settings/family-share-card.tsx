@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -28,7 +28,7 @@ export default function FamilyShareCard() {
       setFamily(data);
     } catch (error: any) {
       const { toast } = await import('sonner');
-      toast.error(error?.message || 'Nao foi possivel carregar os membros vinculados.');
+      toast.error(error?.message || 'Não foi possível carregar os membros vinculados.');
     } finally {
       setIsLoadingMembers(false);
     }
@@ -47,7 +47,7 @@ export default function FamilyShareCard() {
       toast.success('Link de convite gerado.');
     } catch (error: any) {
       const { toast } = await import('sonner');
-      toast.error(error?.message || 'Nao foi possivel gerar o convite.');
+      toast.error(error?.message || 'Não foi possível gerar o convite.');
     } finally {
       setIsGenerating(false);
     }
@@ -61,7 +61,7 @@ export default function FamilyShareCard() {
       toast.success('Link copiado para a area de transferencia.');
     } catch {
       const { toast } = await import('sonner');
-      toast.error('Nao foi possivel copiar o link.');
+      toast.error('Não foi possível copiar o link.');
     }
   };
 
@@ -140,3 +140,4 @@ export default function FamilyShareCard() {
     </Card>
   );
 }
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import CategoryDonut from "@/components/category-donut";
 import ChartCard from "@/components/chart-card";
@@ -72,3 +72,5 @@ export default function CategoryBreakdownCard({ breakdown, total, categoriesMeta
     </ChartCard>
   );
 }
+
+

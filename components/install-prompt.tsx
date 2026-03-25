@@ -74,8 +74,8 @@ export function InstallPrompt() {
         </CardHeader>
         <CardContent className="pt-0">
           <CardDescription className="mb-3">
-            Instale o Salva Contas no seu dispositivo para uma experiência melhor,
-            com acesso rápido e sem barra de endereço.
+            Instale o Salva Contas no seu dispositivo para uma experiencia melhor,
+            com acesso rapido e sem barra de endereco.
           </CardDescription>
 
           {isIOS ? (
@@ -85,7 +85,7 @@ export function InstallPrompt() {
                 <span>Toque em <Badge variant="outline" className="text-xs">Compartilhar</Badge></span>
               </div>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Depois <Badge variant="outline" className="text-xs">Adicionar à Tela de Início</Badge></span>
+                <span>Depois <Badge variant="outline" className="text-xs">Adicionar a Tela de Inicio</Badge></span>
               </div>
             </div>
           ) : (

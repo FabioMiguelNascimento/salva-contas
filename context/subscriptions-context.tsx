@@ -40,7 +40,7 @@ const SubscriptionsContext = createContext<SubscriptionsContextValue | null>(nul
 
 export function SubscriptionsProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isSubscriptionsRoute = pathname === "/assinaturas" || pathname.startsWith("/assinaturas/");
+  const isSubscriptionsRoute = pathname === "/app/assinaturas" || pathname.startsWith("/app/assinaturas/");
 
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [subscriptionMetrics, setSubscriptionMetrics] = useState<SubscriptionMetrics | null>(null);

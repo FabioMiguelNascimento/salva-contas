@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { Badge } from "@/components/ui/badge";
@@ -115,3 +115,5 @@ export function CreditCardTable({ creditCards, onEdit, onDelete }: CreditCardTab
     </Table>
   );
 }
+
+

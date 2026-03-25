@@ -69,9 +69,9 @@ function CartoesPageContent() {
       </TopbarAction>
 
       <PageHeader
-        tag="Finanças"
-        title="Cartões de crédito"
-        description="Gerencie seus cartões, limites e acompanhe os gastos de cada um."
+        tag="Financas"
+        title="Cartoes de credito"
+        description="Gerencie seus cartoes, limites e acompanhe os gastos de cada um."
       />
 
       <SummaryCardsGrid className="grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -79,15 +79,15 @@ function CartoesPageContent() {
           <CardContent className="p-4 sm:p-5">
             <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-600">
               <CreditCardIcon className="h-4 w-4" />
-              Cartões cadastrados
+              Cartoes cadastrados
             </div>
             <div className="space-y-3">
               <div className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
-                <span className="text-sm text-muted-foreground">Crédito ativos</span>
+                <span className="text-sm text-muted-foreground">Credito ativos</span>
                 <span className="text-base font-semibold">{stats.totalCards}</span>
               </div>
               <div className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
-                <span className="text-sm text-muted-foreground">Débito ativos</span>
+                <span className="text-sm text-muted-foreground">Debito ativos</span>
                 <span className="text-base font-semibold">{stats.totalDebitCards}</span>
               </div>
             </div>
@@ -98,7 +98,7 @@ function CartoesPageContent() {
           <CardContent className="p-4 sm:p-5">
             <div className="mb-4 flex items-center gap-2 text-sm font-semibold text-gray-600">
               <Wallet className="h-4 w-4" />
-              Limites de crédito
+              Limites de credito
             </div>
             <div className="space-y-3">
               <div className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
@@ -106,7 +106,7 @@ function CartoesPageContent() {
                 <span className="text-base font-semibold">{currencyFormatter.format(stats.totalLimit)}</span>
               </div>
               <div className="flex items-center justify-between rounded-lg bg-muted/40 px-3 py-2">
-                <span className="text-sm text-muted-foreground">Limite disponível</span>
+                <span className="text-sm text-muted-foreground">Limite disponivel</span>
                 <span className="text-base font-semibold">{currencyFormatter.format(stats.totalAvailable)}</span>
               </div>
             </div>
@@ -135,9 +135,9 @@ function CartoesPageContent() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Seus cartões</CardTitle>
+          <CardTitle>Seus cartoes</CardTitle>
           <CardDescription>
-            Visualize e gerencie todos os seus cartões de crédito cadastrados.
+            Visualize e gerencie todos os seus cartoes de credito cadastrados.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -149,7 +149,7 @@ function CartoesPageContent() {
             </div>
           ) : creditCards.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">
-              Nenhum cartão cadastrado ainda. Clique em "Novo Cartão" para adicionar o primeiro.
+              Nenhum cartao cadastrado ainda. Clique em "Novo Cartao" para adicionar o primeiro.
             </div>
           ) : (
             <div className="space-y-4">
@@ -177,9 +177,9 @@ function CartoesPageContent() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Seus cartões de débito</CardTitle>
+          <CardTitle>Seus cartoes de debito</CardTitle>
           <CardDescription>
-            Visualize e gerencie seus cartões de débito cadastrados.
+            Visualize e gerencie seus cartoes de debito cadastrados.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -191,7 +191,7 @@ function CartoesPageContent() {
             </div>
           ) : debitCards.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">
-              Nenhum cartão de débito cadastrado ainda. Clique em "Novo Débito" para adicionar o primeiro.
+              Nenhum cartao de debito cadastrado ainda. Clique em "Novo Debito" para adicionar o primeiro.
             </div>
           ) : (
             <div className="space-y-4">

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { Button } from "@/components/ui/button";
@@ -77,7 +77,7 @@ export function BudgetTable({ budgetProgress, onEdit, onDelete }: BudgetTablePro
                   )}
                   {isWarning && !isOverBudget && (
                     <span className="rounded-full bg-yellow-500/10 px-2 py-0.5 text-xs font-medium text-yellow-600 dark:text-yellow-400">
-                      Atenção
+                      Atencao
                     </span>
                   )}
                 </div>
@@ -143,3 +143,6 @@ export function BudgetTable({ budgetProgress, onEdit, onDelete }: BudgetTablePro
     </Table>
   );
 }
+
+
+

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { CardFlagIcon } from '@/components/credit-cards/card-flag-icon';
 import { Button } from '@/components/ui/button';
@@ -83,7 +83,7 @@ export function DebitCardCreateSheet() {
               <Label htmlFor="debit-name">Nome do cartão</Label>
               <Input
                 id="debit-name"
-                placeholder="Ex: Itaú Débito, Inter"
+                placeholder="Ex: Itau Débito, Inter"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -111,7 +111,7 @@ export function DebitCardCreateSheet() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="debit-lastFourDigits">Últimos 4 dígitos</Label>
+                <Label htmlFor="debit-lastFourDigits">Ultimos 4 digitos</Label>
                 <Input
                   id="debit-lastFourDigits"
                   placeholder="1234"
@@ -137,3 +137,4 @@ export function DebitCardCreateSheet() {
     </Sheet>
   );
 }
+

@@ -1,4 +1,3 @@
-import { AuthGuard } from "@/components/auth-guard";
 import { InstallPrompt } from "@/components/install-prompt";
 import { Providers } from "@/components/providers";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
@@ -12,7 +11,7 @@ const fontSans = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "Salva Contas",
-  description: "Dashboard inteligente para organizar recibos, contas e transações com IA",
+  description: "Dashboard inteligente para organizar recibos, contas e transacoes com IA",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
@@ -26,12 +25,12 @@ export const metadata: Metadata = {
     type: "website",
     siteName: "Salva Contas",
     title: "Salva Contas",
-    description: "Dashboard inteligente para organizar recibos, contas e transações com IA",
+    description: "Dashboard inteligente para organizar recibos, contas e transacoes com IA",
   },
   twitter: {
     card: "summary",
     title: "Salva Contas",
-    description: "Dashboard inteligente para organizar recibos, contas e transações com IA",
+    description: "Dashboard inteligente para organizar recibos, contas e transacoes com IA",
   },
 };
 
@@ -58,9 +57,7 @@ export default function RootLayout({
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body className={cn("min-h-screen bg-background font-sans antialiased overflow-x-hidden", fontSans.className)}>
-        <Providers>
-          <AuthGuard>{children}</AuthGuard>
-        </Providers>
+        <Providers>{children}</Providers>
         <InstallPrompt />
         <ServiceWorkerRegister />
         <Toaster />

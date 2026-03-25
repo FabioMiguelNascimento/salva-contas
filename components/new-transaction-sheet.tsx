@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { AiTransactionTab } from "@/components/new-transaction/ai-transaction-tab";
 import { ManualTransactionTab } from "@/components/new-transaction/manual-transaction-tab";
@@ -80,7 +80,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
     try {
       if (mode === "ai") {
         if (!selectedFile && textInput.trim().length < 6) {
-          setError("Envie um arquivo ou descreva a transação (mín. 6 caracteres).");
+          setError("Envie um arquivo ou descreva a transação (min. 6 caracteres).");
           return;
         }
 
@@ -101,7 +101,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
           return;
         }
         if (!Number.isFinite(amountValue) || amountValue <= 0) {
-          setError("Informe um valor válido maior que zero.");
+          setError("Informe um valor valido maior que zero.");
           return;
         }
         if (!manualCategoryId) {
@@ -119,13 +119,13 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
 
         if (isSplitMode) {
           if (splits.length < 2) {
-            setError("Adicione pelo menos 2 métodos para dividir o pagamento.");
+            setError("Adicione pelo menos 2 metodos para dividir o pagamento.");
             return;
           }
 
           const splitTotal = splits.reduce((sum, split) => sum + (Number(split.amount) || 0), 0);
           if (Math.abs(splitTotal - amountValue) > 0.01) {
-            setError("A soma dos métodos de pagamento deve ser igual ao valor total.");
+            setError("A soma dos metodos de pagamento deve ser igual ao valor total.");
             return;
           }
 
@@ -148,7 +148,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
 
         const category = categories.find((item) => item.id === manualCategoryId);
         if (!category) {
-          setError("Categoria inválida.");
+          setError("Categoria invalida.");
           return;
         }
 
@@ -204,7 +204,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
         <SheetHeader className="p-0">
           <SheetTitle className="text-lg">Nova Transação</SheetTitle>
           <SheetDescription>
-            Escolha entre criação manual ou assistida por IA.
+            Escolha entre criacao manual ou assistida por IA.
           </SheetDescription>
         </SheetHeader>
 
@@ -290,3 +290,6 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
     </Sheet>
   );
 }
+
+
+

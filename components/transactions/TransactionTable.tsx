@@ -1,4 +1,4 @@
-import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
+﻿import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -179,3 +179,5 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
     </Table>
   );
 }
+
+

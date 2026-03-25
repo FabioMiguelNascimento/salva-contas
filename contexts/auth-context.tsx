@@ -111,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated: false,
         isLoading: false,
       });
-      router.push("/login");
+      router.push("/entrar");
     } finally {
       isRefreshingRef.current = false;
     }
@@ -197,7 +197,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 isAuthenticated: false,
                 isLoading: false,
               });
-              router.push("/login");
+              router.push("/entrar");
               return Promise.reject(error);
             }
           }
@@ -211,7 +211,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             isAuthenticated: false,
             isLoading: false,
           });
-          router.push("/login");
+          router.push("/entrar");
         }
         return Promise.reject(error);
       }
@@ -386,7 +386,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isLoading: false,
     });
     
-    router.push("/login");
+    router.push("/entrar");
   }, [clearTokens, router]);
 
   const updateUser = useCallback((user: User) => {

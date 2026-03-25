@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { CategorySelect } from "@/components/category-select";
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ export function SubscriptionEditDialog({ editor }: SubscriptionEditDialogProps) 
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Editar assinatura</DialogTitle>
-          <DialogDescription>Ajuste valores ou frequência desta recorrência.</DialogDescription>
+          <DialogDescription>Ajuste valores ou frequencia desta recorrência.</DialogDescription>
         </DialogHeader>
         {editing && (
           <form className="space-y-4" onSubmit={handleEditSubmit}>
@@ -52,7 +52,7 @@ export function SubscriptionEditDialog({ editor }: SubscriptionEditDialogProps) 
               />
             </div>
             <div className="space-y-2">
-              <Label>Frequência</Label>
+              <Label>Frequencia</Label>
               <Select value={values.frequency} onValueChange={(value: SubscriptionFrequency) => setValue("frequency", value)}>
                 <SelectTrigger>
                   <SelectValue />
@@ -68,7 +68,7 @@ export function SubscriptionEditDialog({ editor }: SubscriptionEditDialogProps) 
             </div>
             {(values.frequency === "monthly" || values.frequency === "yearly") && (
               <div className="space-y-2">
-                <Label>Dia do mês</Label>
+                <Label>Dia do mes</Label>
                 <Input
                   type="number"
                   min={1}
@@ -97,7 +97,7 @@ export function SubscriptionEditDialog({ editor }: SubscriptionEditDialogProps) 
             )}
             {values.frequency === "yearly" && (
               <div className="space-y-2">
-                <Label>Mês</Label>
+                <Label>Mes</Label>
                 <Select value={String(values.month)} onValueChange={(value) => setValue("month", Number(value))}>
                   <SelectTrigger>
                     <SelectValue />
@@ -125,7 +125,7 @@ export function SubscriptionEditDialog({ editor }: SubscriptionEditDialogProps) 
                 Cancelar
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Salvar alterações
+                {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}Salvar alteracoes
               </Button>
             </DialogFooter>
           </form>
@@ -134,3 +134,5 @@ export function SubscriptionEditDialog({ editor }: SubscriptionEditDialogProps) 
     </Dialog>
   );
 }
+
+

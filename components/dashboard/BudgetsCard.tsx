@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { Button } from "@/components/ui/button";
@@ -28,13 +28,13 @@ export default function BudgetsCard({ budgetsWithUsage, isLoading }: BudgetsCard
     <Card className="lg:col-span-2 bg-white shadow-sm border border-gray-100">
       <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
-          <CardTitle className="text-base font-semibold text-gray-800">Orçamentos do Mês</CardTitle>
+          <CardTitle className="text-base font-semibold text-gray-800">Orçamentos do Mes</CardTitle>
           <p className="text-sm text-gray-400">Acompanhe seus limites por categoria</p>
         </div>
         <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
           <InfoPopover content="Aqui você pode acompanhar o progresso dos seus orçamentos mensais. Cada orçamento mostra quanto já foi gasto em relação ao limite definido, com uma barra de progresso colorida (verde para dentro do orçamento, vermelho quando excedido)." />
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/orcamentos">Gerenciar</Link>
+            <Link href="/app/orcamentos">Gerenciar</Link>
           </Button>
         </div>
       </CardHeader>
@@ -47,7 +47,7 @@ export default function BudgetsCard({ budgetsWithUsage, isLoading }: BudgetsCard
             <p className="text-sm text-gray-400">Nenhum orçamento definido</p>
             <p className="text-xs text-gray-400 mb-4">Defina limites para controlar seus gastos</p>
             <Button variant="outline" size="sm" asChild>
-              <Link href="/orcamentos">Criar orçamento</Link>
+              <Link href="/app/orcamentos">Criar orçamento</Link>
             </Button>
           </div>
         ) : (
@@ -78,3 +78,4 @@ export default function BudgetsCard({ budgetsWithUsage, isLoading }: BudgetsCard
     </Card>
   );
 }
+
