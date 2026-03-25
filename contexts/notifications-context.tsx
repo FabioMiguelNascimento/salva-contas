@@ -63,8 +63,18 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, [loadNotifications]);
 
+  const lastRefreshAuth = useRef<{ refresh: any; isAuthenticated: boolean } | null>(null);
+
   // Initial load — refresh when auth becomes available
   useEffect(() => {
+    if (
+      lastRefreshAuth.current?.refresh === refresh &&
+      lastRefreshAuth.current?.isAuthenticated === isAuthenticated
+    ) {
+      return;
+    }
+    lastRefreshAuth.current = { refresh, isAuthenticated };
+
     if (isAuthenticated) {
       refresh();
     } else {

@@ -12,7 +12,7 @@ import type {
     UpdateSubscriptionPayload,
 } from "@/types/finance";
 import { usePathname } from "next/navigation";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 interface SubscriptionsContextValue {
   subscriptions: Subscription[];
@@ -55,7 +55,17 @@ export function SubscriptionsProvider({ children }: { children: React.ReactNode 
     }
   }, [isSubscriptionsRoute]);
 
+  const lastRefreshParams = useRef<{ refresh: any; isSubscriptionsRoute: boolean } | null>(null);
+
   useEffect(() => {
+    if (
+      lastRefreshParams.current?.refresh === refresh &&
+      lastRefreshParams.current?.isSubscriptionsRoute === isSubscriptionsRoute
+    ) {
+      return;
+    }
+    lastRefreshParams.current = { refresh, isSubscriptionsRoute };
+
     if (!isSubscriptionsRoute) {
       setIsLoading(false);
       return;

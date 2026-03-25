@@ -14,6 +14,7 @@ export interface TopbarProps {
   refresh: () => void;
   isSyncing: boolean;
   actionNode?: React.ReactNode;
+  showNewTransaction?: boolean;
   logout: () => void;
   onBrandClick?: () => void;
 }
@@ -24,6 +25,7 @@ export function Topbar({
   refresh,
   isSyncing,
   actionNode,
+  showNewTransaction = true,
   logout,
   onBrandClick,
 }: TopbarProps) {
@@ -54,11 +56,11 @@ export function Topbar({
           Atualizar
         </Button>
 
-        {actionNode ?? (
+        {actionNode ?? (showNewTransaction ? (
           <NewTransactionDialog
             trigger={<Button>Nova Transação</Button>}
           />
-        )}
+        ) : null)}
       </div>
     </header>
   );

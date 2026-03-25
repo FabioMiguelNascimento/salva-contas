@@ -1,4 +1,3 @@
-import { AppShell } from "@/components/app-shell";
 import { AuthGuard } from "@/components/auth-guard";
 import { InstallPrompt } from "@/components/install-prompt";
 import { Providers } from "@/components/providers";
@@ -60,9 +59,7 @@ export default function RootLayout({
       </head>
       <body className={cn("min-h-screen bg-background font-sans antialiased overflow-x-hidden", fontSans.className)}>
         <Providers>
-          <AuthGuard>
-            <AppShell>{children}</AppShell>
-          </AuthGuard>
+          <AuthGuard>{children}</AuthGuard>
         </Providers>
         <InstallPrompt />
         <ServiceWorkerRegister />

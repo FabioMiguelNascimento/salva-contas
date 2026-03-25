@@ -17,7 +17,7 @@ import type {
     VaultAmountPayload,
 } from "@/types/finance";
 import { usePathname } from "next/navigation";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 interface VaultsContextValue {
   vaults: Vault[];
@@ -66,7 +66,17 @@ export function VaultsProvider({ children }: { children: React.ReactNode }) {
     }
   }, [isVaultsRoute]);
 
+  const lastRefreshParams = useRef<{ refresh: any; isVaultsRoute: boolean } | null>(null);
+
   useEffect(() => {
+    if (
+      lastRefreshParams.current?.refresh === refresh &&
+      lastRefreshParams.current?.isVaultsRoute === isVaultsRoute
+    ) {
+      return;
+    }
+    lastRefreshParams.current = { refresh, isVaultsRoute };
+
     if (!isVaultsRoute) {
       setIsLoading(false);
       return;

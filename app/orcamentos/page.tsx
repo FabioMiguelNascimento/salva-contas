@@ -1,5 +1,6 @@
 "use client";
 
+import { AppShell } from "@/components/app-shell";
 import { BudgetCreateSheet } from "@/components/budgets/budget-create-sheet";
 import { BudgetDeleteSheet } from "@/components/budgets/budget-delete-sheet";
 import { BudgetEditSheet } from "@/components/budgets/budget-edit-sheet";
@@ -9,6 +10,7 @@ import { PageHeader } from "@/components/page-header";
 import { SummaryCard } from "@/components/summary-card";
 import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { BudgetsProvider } from "@/context/budgets-context";
 import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useBudgetEditor } from "@/hooks/use-budget-editor";
 import { useBudgetForm } from "@/hooks/use-budget-form";
@@ -21,7 +23,7 @@ const currencyFormatter = new Intl.NumberFormat("pt-BR", {
   currency: "BRL",
 });
 
-export default function BudgetsPage() {
+function BudgetsPageContent() {
   const { budgetProgress, isLoading, createBudgetRule, updateBudgetRule, deleteBudgetRule, filters } = useBudgetsHook();
 
   const stats = useBudgetStats(budgetProgress);
@@ -124,5 +126,15 @@ export default function BudgetsPage() {
       <BudgetEditSheet editor={editor} />
       <BudgetDeleteSheet editor={editor} />
     </div>
+  );
+}
+
+export default function BudgetsPage() {
+  return (
+    <BudgetsProvider>
+      <AppShell>
+        <BudgetsPageContent />
+      </AppShell>
+    </BudgetsProvider>
   );
 }

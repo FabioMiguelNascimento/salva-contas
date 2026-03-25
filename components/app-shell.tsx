@@ -1,27 +1,19 @@
 "use client";
 
-import { useTransactions } from "@/context/transactions-context";
 import { useAuth } from "@/contexts/auth-context";
 import { TopbarActionProvider, useTopbarAction } from "@/contexts/topbar-action-context";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-import { BudgetsProvider } from "@/context/budgets-context";
-import { CardsProvider } from "@/context/cards-context";
-import { SubscriptionsProvider } from "@/context/subscriptions-context";
-import { VaultsProvider } from "@/context/vaults-context";
-
-import { Button } from "@/components/ui/button";
 import {
   SidebarProvider,
   SidebarTrigger,
   useSidebar
 } from "@/components/ui/sidebar";
 
-import { TransactionsProvider } from "@/context/transactions-context";
+import { useFinancePeriod } from "@/context/finance-period-context";
 import { AiAdvisorSheet } from "./ai-advisor-sheet";
 import { AppSidebar } from "./app-sidebar";
-import { NewTransactionDialog } from "./new-transaction-sheet";
 import { NotificationsDropdown } from "./notifications-dropdown";
 import { SettingsDialog } from "./settings-dialog";
 import { Topbar } from "./topbar";
@@ -38,19 +30,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <TopbarActionProvider>
-        <TransactionsProvider>
-          <CardsProvider>
-            <SubscriptionsProvider>
-              <BudgetsProvider>
-                <VaultsProvider>
-                  <AppShellContent>
-                    {children}
-                  </AppShellContent>
-                </VaultsProvider>
-              </BudgetsProvider>
-            </SubscriptionsProvider>
-          </CardsProvider>
-        </TransactionsProvider>
+        <AppShellContent>
+          {children}
+        </AppShellContent>
       </TopbarActionProvider>
     </SidebarProvider>
   );
@@ -60,7 +42,8 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
   const { actionNode } = useTopbarAction();
   const { toggleSidebar } = useSidebar();
   const { user, logout } = useAuth();
-  const { pendingBills, refresh, isSyncing } = useTransactions();
+  
+  const { pendingBillsCount, isSyncing, refresh } = useFinancePeriod();
   
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsSelectedTab, setSettingsSelectedTab] = useState<string>('profile');
@@ -75,10 +58,11 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-muted/30 overflow-x-hidden w-full">
       <Topbar
         userName={user?.name}
-        pendingBillsCount={pendingBills.length}
+        pendingBillsCount={pendingBillsCount}
         refresh={refresh}
         isSyncing={isSyncing}
         actionNode={actionNode}
+        showNewTransaction={false}
         logout={logout}
         onBrandClick={toggleSidebar}
       />
@@ -106,11 +90,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
             <SidebarTrigger />
             <div className="ml-auto flex items-center gap-2">
               <NotificationsDropdown />
-              {actionNode ?? (
-                <NewTransactionDialog
-                  trigger={<Button size="sm">Nova Transação</Button>}
-                />
-              )}
+              {actionNode}
             </div>
           </header>
 

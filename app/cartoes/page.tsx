@@ -1,5 +1,6 @@
 "use client";
 
+import { AppShell } from "@/components/app-shell";
 import { CreditCardCreateSheet } from "@/components/credit-cards/credit-card-create-sheet";
 import { CreditCardDeleteSheet } from "@/components/credit-cards/credit-card-delete-sheet";
 import { CreditCardEditSheet } from "@/components/credit-cards/credit-card-edit-sheet";
@@ -13,6 +14,7 @@ import { DebitCardTable } from "@/components/debit-cards/debit-card-table";
 import { PageHeader } from "@/components/page-header";
 import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardsProvider } from "@/context/cards-context";
 import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useCardsHook } from "@/hooks/use-cards";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
@@ -20,7 +22,7 @@ import type { CreditCard, DebitCard } from "@/types/finance";
 import { CreditCard as CreditCardIcon, TrendingDown, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
 
-export default function CartoesPage() {
+function CartoesPageContent() {
   const { creditCards, debitCards, isLoading } = useCardsHook();
 
   const [editSheet, setEditSheet] = useState<{ open: boolean; card: CreditCard | null }>({
@@ -260,5 +262,15 @@ export default function CartoesPage() {
         onOpenChange={(open) => setDeleteDebitSheet({ open, card: open ? deleteDebitSheet.card : null })}
       />
     </div>
+  );
+}
+
+export default function CartoesPage() {
+  return (
+    <CardsProvider>
+      <AppShell>
+        <CartoesPageContent />
+      </AppShell>
+    </CardsProvider>
   );
 }

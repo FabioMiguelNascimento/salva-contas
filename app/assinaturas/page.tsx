@@ -1,5 +1,6 @@
 "use client";
 
+import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { SubscriptionCreateSheet } from "@/components/subscriptions/subscription-create-sheet";
 import { SubscriptionDeleteSheet } from "@/components/subscriptions/subscription-delete-sheet";
@@ -10,6 +11,7 @@ import { SummaryCard } from "@/components/summary-card";
 import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { SubscriptionsProvider } from "@/context/subscriptions-context";
 import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useSubscriptionEditor } from "@/hooks/use-subscription-editor";
 import { useSubscriptionFilters } from "@/hooks/use-subscription-filters";
@@ -19,7 +21,7 @@ import { useSubscriptionsHook } from "@/hooks/use-subscriptions";
 import { currencyFormatter, frequencyOptions } from "@/lib/subscriptions/constants";
 import { PlusCircle, Shield, Zap } from "lucide-react";
 
-export default function SubscriptionsPage() {
+function SubscriptionsPageContent() {
   const { subscriptions, isLoading, createSubscriptionRule, updateSubscriptionRule, deleteSubscriptionRule } = useSubscriptionsHook();
 
   const filters = useSubscriptionFilters(subscriptions);
@@ -134,5 +136,15 @@ export default function SubscriptionsPage() {
       <SubscriptionEditSheet editor={editor} />
       <SubscriptionDeleteSheet editor={editor} />
     </div>
+  );
+}
+
+export default function SubscriptionsPage() {
+  return (
+    <SubscriptionsProvider>
+      <AppShell>
+        <SubscriptionsPageContent />
+      </AppShell>
+    </SubscriptionsProvider>
   );
 }

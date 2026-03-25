@@ -1,5 +1,6 @@
 "use client";
 
+import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { SummaryCard } from "@/components/summary-card";
 import { SummaryCardsGrid } from "@/components/summary-cards-grid";
@@ -9,7 +10,7 @@ import { VaultAmountSheet } from "@/components/vaults/vault-amount-sheet";
 import { VaultCard } from "@/components/vaults/vault-card";
 import { VaultFormSheet } from "@/components/vaults/vault-form-sheet";
 import { VaultTable } from "@/components/vaults/vault-table";
-import { useVaults } from "@/context/vaults-context";
+import { useVaults, VaultsProvider } from "@/context/vaults-context";
 import { TopbarAction } from "@/contexts/topbar-action-context";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import type { Vault } from "@/types/finance";
@@ -24,7 +25,7 @@ interface VaultActionState {
   vault: Vault;
 }
 
-export default function VaultsPage() {
+function VaultsPageContent() {
   const {
     vaults,
     isLoading,
@@ -220,5 +221,15 @@ export default function VaultsPage() {
         onSubmit={submitAction}
       />
     </div>
+  );
+}
+
+export default function VaultsPage() {
+  return (
+    <VaultsProvider>
+      <AppShell>
+        <VaultsPageContent />
+      </AppShell>
+    </VaultsProvider>
   );
 }

@@ -223,8 +223,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [clearTokens, router, scheduleTokenRefresh]);
 
+  const initializedRef = useRef(false);
+
   useEffect(() => {
     const loadStoredAuth = async () => {
+      if (initializedRef.current) return;
+      initializedRef.current = true;
+
       try {
         const storedToken = localStorage.getItem(TOKEN_KEY);
         const storedRefreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);

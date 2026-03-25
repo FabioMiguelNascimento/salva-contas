@@ -1,5 +1,6 @@
 "use client";
 
+import { AppShell } from "@/components/app-shell";
 import { AttachmentViewer } from "@/components/attachment-viewer";
 import { DatePicker } from "@/components/date-picker";
 import { PageHeader } from "@/components/page-header";
@@ -14,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useTransactions } from "@/context/transactions-context";
+import { TransactionsProvider, useTransactions } from "@/context/transactions-context";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
@@ -32,7 +33,7 @@ const filterTabs = [
   { value: "upcoming", label: "Próximos 3 dias" },
 ];
 
-export default function ContasPage() {
+function ContasPageContent() {
   const { pendingBills, markAsPaid, updateExistingTransaction, isLoading } = useTransactions();
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [payDialog, setPayDialog] = useState<{ open: boolean; bill?: Transaction }>({ open: false });
@@ -425,4 +426,14 @@ function formatDaysRemaining(bill: Transaction) {
   const diff = differenceInCalendarDays(parseDateOnly(bill.dueDate)!, new Date());
   const prefix = diff > 0 ? "+" : "";
   return `${prefix}${diff} dias`;
+}
+
+export default function ContasPage() {
+  return (
+    <TransactionsProvider>
+      <AppShell>
+        <ContasPageContent />
+      </AppShell>
+    </TransactionsProvider>
+  );
 }

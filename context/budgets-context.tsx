@@ -15,7 +15,7 @@ import type {
     UpdateBudgetPayload,
 } from "@/types/finance";
 import { usePathname } from "next/navigation";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 interface BudgetsContextValue {
   filters: BudgetFilters;
@@ -76,7 +76,17 @@ export function BudgetsProvider({ children }: { children: React.ReactNode }) {
     }
   }, [filters, isBudgetsRoute]);
 
+  const lastRefreshParams = useRef<{ refresh: any; isBudgetsRoute: boolean } | null>(null);
+
   useEffect(() => {
+    if (
+      lastRefreshParams.current?.refresh === refresh &&
+      lastRefreshParams.current?.isBudgetsRoute === isBudgetsRoute
+    ) {
+      return;
+    }
+    lastRefreshParams.current = { refresh, isBudgetsRoute };
+
     if (!isBudgetsRoute) {
       setIsLoading(false);
       return;

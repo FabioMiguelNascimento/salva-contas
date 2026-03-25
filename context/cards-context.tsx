@@ -21,7 +21,7 @@ import type {
     UpdateDebitCardPayload,
 } from "@/types/finance";
 import { usePathname } from "next/navigation";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 interface CardsContextValue {
   creditCards: CreditCard[];
@@ -63,7 +63,13 @@ export function CardsProvider({ children }: { children: React.ReactNode }) {
     }
   }, [isCardsRoute]);
 
+  const lastRefreshLoad = useRef<any>(null);
+
   useEffect(() => {
+    if (lastRefreshLoad.current === load) {
+      return;
+    }
+    lastRefreshLoad.current = load;
     void load();
   }, [load]);
 

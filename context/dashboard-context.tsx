@@ -2,23 +2,20 @@
 
 import { fetchDashboardSnapshot } from "@/services/dashboard";
 import type {
-    Budget,
-    BudgetProgress,
-    CreditCard,
-    DashboardMetrics,
-    DebitCard,
-    Subscription,
-    Transaction,
-    TransactionCategory,
-    TransactionFilters,
-    Vault,
+  Budget,
+  BudgetProgress,
+  CreditCard,
+  DashboardMetrics,
+  DebitCard,
+  Subscription,
+  Transaction,
+  TransactionCategory,
+  Vault,
 } from "@/types/finance";
-import { usePathname } from "next/navigation";
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useFinancePeriod } from "./finance-period-context";
 
 interface DashboardContextValue {
-  filters: TransactionFilters;
-  setFilters: (filters: TransactionFilters) => void;
   isLoading: boolean;
   isSyncing: boolean;
   error: string | null;
@@ -33,21 +30,14 @@ interface DashboardContextValue {
   creditCards: CreditCard[];
   debitCards: DebitCard[];
   vaults: Vault[];
-  refresh: () => Promise<void>;
+  refresh: (force?: boolean) => Promise<void>;
 }
 
 const DashboardContext = createContext<DashboardContextValue | null>(null);
 
-const initialFilters: TransactionFilters = {
-  month: new Date().getMonth() + 1,
-  year: new Date().getFullYear(),
-};
-
 export function DashboardProvider({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isDashboardRoute = pathname === "/" || pathname.startsWith("/\"");
+  const { filters, refreshTicket } = useFinancePeriod();
 
-  const [filters, setFilters] = useState<TransactionFilters>(initialFilters);
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<TransactionCategory[]>([]);
@@ -63,8 +53,6 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
   const [lastSync, setLastSync] = useState<string | null>(null);
 
   const refresh = useCallback(async () => {
-    if (!isDashboardRoute) return;
-
     setIsSyncing(true);
     try {
       const snapshot = await fetchDashboardSnapshot(filters);
@@ -86,25 +74,26 @@ export function DashboardProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
       setIsSyncing(false);
     }
-  }, [filters, isDashboardRoute]);
+  }, [filters]);
+
+  const lastRefreshParams = useRef<{ refresh: any; refreshTicket: number } | null>(null);
 
   useEffect(() => {
-    if (!isDashboardRoute) {
-      setIsLoading(false);
+    if (
+      lastRefreshParams.current?.refresh === refresh &&
+      lastRefreshParams.current?.refreshTicket === refreshTicket
+    ) {
       return;
     }
-
-    setIsLoading(true);
+    lastRefreshParams.current = { refresh, refreshTicket };
     void refresh();
-  }, [isDashboardRoute, refresh]);
+  }, [refresh, refreshTicket]);
 
   const pendingBills = transactions.filter((transaction) => transaction.status === "pending");
 
   return (
     <DashboardContext.Provider
       value={{
-        filters,
-        setFilters,
         isLoading,
         isSyncing,
         error,

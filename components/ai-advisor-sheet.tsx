@@ -2,7 +2,7 @@
 
 import AiAdvisorCard from "@/components/ai-advisor/AiAdvisorCard";
 import { Sheet, SheetBody, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { useTransactions } from "@/context/transactions-context";
+import { useFinancePeriod } from "@/context/finance-period-context";
 
 interface AiAdvisorSheetProps {
   open: boolean;
@@ -10,7 +10,11 @@ interface AiAdvisorSheetProps {
 }
 
 export function AiAdvisorSheet({ open, onOpenChange }: AiAdvisorSheetProps) {
-  const { filters } = useTransactions();
+  const { filters } = useFinancePeriod();
+
+  const month = filters.month;
+  const year = filters.year;
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full h-dvh sm:w-[96vw] sm:max-w-[860px] p-0 gap-0">
@@ -21,7 +25,7 @@ export function AiAdvisorSheet({ open, onOpenChange }: AiAdvisorSheetProps) {
           </SheetDescription>
         </SheetHeader>
         <SheetBody className="flex-1 min-h-0 p-2 sm:p-3">
-          <AiAdvisorCard month={filters.month} year={filters.year} />
+          <AiAdvisorCard month={month} year={year} />
         </SheetBody>
       </SheetContent>
     </Sheet>

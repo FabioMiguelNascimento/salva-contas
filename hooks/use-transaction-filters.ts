@@ -1,3 +1,4 @@
+import { useFinancePeriod } from "@/context/finance-period-context";
 import { useTransactions } from "@/context/transactions-context";
 import { removeAccents } from "@/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -12,7 +13,8 @@ export type TransactionFilters = {
 };
 
 export function useTransactionFilters(pageSize = 8) {
-  const { filters, setFilters, categories, transactions } = useTransactions();
+  const { categories, transactions } = useTransactions();
+  const { filters, setFilters } = useFinancePeriod();
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();

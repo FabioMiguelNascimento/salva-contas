@@ -3,10 +3,12 @@
 import { Filter } from "lucide-react";
 import { useState } from "react";
 
+import { AppShell } from "@/components/app-shell";
 import { AttachmentViewer } from "@/components/attachment-viewer";
 import { NewTransactionDialog } from "@/components/new-transaction-sheet";
 import { PageHeader } from "@/components/page-header";
-import { useTransactions } from "@/context/transactions-context";
+import { useFinancePeriod } from "@/context/finance-period-context";
+import { TransactionsProvider, useTransactions } from "@/context/transactions-context";
 import { TopbarAction } from "@/contexts/topbar-action-context";
 
 import { DeleteTransactionDialog } from "@/components/transactions/DeleteTransactionDialog";
@@ -27,15 +29,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 import type { Transaction } from "@/types/finance";
 
-export default function ExtratoPage() {
+function ExtratoPageContent() {
   const {
     transactions,
-    filters,
-    setFilters,
     isLoading,
     categories,
     removeTransaction,
   } = useTransactions();
+
+  const { filters, setFilters } = useFinancePeriod();
 
   const {
     filters: urlFilters,
@@ -191,5 +193,15 @@ export default function ExtratoPage() {
         attachmentMimeType={attachmentViewer.transaction?.attachmentMimeType}
       />
     </div>
+  );
+}
+
+export default function ExtratoPage() {
+  return (
+    <TransactionsProvider>
+      <AppShell>
+        <ExtratoPageContent />
+      </AppShell>
+    </TransactionsProvider>
   );
 }

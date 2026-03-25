@@ -14,7 +14,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { useTransactions } from "@/context/transactions-context";
 import { useAuth } from "@/contexts/auth-context";
 import { CalendarClock, CreditCard, HandCoins, LayoutDashboard, LogOut, PiggyBank, ReceiptText, Repeat, Settings, Sparkles, User, Users } from "lucide-react";
 import Image from "next/image";
@@ -83,7 +82,7 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
-  const { pendingBills } = useTransactions();
+  // const { pendingBills } = useTransactions();
 
   const userInitials = user?.name
     ? user.name
@@ -96,10 +95,10 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
 
   const navItems = baseNavItems.map((item) => ({
     ...item,
-    badge:
-      item.href === "/contas" && pendingBills.length > 0
-        ? `${pendingBills.length}`
-        : undefined,
+    // badge:
+    //   item.href === "/contas" && pendingBills.length > 0
+    //     ? `${pendingBills.length}`
+    // : undefined,
   }));
 
   return (
@@ -137,7 +136,7 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
                         <span>{item.label}</span>
                       </Link>
                     </SidebarMenuButton>
-                    {item.badge && <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>}
+                    {/* {item.badge && <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>} */}
                   </SidebarMenuItem>
                 );
               })}

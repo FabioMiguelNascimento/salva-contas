@@ -1,5 +1,6 @@
 "use client";
 
+import { AppShell } from "@/components/app-shell";
 import BudgetsCard from "@/components/dashboard/BudgetsCard";
 import CategoryBreakdownCard from "@/components/dashboard/CategoryBreakdownCard";
 import CreditCardsCard from "@/components/dashboard/CreditCardsCard";
@@ -21,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DashboardProvider, useDashboard } from "@/context/dashboard-context";
+import { useFinancePeriod } from "@/context/finance-period-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { currencyFormatter, getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
 import { cn, parseDateOnly } from "@/lib/utils";
@@ -37,8 +39,9 @@ import { useMemo } from "react";
 import type { DateRange } from "react-day-picker";
 
 function DashboardContent() {
-  const { metrics, transactions, pendingBills, subscriptions, creditCards, budgets, categories, filters, setFilters, isLoading, lastSync } =
+  const { metrics, transactions, pendingBills, subscriptions, creditCards, budgets, categories, isLoading, lastSync } =
     useDashboard();
+  const { filters, setFilters } = useFinancePeriod();
   const isMobile = useIsMobile();
 
   const years = getAvailableYears();
@@ -375,9 +378,9 @@ function DashboardContent() {
 export default function DashboardPage() {
   return (
     <DashboardProvider>
-      <DashboardContent />
+      <AppShell>
+        <DashboardContent />
+      </AppShell>
     </DashboardProvider>
   );
 }
-
-
