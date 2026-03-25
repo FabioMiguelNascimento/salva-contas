@@ -14,7 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { useFinance } from "@/hooks/use-finance";
+import { useTransactions } from "@/context/transactions-context";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
@@ -33,7 +33,7 @@ const filterTabs = [
 ];
 
 export default function ContasPage() {
-  const { pendingBills, markAsPaid, updateExistingTransaction, isLoading } = useFinance();
+  const { pendingBills, markAsPaid, updateExistingTransaction, isLoading } = useTransactions();
   const [activeFilter, setActiveFilter] = useState<string>("all");
   const [payDialog, setPayDialog] = useState<{ open: boolean; bill?: Transaction }>({ open: false });
   const [editSheet, setEditSheet] = useState<{ open: boolean; bill?: Transaction }>({ open: false });

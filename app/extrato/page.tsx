@@ -6,8 +6,8 @@ import { useState } from "react";
 import { AttachmentViewer } from "@/components/attachment-viewer";
 import { NewTransactionDialog } from "@/components/new-transaction-sheet";
 import { PageHeader } from "@/components/page-header";
+import { useTransactions } from "@/context/transactions-context";
 import { TopbarAction } from "@/contexts/topbar-action-context";
-import { useFinance } from "@/hooks/use-finance";
 
 import { DeleteTransactionDialog } from "@/components/transactions/DeleteTransactionDialog";
 import { EditTransactionSheet } from "@/components/transactions/EditTransactionSheet";
@@ -35,7 +35,7 @@ export default function ExtratoPage() {
     isLoading,
     categories,
     removeTransaction,
-  } = useFinance();
+  } = useTransactions();
 
   const {
     filters: urlFilters,

@@ -14,14 +14,14 @@ import { PageHeader } from "@/components/page-header";
 import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TopbarAction } from "@/contexts/topbar-action-context";
-import { useFinance } from "@/hooks/use-finance";
+import { useCardsHook } from "@/hooks/use-cards";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import type { CreditCard, DebitCard } from "@/types/finance";
 import { CreditCard as CreditCardIcon, TrendingDown, Wallet } from "lucide-react";
 import { useMemo, useState } from "react";
 
 export default function CartoesPage() {
-  const { creditCards, debitCards, isLoading } = useFinance();
+  const { creditCards, debitCards, isLoading } = useCardsHook();
 
   const [editSheet, setEditSheet] = useState<{ open: boolean; card: CreditCard | null }>({
     open: false,

@@ -15,7 +15,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from "@/components/ui/popover";
-import { useFinance } from "@/hooks/use-finance";
+import { useTransactions } from "@/context/transactions-context";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
@@ -34,7 +34,7 @@ export function CategorySelect({
   disabled = false,
 }: CategorySelectProps) {
   const [open, setOpen] = useState(false);
-  const { categories } = useFinance();
+  const { categories } = useTransactions();
 
   const selectedCategory = categories.find((cat) => cat.id === value);
 

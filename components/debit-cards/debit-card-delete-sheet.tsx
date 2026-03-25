@@ -10,7 +10,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
-import { useFinance } from '@/hooks/use-finance';
+import { useCardsHook } from '@/hooks/use-cards';
 import { formatDebitCardNumber, getDebitFlagLabel } from '@/lib/debit-cards/constants';
 import type { DebitCard } from '@/types/finance';
 import { useState } from 'react';
@@ -22,7 +22,7 @@ interface DebitCardDeleteSheetProps {
 }
 
 export function DebitCardDeleteSheet({ card, open, onOpenChange }: DebitCardDeleteSheetProps) {
-  const { deleteDebitCardEntry } = useFinance();
+  const { deleteDebitCardEntry } = useCardsHook();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleDelete = async () => {

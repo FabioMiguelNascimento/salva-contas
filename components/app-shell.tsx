@@ -1,10 +1,15 @@
 "use client";
 
+import { useTransactions } from "@/context/transactions-context";
 import { useAuth } from "@/contexts/auth-context";
 import { TopbarActionProvider, useTopbarAction } from "@/contexts/topbar-action-context";
-import { useFinance } from "@/hooks/use-finance";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+
+import { BudgetsProvider } from "@/context/budgets-context";
+import { CardsProvider } from "@/context/cards-context";
+import { SubscriptionsProvider } from "@/context/subscriptions-context";
+import { VaultsProvider } from "@/context/vaults-context";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +18,7 @@ import {
   useSidebar
 } from "@/components/ui/sidebar";
 
+import { TransactionsProvider } from "@/context/transactions-context";
 import { AiAdvisorSheet } from "./ai-advisor-sheet";
 import { AppSidebar } from "./app-sidebar";
 import { NewTransactionDialog } from "./new-transaction-sheet";
@@ -32,9 +38,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <TopbarActionProvider>
-        <AppShellContent>
-          {children}
-        </AppShellContent>
+        <TransactionsProvider>
+          <CardsProvider>
+            <SubscriptionsProvider>
+              <BudgetsProvider>
+                <VaultsProvider>
+                  <AppShellContent>
+                    {children}
+                  </AppShellContent>
+                </VaultsProvider>
+              </BudgetsProvider>
+            </SubscriptionsProvider>
+          </CardsProvider>
+        </TransactionsProvider>
       </TopbarActionProvider>
     </SidebarProvider>
   );
@@ -44,7 +60,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
   const { actionNode } = useTopbarAction();
   const { toggleSidebar } = useSidebar();
   const { user, logout } = useAuth();
-  const { pendingBills, refresh, isSyncing } = useFinance();
+  const { pendingBills, refresh, isSyncing } = useTransactions();
   
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsSelectedTab, setSettingsSelectedTab] = useState<string>('profile');

@@ -9,8 +9,8 @@ import { VaultAmountSheet } from "@/components/vaults/vault-amount-sheet";
 import { VaultCard } from "@/components/vaults/vault-card";
 import { VaultFormSheet } from "@/components/vaults/vault-form-sheet";
 import { VaultTable } from "@/components/vaults/vault-table";
+import { useVaults } from "@/context/vaults-context";
 import { TopbarAction } from "@/contexts/topbar-action-context";
-import { useFinance } from "@/hooks/use-finance";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import type { Vault } from "@/types/finance";
 import { PiggyBank, PlusCircle, Target, Wallet2 } from "lucide-react";
@@ -35,7 +35,7 @@ export default function VaultsPage() {
     depositVaultAmount,
     withdrawVaultAmount,
     addVaultYieldAmount,
-  } = useFinance();
+  } = useVaults();
 
   const [createOpen, setCreateOpen] = useState(false);
   const [editingVault, setEditingVault] = useState<Vault | null>(null);

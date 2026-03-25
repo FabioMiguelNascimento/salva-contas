@@ -3,20 +3,20 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuBadge,
-    SidebarMenuButton,
-    SidebarMenuItem,
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuBadge,
+  SidebarMenuButton,
+  SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useTransactions } from "@/context/transactions-context";
 import { useAuth } from "@/contexts/auth-context";
-import { useFinance } from "@/hooks/use-finance";
-import { CalendarClock, CreditCard, HandCoins, LayoutDashboard, LogOut, PiggyBank, ReceiptText, Repeat, Settings, Sparkles, Target, User, Users } from "lucide-react";
+import { CalendarClock, CreditCard, HandCoins, LayoutDashboard, LogOut, PiggyBank, ReceiptText, Repeat, Settings, Sparkles, User, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -83,7 +83,7 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
-  const { pendingBills } = useFinance();
+  const { pendingBills } = useTransactions();
 
   const userInitials = user?.name
     ? user.name

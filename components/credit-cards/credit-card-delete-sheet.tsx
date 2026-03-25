@@ -10,7 +10,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet";
-import { useFinance } from "@/hooks/use-finance";
+import { useCardsHook } from "@/hooks/use-cards";
 import { formatCardNumber, getFlagLabel } from "@/lib/credit-cards/constants";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import type { CreditCard } from "@/types/finance";
@@ -23,7 +23,7 @@ interface CreditCardDeleteSheetProps {
 }
 
 export function CreditCardDeleteSheet({ card, open, onOpenChange }: CreditCardDeleteSheetProps) {
-  const { deleteCreditCardEntry } = useFinance();
+  const { deleteCreditCardEntry } = useCardsHook();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleDelete = async () => {

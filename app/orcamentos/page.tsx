@@ -13,7 +13,7 @@ import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useBudgetEditor } from "@/hooks/use-budget-editor";
 import { useBudgetForm } from "@/hooks/use-budget-form";
 import { useBudgetStats } from "@/hooks/use-budget-stats";
-import { useFinance } from "@/hooks/use-finance";
+import { useBudgetsHook } from "@/hooks/use-budgets";
 import { AlertTriangle, CheckCircle2, PiggyBank, TrendingDown } from "lucide-react";
 
 const currencyFormatter = new Intl.NumberFormat("pt-BR", {
@@ -22,7 +22,7 @@ const currencyFormatter = new Intl.NumberFormat("pt-BR", {
 });
 
 export default function BudgetsPage() {
-  const { budgetProgress, isLoading, createBudgetRule, updateBudgetRule, deleteBudgetRule, filters } = useFinance();
+  const { budgetProgress, isLoading, createBudgetRule, updateBudgetRule, deleteBudgetRule, filters } = useBudgetsHook();
 
   const stats = useBudgetStats(budgetProgress);
   const form = useBudgetForm({

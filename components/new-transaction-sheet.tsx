@@ -17,7 +17,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useFinance } from "@/hooks/use-finance";
+import { useTransactions } from "@/context/transactions-context";
 import { createManualTransaction } from "@/services/transactions";
 import type { TransactionStatus, TransactionType } from "@/types/finance";
 import { format } from "date-fns";
@@ -29,7 +29,7 @@ interface NewTransactionSheetProps {
 }
 
 export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
-  const { processUnstructuredTransaction, categories, refresh } = useFinance();
+  const { processUnstructuredTransaction, categories, refresh } = useTransactions();
   const [mode, setMode] = useState<"ai" | "manual">("ai");
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);

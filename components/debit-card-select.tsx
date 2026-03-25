@@ -15,7 +15,7 @@ import {
     PopoverContent,
     PopoverTrigger,
 } from '@/components/ui/popover';
-import { useFinance } from '@/hooks/use-finance';
+import { useCardsHook } from '@/hooks/use-cards';
 import { formatDebitCardNumber } from '@/lib/debit-cards/constants';
 import { cn } from '@/lib/utils';
 import { Check, ChevronsUpDown, CreditCard } from 'lucide-react';
@@ -37,7 +37,7 @@ export function DebitCardSelect({
   allowClear = true,
 }: DebitCardSelectProps) {
   const [open, setOpen] = useState(false);
-  const { debitCards } = useFinance();
+  const { debitCards } = useCardsHook();
 
   const activeCards = debitCards.filter((card) => card.status === 'active');
   const selectedCard = debitCards.find((card) => card.id === value);

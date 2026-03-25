@@ -1,12 +1,12 @@
 import { apiClient } from '@/lib/api-client';
 import type {
-  CreateVaultPayload,
-  UpdateVaultPayload,
-  Vault,
-  VaultAiActionPayload,
-  VaultAmountPayload,
-  VaultHistoryQuery,
-  VaultHistoryResponse,
+    CreateVaultPayload,
+    UpdateVaultPayload,
+    Vault,
+    VaultAiActionPayload,
+    VaultAmountPayload,
+    VaultHistoryQuery,
+    VaultHistoryResponse,
 } from '@/types/finance';
 
 type ApiVault = Omit<Vault, 'targetAmount' | 'currentAmount'> & {
@@ -55,9 +55,46 @@ const normalizeVault = (vault: ApiVault): Vault => ({
   currentAmount: toNumber(vault.currentAmount),
 });
 
+export interface VaultsSummaryResponse {
+  vaults: Vault[];
+  metrics: {
+    financials: {
+      income: number;
+      expenses: number;
+      balance: number;
+      availableBalance: number;
+      savedAmount: number;
+    };
+    pendingBills: {
+      count: number;
+      totalAmount: number;
+      overdue: number;
+    };
+    categoryBreakdown: Array<{
+      category: string;
+      total: number;
+    }>;
+    lastUpdated: string;
+  };
+  totals: {
+    totalVaults: number;
+    totalTarget: number;
+  };
+}
+
 export async function fetchVaults(): Promise<Vault[]> {
   const response = await apiClient.get<ApiResponse<ApiVault[]>>('/vaults');
   return (unwrapData(response.data) ?? []).map(normalizeVault);
+}
+
+export async function fetchVaultsSummary(): Promise<VaultsSummaryResponse> {
+  const response = await apiClient.get<ApiResponse<{ vaults: ApiVault[]; metrics: any; totals: any }>>('/vaults/summary');
+  const payload = unwrapData(response.data);
+  return {
+    vaults: (payload.vaults ?? []).map(normalizeVault),
+    metrics: payload.metrics,
+    totals: payload.totals,
+  };
 }
 
 export async function createVault(payload: CreateVaultPayload): Promise<Vault> {

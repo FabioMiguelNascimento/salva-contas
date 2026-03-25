@@ -21,14 +21,14 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
-import { useFinance } from "@/hooks/use-finance";
+import { useCardsHook } from "@/hooks/use-cards";
 import { creditCardFlags } from "@/lib/credit-cards/constants";
 import type { CreateCreditCardPayload, CreditCardFlag } from "@/types/finance";
 import { PlusCircle } from "lucide-react";
 import { useState } from "react";
 
 export function CreditCardCreateSheet() {
-  const { createCreditCardEntry } = useFinance();
+  const { createCreditCardEntry } = useCardsHook();
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 

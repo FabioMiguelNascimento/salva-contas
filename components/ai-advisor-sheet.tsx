@@ -2,7 +2,7 @@
 
 import AiAdvisorCard from "@/components/ai-advisor/AiAdvisorCard";
 import { Sheet, SheetBody, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { useFinance } from "@/hooks/use-finance";
+import { useTransactions } from "@/context/transactions-context";
 
 interface AiAdvisorSheetProps {
   open: boolean;
@@ -10,7 +10,7 @@ interface AiAdvisorSheetProps {
 }
 
 export function AiAdvisorSheet({ open, onOpenChange }: AiAdvisorSheetProps) {
-  const { filters } = useFinance();
+  const { filters } = useTransactions();
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full h-dvh sm:w-[96vw] sm:max-w-[860px] p-0 gap-0">

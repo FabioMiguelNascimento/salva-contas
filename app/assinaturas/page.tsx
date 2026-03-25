@@ -11,16 +11,16 @@ import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { TopbarAction } from "@/contexts/topbar-action-context";
-import { useFinance } from "@/hooks/use-finance";
 import { useSubscriptionEditor } from "@/hooks/use-subscription-editor";
 import { useSubscriptionFilters } from "@/hooks/use-subscription-filters";
 import { useSubscriptionForm } from "@/hooks/use-subscription-form";
 import { useSubscriptionStats } from "@/hooks/use-subscription-stats";
+import { useSubscriptionsHook } from "@/hooks/use-subscriptions";
 import { currencyFormatter, frequencyOptions } from "@/lib/subscriptions/constants";
 import { PlusCircle, Shield, Zap } from "lucide-react";
 
 export default function SubscriptionsPage() {
-  const { subscriptions, isLoading, createSubscriptionRule, updateSubscriptionRule, deleteSubscriptionRule } = useFinance();
+  const { subscriptions, isLoading, createSubscriptionRule, updateSubscriptionRule, deleteSubscriptionRule } = useSubscriptionsHook();
 
   const filters = useSubscriptionFilters(subscriptions);
   const stats = useSubscriptionStats(subscriptions);

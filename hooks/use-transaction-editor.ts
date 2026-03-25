@@ -1,10 +1,10 @@
 import type { SplitRow } from "@/components/new-transaction/split-payment-builder";
-import { useFinance } from "@/hooks/use-finance";
+import { useTransactions } from "@/context/transactions-context";
 import type { PaymentMethod, Transaction } from "@/types/finance";
 import { useCallback, useState } from "react";
 
 export function useTransactionEditor() {
-  const { updateExistingTransaction } = useFinance();
+  const { updateExistingTransaction } = useTransactions();
   const [open, setOpen] = useState(false);
   const [transaction, setTransaction] = useState<Transaction | undefined>();
   const [isProcessing, setIsProcessing] = useState(false);

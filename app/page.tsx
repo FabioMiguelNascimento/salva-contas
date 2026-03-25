@@ -20,7 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useFinance } from "@/hooks/use-finance";
+import { DashboardProvider, useDashboard } from "@/context/dashboard-context";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { currencyFormatter, getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
 import { cn, parseDateOnly } from "@/lib/utils";
@@ -36,9 +36,9 @@ import {
 import { useMemo } from "react";
 import type { DateRange } from "react-day-picker";
 
-export default function DashboardPage() {
+function DashboardContent() {
   const { metrics, transactions, pendingBills, subscriptions, creditCards, budgets, categories, filters, setFilters, isLoading, lastSync } =
-    useFinance();
+    useDashboard();
   const isMobile = useIsMobile();
 
   const years = getAvailableYears();
@@ -369,6 +369,14 @@ export default function DashboardPage() {
       </section>
         </section>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <DashboardProvider>
+      <DashboardContent />
+    </DashboardProvider>
   );
 }
 

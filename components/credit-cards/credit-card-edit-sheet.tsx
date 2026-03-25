@@ -20,7 +20,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet";
-import { useFinance } from "@/hooks/use-finance";
+import { useCardsHook } from "@/hooks/use-cards";
 import { creditCardFlags, creditCardStatuses } from "@/lib/credit-cards/constants";
 import type { CreditCard, CreditCardFlag, CreditCardStatus } from "@/types/finance";
 import { useEffect, useState } from "react";
@@ -32,7 +32,7 @@ interface CreditCardEditSheetProps {
 }
 
 export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEditSheetProps) {
-  const { updateCreditCardEntry } = useFinance();
+  const { updateCreditCardEntry } = useCardsHook();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [name, setName] = useState("");

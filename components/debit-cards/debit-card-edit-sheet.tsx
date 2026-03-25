@@ -20,7 +20,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
-import { useFinance } from '@/hooks/use-finance';
+import { useCardsHook } from '@/hooks/use-cards';
 import { creditCardFlags } from '@/lib/credit-cards/constants';
 import { debitCardStatuses } from '@/lib/debit-cards/constants';
 import type { CreditCardFlag, DebitCard, DebitCardStatus } from '@/types/finance';
@@ -33,7 +33,7 @@ interface DebitCardEditSheetProps {
 }
 
 export function DebitCardEditSheet({ card, open, onOpenChange }: DebitCardEditSheetProps) {
-  const { updateDebitCardEntry } = useFinance();
+  const { updateDebitCardEntry } = useCardsHook();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [name, setName] = useState('');
