@@ -20,11 +20,11 @@ export function Header() {
   const { user, isAuthenticated, logout } = useAuth()
   const userInitials = user?.name
     ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .slice(0, 2)
-        .join("")
-        .toUpperCase()
+      .split(" ")
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase()
     : "US"
 
   useEffect(() => {
@@ -36,12 +36,11 @@ export function Header() {
   }, [])
 
   return (
-    <header 
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled 
-          ? "bg-background/80 backdrop-blur-xl border-b border-border shadow-sm" 
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
+          ? "bg-background/80 backdrop-blur-xl border-b border-border shadow-sm"
           : "bg-transparent"
-      }`}
+        }`}
     >
       <div className="container mx-auto px-4">
         <div className="flex h-20 items-center justify-between">
@@ -51,7 +50,7 @@ export function Header() {
             </div>
             <span className="font-semibold text-lg text-foreground">Salva Contas</span>
           </Link>
-          
+
           <nav className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => (
               <Link
@@ -63,21 +62,20 @@ export function Header() {
               </Link>
             ))}
           </nav>
-          
+
           {isAuthenticated ? (
             <div className="hidden md:flex items-center gap-3">
-              <div className="flex items-center gap-2 rounded-xl border border-border bg-card py-1.5 px-2">
-                <Avatar>
-                  <AvatarFallback>{userInitials}</AvatarFallback>
-                </Avatar>
-                <div className="text-left">
-                  <div className="text-sm font-medium text-foreground">
-                    {user?.name || user?.email || "usuário"}
-                  </div>
-                </div>
-              </div>
               <Button variant="ghost" className="px-5" asChild>
-                <Link href="/app/dashboard">Dashboard</Link>
+                <Link href="/app/dashboard">
+                  <Avatar>
+                    <AvatarFallback>{userInitials}</AvatarFallback>
+                  </Avatar>
+                  <div className="text-left">
+                    <div className="text-sm font-medium text-foreground">
+                      {user?.name || user?.email || "usuário"}
+                    </div>
+                  </div>
+                </Link>
               </Button>
               <Button variant="outline" className="px-5" onClick={logout}>
                 Sair
@@ -100,7 +98,7 @@ export function Header() {
               </Button>
             </div>
           )}
-          
+
           <Button
             type="button"
             variant="ghost"
