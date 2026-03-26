@@ -88,33 +88,27 @@ export function KpiSparklineCard({
 
   const isPositive = change.startsWith("+");
   const isNegative = change.startsWith("-");
-  const badgeClass = isPositive
-    ? "bg-emerald-50 text-emerald-700"
-    : isNegative
-    ? "bg-rose-50 text-rose-600"
-    : "bg-gray-100 text-gray-500";
 
   if (isLoading) {
     return (
-      <Card className="bg-white shadow-sm border border-gray-100 overflow-hidden">
-        <CardContent className="p-5 pb-0">
-          <div className="flex items-start justify-between mb-3">
-            <Skeleton className="h-4 w-28" />
-            <Skeleton className="h-9 w-9 rounded-xl" />
+      <Card className="bg-white shadow-sm rounded-none border border-gray-100 h-[230px] md:h-60 overflow-hidden">
+        <CardContent className="h-full flex flex-col p-3 pb-1">
+          <div className="flex items-start justify-between mb-2 gap-1">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-7 w-7" />
           </div>
-          <Skeleton className="h-9 w-36 mb-2" />
-          <Skeleton className="h-5 w-24 rounded-full mb-4" />
-          <Skeleton className="h-16 w-full" />
+          <Skeleton className="h-8 w-28 mb-1" />
+          <Skeleton className="h-4 w-20 mb-2" />
+          <Skeleton className="h-12 w-full" />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="bg-white shadow-sm border border-gray-100 overflow-hidden">
-      <CardContent className="p-5 pb-0">
-        {/* Header row */}
-        <div className="flex items-start justify-between gap-2 mb-3">
+    <Card className="bg-white shadow-none h-[230px] md:h-60 border-0 rounded-none overflow-hidden border-b border-r border-gray-100">
+      <CardContent className="h-full flex flex-col p-3 pb-1">
+        <div className="flex items-start justify-between gap-1 mb-2">
           <div className="flex items-center gap-2">
             <p className="text-sm font-medium text-gray-500 leading-snug">{title}</p>
             <InfoPopover content={
@@ -130,25 +124,22 @@ export function KpiSparklineCard({
           </div>
         </div>
 
-        {/* Value */}
-        <div className="text-3xl font-extrabold text-gray-900 tracking-tight leading-none mb-2">
+        <div className="text-2xl font-extrabold text-gray-900 tracking-tight leading-none mb-1">
           {value}
         </div>
 
-        {/* Change badge */}
         <span
           className={cn(
-            "inline-block text-xs font-semibold px-2.5 py-1 rounded-full mb-4",
-            badgeClass
+            "inline-block text-xs font-semibold mb-2",
+            isPositive ? "text-emerald-700" : isNegative ? "text-rose-600" : "text-gray-500"
           )}
         >
           {change}
         </span>
       </CardContent>
 
-      {/* Sparkline — full width, flush to card edges */}
-      <div className="h-16">
-        <ResponsiveContainer width="100%" height="100%" minWidth={220} minHeight={64}>
+      <div className="h-12">
+        <ResponsiveContainer width="100%" height="100%" minWidth={180} minHeight={48}>
           <AreaChart data={sparklineData} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
             <defs>
               <linearGradient id={cfg.gradientId} x1="0" y1="0" x2="0" y2="1">

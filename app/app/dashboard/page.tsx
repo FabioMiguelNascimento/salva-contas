@@ -11,6 +11,7 @@ import UpcomingBillsCard from "@/components/dashboard/UpcomingBillsCard";
 import { KpiSparklineCard } from "@/components/kpi-sparkline-card";
 import { PageHeader } from "@/components/page-header";
 import { SummaryCard } from "@/components/summary-card";
+import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -237,84 +238,88 @@ function DashboardContent() {
       />
 
 
-      <section className="rounded-xl border bg-card p-3 sm:p-4 space-y-4 sm:space-y-6 lg:space-y-8 overflow-x-hidden min-h-screen">
-          <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:flex xl:items-end xl:justify-end">
-            <div>
-              <label htmlFor="dashboard-filter-range" className="mb-1 block text-xs font-medium text-muted-foreground">
-                Periodo
-              </label>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      id="dashboard-filter-range"
-                      variant="outline"
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !hasDateRange && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon data-icon="inline-start" />
-                      <span className="truncate">{rangeLabel}</span>
+      <section className="rounded-xl border bg-card p-0 overflow-hidden">
+          <div className="p-4 sm:p-5 ">
+            <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+              <div>
+                <label htmlFor="dashboard-filter-range" className="mb-1 block text-xs font-medium text-muted-foreground">
+                  Periodo
+                </label>
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        id="dashboard-filter-range"
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !hasDateRange && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon data-icon="inline-start" />
+                        <span className="truncate">{rangeLabel}</span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="range"
+                        selected={selectedRange}
+                        onSelect={handleRangeChange}
+                        numberOfMonths={isMobile ? 1 : 2}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                  {hasDateRange && (
+                    <Button variant="outline" onClick={clearDateRange} className="w-full sm:w-auto">
+                      Limpar
                     </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="range"
-                      selected={selectedRange}
-                      onSelect={handleRangeChange}
-                      numberOfMonths={isMobile ? 1 : 2}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                {hasDateRange && (
-                  <Button variant="outline" onClick={clearDateRange} className="w-full sm:w-auto">
-                    Limpar
-                  </Button>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-2">
-              <div>
-                <label htmlFor="dashboard-filter-month" className="mb-1 block text-xs font-medium text-muted-foreground">
-                  Mes
-                </label>
-                <Select value={String(filters.month)} onValueChange={handleMonthChange}>
-                  <SelectTrigger id="dashboard-filter-month" aria-label="Filtrar dashboard por mes" className="w-full">
-                    <SelectValue placeholder="Mes" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {monthsShort.map((month) => (
-                      <SelectItem key={month.value} value={String(month.value)}>
-                        {month.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  )}
+                </div>
               </div>
 
-              <div>
-                <label htmlFor="dashboard-filter-year" className="mb-1 block text-xs font-medium text-muted-foreground">
-                  Ano
-                </label>
-                <Select value={String(filters.year)} onValueChange={handleYearChange}>
-                  <SelectTrigger id="dashboard-filter-year" aria-label="Filtrar dashboard por ano" className="w-full">
-                    <SelectValue placeholder="Ano" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {years.map((year) => (
-                      <SelectItem key={year} value={String(year)}>
-                        {year}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-2">
+                <div>
+                  <label htmlFor="dashboard-filter-month" className="mb-1 block text-xs font-medium text-muted-foreground">
+                    Mes
+                  </label>
+                  <Select value={String(filters.month)} onValueChange={handleMonthChange}>
+                    <SelectTrigger id="dashboard-filter-month" aria-label="Filtrar dashboard por mes" className="w-full">
+                      <SelectValue placeholder="Mes" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {monthsShort.map((month) => (
+                        <SelectItem key={month.value} value={String(month.value)}>
+                          {month.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <label htmlFor="dashboard-filter-year" className="mb-1 block text-xs font-medium text-muted-foreground">
+                    Ano
+                  </label>
+                  <Select value={String(filters.year)} onValueChange={handleYearChange}>
+                    <SelectTrigger id="dashboard-filter-year" aria-label="Filtrar dashboard por ano" className="w-full">
+                      <SelectValue placeholder="Ano" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {years.map((year) => (
+                        <SelectItem key={year} value={String(year)}>
+                          {year}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
           </div>
-        <section className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
+      </section>
+
+        <SummaryCardsGrid className="grid-cols-1 md:grid-cols-2 xl:grid-cols-4">
           <KpiSparklineCard
             variant="expense"
             icon={ArrowDownRight}
@@ -350,7 +355,7 @@ function DashboardContent() {
             variant="success"
             isLoading={isLoading}
           />
-        </section>
+        </SummaryCardsGrid>
 
       <section className="grid gap-4 lg:grid-cols-3 overflow-hidden">
         <SpendingCard data={dailySpending} isLoading={isLoading} title={spendingTitle} infoContent={spendingInfo} />
@@ -370,7 +375,6 @@ function DashboardContent() {
       <section className="">
         <BudgetsCard budgetsWithUsage={budgetsWithUsage} isLoading={isLoading} />
       </section>
-        </section>
     </div>
   );
 }

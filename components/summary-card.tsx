@@ -1,7 +1,6 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { ComponentType, SVGProps } from "react";
 
@@ -47,19 +46,21 @@ export function SummaryCard({
 
   if (isLoading) {
     return (
-      <Card className="bg-white shadow-sm border border-gray-100">
-        <CardContent className="space-y-2 p-4 sm:p-5">
-          <Skeleton className="h-3 w-14 sm:w-24" />
-          <Skeleton className="h-8 w-20 sm:w-32" />
-          <Skeleton className="h-5 w-16 sm:w-20 rounded-full" />
+      <Card className="bg-white shadow-sm border border-gray-100 h-full rounded-none">
+        <CardContent className="h-full flex flex-col p-4 sm:p-5">
+          <div className="h-5 w-24 rounded-none bg-slate-200 animate-pulse" />
+          <div className="mt-2 h-8 w-32 rounded-none bg-slate-200 animate-pulse" />
+          <div className="mt-2 h-4 w-20 rounded-none bg-slate-200 animate-pulse" />
+          <div className="mt-auto h-3 w-16 rounded-none bg-slate-200 animate-pulse" />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className={cn("relative overflow-hidden bg-white shadow-sm border border-gray-100")}>
-      <CardContent className="p-4 sm:p-5">
+    <Card className={cn("relative h-full snap-start w-full overflow-hidden bg-white shadow-none border-0 rounded-none md:shrink-0 md:w-full", "border-b border-r border-gray-100")}
+      style={{ margin: 0 }}>
+      <CardContent className="h-full flex flex-col p-4 sm:p-5">
         <div className="flex items-start justify-between gap-2">
           <p className="text-xs sm:text-sm font-medium text-gray-500 truncate pr-1">{title}</p>
           <div className={cn("rounded-xl p-2 sm:p-2.5 shrink-0", iconContainerStyles[variant])}>
@@ -68,10 +69,11 @@ export function SummaryCard({
         </div>
         <div className="mt-2 text-2xl sm:text-3xl font-extrabold text-gray-900 truncate">{value}</div>
         {helper && (
-          <span className={cn("mt-2 inline-block text-xs font-medium px-2 py-0.5 rounded-full truncate max-w-full", helperBadgeStyles)}>
+          <span className={cn("mt-2 inline-block text-xs font-medium px-2 py-0.5 rounded-full truncate max-w-full" )}>
             {helper}
           </span>
         )}
+        <div className="flex-1" />
       </CardContent>
     </Card>
   );
