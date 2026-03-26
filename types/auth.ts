@@ -3,6 +3,8 @@ export interface User {
   name?: string;
   email: string;
   linkedToId?: string | null;
+  planTier?: 'FREE' | 'PRO' | 'FAMILY';
+  stripeCustomerId?: string | null;
   createdAt?: string;
   emailConfirmedAt?: string | null;
 }

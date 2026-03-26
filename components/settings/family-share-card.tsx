@@ -2,10 +2,11 @@
 
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/hooks/use-auth';
 import { generateInvite, getFamilyMembers } from '@/services/family-invites';
-import { Link2, RefreshCw, Users } from 'lucide-react';
+import { Link2, Lock, RefreshCw, Sparkles, Users } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 function getInitials(name?: string | null, email?: string | null) {
@@ -16,12 +17,16 @@ function getInitials(name?: string | null, email?: string | null) {
 }
 
 export default function FamilyShareCard() {
+  const { user } = useAuth();
   const [inviteUrl, setInviteUrl] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [family, setFamily] = useState<{ owner: any; members: any[]; isOwner: boolean } | null>(null);
 
+  const isFamilyPlan = user?.planTier === 'FAMILY';
+
   const loadMembers = async () => {
+    if (!isFamilyPlan) return;
     try {
       setIsLoadingMembers(true);
       const data = await getFamilyMembers();
@@ -36,7 +41,7 @@ export default function FamilyShareCard() {
 
   useEffect(() => {
     loadMembers();
-  }, []);
+  }, [isFamilyPlan]);
 
   const handleGenerateInvite = async () => {
     try {
@@ -64,6 +69,47 @@ export default function FamilyShareCard() {
       toast.error('Não foi possível copiar o link.');
     }
   };
+
+  if (!isFamilyPlan) {
+    return (
+      <Card className="relative overflow-hidden border-2 border-dashed border-primary/20">
+        <div className="absolute inset-0 bg-background/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-6 text-center">
+          <div className="p-3 rounded-full bg-primary/10 mb-4 ring-8 ring-primary/5">
+            <Lock className="h-6 w-6 text-primary" />
+          </div>
+          <h3 className="text-lg font-bold mb-2">Plano Família Necessário</h3>
+          <p className="text-sm text-muted-foreground max-w-[320px] mb-6">
+            A partilha familiar permite que você convide um parceiro para gerenciar as finanças em conjunto no mesmo caderno.
+          </p>
+          <Button className="rounded-full shadow-lg shadow-primary/20 gap-2" asChild>
+            <a href="/precos">
+              <Sparkles className="h-4 w-4" />
+              Fazer Upgrade agora
+            </a>
+          </Button>
+        </div>
+        
+        <CardHeader className="opacity-40 grayscale-[0.5]">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Users className="h-4 w-4" />
+            Partilha Familiar
+          </CardTitle>
+          <CardDescription>
+            Convide membros para compartilhar seu caderno financeiro.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4 opacity-40 grayscale-[0.5] pointer-events-none">
+          <div className="flex gap-2">
+            <Button disabled>Gerar link de convite</Button>
+            <Button variant="outline" disabled>Atualizar membros</Button>
+          </div>
+          <div className="h-24 rounded-lg border border-dashed flex items-center justify-center">
+             <p className="text-xs text-muted-foreground">Conteúdo bloqueado</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card>

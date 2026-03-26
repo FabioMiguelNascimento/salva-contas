@@ -11,7 +11,7 @@ import { useEffect, useState } from "react"
 const navLinks = [
   { href: "/#recursos", label: "Recursos" },
   { href: "/#como-funciona", label: "Como funciona" },
-  { href: "/precos", label: "PreÃ§os" },
+  { href: "/precos", label: "Preços" },
 ]
 
 export function Header() {

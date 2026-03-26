@@ -27,6 +27,7 @@ interface AuthContextValue extends AuthState {
   register: (payload: RegisterPayload) => Promise<{ needsEmailConfirmation: boolean }>;
   logout: () => void;
   updateUser: (user: User) => void;
+  refreshUser: () => Promise<void>;
   forgotPassword: (email: string) => Promise<void>;
   updatePassword: (password: string) => Promise<void>;
 }
@@ -246,14 +247,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             try {
               const response = await authService.refreshToken({ refreshToken: storedRefreshToken });
 
-              // Persist tokens immediately so subsequent requests (like /me) include Authorization header
               localStorage.setItem(TOKEN_KEY, response.accessToken);
               localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
               localStorage.setItem(EXPIRES_AT_KEY, response.expiresAt.toString());
 
               const user = await authService.getMe();
 
-              // Now persist the user and update state
               saveTokens(response.accessToken, response.refreshToken, response.expiresAt, user);
 
               setState({
@@ -330,7 +329,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (payload: LoginPayload) => {
     const response = await authService.login(payload);
 
-    // persiste token imediatamente (necessário para chamadas subsequentes a /me)
     const provisionalUser: User = {
       id: response.user.id,
       email: response.user.email,
@@ -339,7 +337,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     saveTokens(response.accessToken, response.refreshToken, response.expiresAt, provisionalUser);
 
-    // atualiza estado preliminar para evitar flash enquanto buscamos /me
     setState((prev) => ({
       ...prev,
       user: provisionalUser,
@@ -352,13 +349,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     scheduleTokenRefresh(response.expiresAt);
 
-    // busca a informação canônica do usuário pelo endpoint /auth/me e atualiza localStorage/estado
     try {
       const me = await authService.getMe();
       localStorage.setItem(USER_KEY, JSON.stringify(me));
       setState((prev) => ({ ...prev, user: me }));
     } catch (err) {
-      // se /me falhar, mantemos o usuário provisório (não falhar o login por isso)
       console.warn('Failed to fetch /auth/me after login:', err);
     }
   }, [saveTokens, scheduleTokenRefresh]);
@@ -394,6 +389,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setState((prev) => ({ ...prev, user }));
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    try {
+      const me = await authService.getMe();
+      localStorage.setItem(USER_KEY, JSON.stringify(me));
+      setState((prev) => ({ ...prev, user: me }));
+    } catch (err) {
+      console.error('Failed to refresh user:', err);
+    }
+  }, []);
+
   const forgotPassword = useCallback(async (email: string) => {
     await authService.forgotPassword({ email });
   }, []);
@@ -402,7 +407,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await authService.updatePassword({ password });
   }, []);
 
-  // Processa tokens do hash da URL (callback do Supabase após confirmação de email)
   useEffect(() => {
     const processHashTokens = async () => {
       if (typeof window === "undefined") return;
@@ -422,18 +426,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log(`Processing Supabase ${type} callback...`);
 
       try {
-        // Calcula expiresAt
         const expiresAt = Math.floor(Date.now() / 1000) + parseInt(expiresIn || "3600", 10);
 
-        // Salva tokens temporariamente
         localStorage.setItem(TOKEN_KEY, accessToken);
         localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
         localStorage.setItem(EXPIRES_AT_KEY, expiresAt.toString());
 
-        // Busca dados do usuário
         const user = await authService.getMe();
 
-        // Persiste tudo
         saveTokens(accessToken, refreshToken, expiresAt, user);
 
         setState({
@@ -447,10 +447,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         scheduleTokenRefresh(expiresAt);
 
-        // Remove o hash da URL
         window.history.replaceState(null, "", window.location.pathname);
 
-        // Mostra mensagem de sucesso
         if (type === "signup") {
           (await import("sonner")).toast.success("Email confirmado com sucesso! Bem-vindo(a)!");
           router.push("/");
@@ -463,7 +461,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         console.error("Failed to process Supabase callback:", error);
         (await import("sonner")).toast.error("Erro ao processar confirmação. Tente fazer login.");
-        // Remove o hash em caso de erro
         window.history.replaceState(null, "", window.location.pathname);
       }
     };
@@ -478,10 +475,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       register,
       logout,
       updateUser,
+      refreshUser,
       forgotPassword,
       updatePassword,
     }),
-    [state, login, register, logout, updateUser, forgotPassword, updatePassword]
+    [state, login, register, logout, updateUser, refreshUser, forgotPassword, updatePassword]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

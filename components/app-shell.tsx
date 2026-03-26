@@ -14,6 +14,7 @@ import {
 import { useFinancePeriod } from "@/context/finance-period-context";
 import { AiAdvisorSheet } from "./ai-advisor-sheet";
 import { AppSidebar } from "./app-sidebar";
+import { SubscriptionSuccessHandler } from "./auth/subscription-success-handler";
 import { NotificationsDropdown } from "./notifications-dropdown";
 import { SettingsDialog } from "./settings-dialog";
 import { Topbar } from "./topbar";
@@ -56,6 +57,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen bg-muted/30 overflow-x-hidden w-full">
+      <SubscriptionSuccessHandler />
       <Topbar
         userName={user?.name}
         pendingBillsCount={pendingBillsCount}

@@ -77,15 +77,15 @@ function DashboardContent() {
 
   const recentTransactions = transactions.slice(0, 5);
 
-  const urgentBills = useMemo(
-    () =>
-      pendingBills.filter((bill) => {
-        if (!bill.dueDate) return false;
-        const diff = differenceInCalendarDays(new Date(bill.dueDate), new Date());
-        return diff <= 0;
-      }),
-    [pendingBills]
-  );
+    const urgentBills = useMemo(
+      () =>
+        pendingBills.filter((bill) => {
+          if (!bill.dueDate) return false;
+          const diff = differenceInCalendarDays(new Date(bill.dueDate), new Date());
+          return diff <= 0;
+        }),
+      [pendingBills]
+    );
 
   const nextBills = useMemo(
     () =>
