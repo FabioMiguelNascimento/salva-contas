@@ -18,9 +18,12 @@ const currencyFormatter = new Intl.NumberFormat("pt-BR", {
 });
 
 export function BudgetProgressCard({ progress, onEdit, onDelete }: BudgetProgressCardProps) {
-  const { budget, spent, remaining, percentage } = progress;
-  const isOverBudget = percentage > 100;
-  const isWarning = percentage > 80 && percentage <= 100;
+  const { budget, spent, remaining } = progress;
+  const budgetAmount = Number(budget.amount) || 0;
+  const utilizationPercentage = budgetAmount > 0 ? (spent / budgetAmount) * 100 : 0;
+  const progressValue = Math.min(100, Math.max(0, utilizationPercentage));
+  const isOverBudget = remaining < 0;
+  const isWarning = !isOverBudget && utilizationPercentage > 80;
 
   return (
     <div className="group relative rounded-xl border bg-card p-4 transition-colors hover:bg-muted/30">
@@ -65,10 +68,10 @@ export function BudgetProgressCard({ progress, onEdit, onDelete }: BudgetProgres
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Limite</span>
-          <span className="font-medium">{currencyFormatter.format(budget.amount)}</span>
+          <span className="font-medium">{currencyFormatter.format(budgetAmount)}</span>
         </div>
         <Progress
-          value={Math.min(percentage, 100)}
+          value={progressValue}
           className={cn(
             "h-2",
             isOverBudget && "[&>div]:bg-destructive",
@@ -76,7 +79,7 @@ export function BudgetProgressCard({ progress, onEdit, onDelete }: BudgetProgres
           )}
         />
         <div className="flex items-center justify-between text-xs text-muted-foreground">
-          <span>{percentage.toFixed(0)}% utilizado</span>
+          <span>{utilizationPercentage.toFixed(0)}% utilizado</span>
           <span
             className={cn(
               remaining >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-destructive",

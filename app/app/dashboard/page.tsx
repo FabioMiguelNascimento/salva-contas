@@ -40,7 +40,7 @@ import { useMemo } from "react";
 import type { DateRange } from "react-day-picker";
 
 function DashboardContent() {
-  const { metrics, transactions, pendingBills, subscriptions, creditCards, budgets, categories, isLoading, lastSync } =
+  const { metrics, transactions, pendingBills, subscriptions, creditCards, budgets, budgetProgress, categories, isLoading, lastSync } =
     useDashboard();
   const { filters, setFilters } = useFinancePeriod();
   const isMobile = useIsMobile();
@@ -160,19 +160,23 @@ function DashboardContent() {
   const creditUsagePercent = totalCreditLimit > 0 ? (totalCreditUsed / totalCreditLimit) * 100 : 0;
 
   const budgetsWithUsage = useMemo(() => {
+    const progressByBudgetId = new Map(
+      budgetProgress.map((progress) => [progress.budget.id, progress])
+    );
+
     return budgets.map((budget) => {
-      const categoryExpenses = transactions
-        .filter((t) => t.type === "expense" && t.categoryId === budget.categoryId)
-        .reduce((sum, t) => sum + t.amount, 0);
-      const usagePercent = budget.amount > 0 ? (categoryExpenses / budget.amount) * 100 : 0;
+      const progress = progressByBudgetId.get(budget.id);
+      const spent = progress?.spent ?? 0;
+      const usagePercent = budget.amount > 0 ? (spent / budget.amount) * 100 : 0;
+
       return {
         ...budget,
-        spent: categoryExpenses,
+        spent,
         usagePercent: Math.min(usagePercent, 100),
-        isOverBudget: categoryExpenses > budget.amount,
+        isOverBudget: spent > budget.amount,
       };
     });
-  }, [budgets, transactions]);
+  }, [budgets, budgetProgress]);
 
   const handleMonthChange = (value: string) => {
     setFilters({
