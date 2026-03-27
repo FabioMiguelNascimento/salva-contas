@@ -1,10 +1,11 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/contexts/auth-context"
 import { useSubscription } from "@/hooks/use-subscription"
-import { BillingCycle, COMPARISON_FEATURES, SUBSCRIPTION_PLANS } from "@/lib/subscriptions/config"
+import { BillingCycle, COMPARISON_FEATURES, PlanTier, SUBSCRIPTION_PLANS } from "@/lib/subscriptions/config"
 import { Check, ChevronDown, Loader2, Sparkles } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 const faqs = [
   {
@@ -22,15 +23,69 @@ const faqs = [
 ]
 
 export function PricingPage() {
-  const [billingCycle, setBillingCycle] = useState<BillingCycle>("monthly")
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams()
+  const queryPlan = searchParams.get("plan") as PlanTier | null
+  const queryCycle = searchParams.get("cycle") as BillingCycle | null
+
+  const { isAuthenticated } = useAuth()
+  const [billingCycle, setBillingCycle] = useState<BillingCycle>(
+    queryCycle === "yearly" ? "yearly" : "monthly",
+  )
+  const [selectedPlan, setSelectedPlan] = useState<PlanTier | null>(queryPlan as PlanTier | null)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const [progress, setProgress] = useState(0)
+  const [autoSubscribe, setAutoSubscribe] = useState(false)
+
+  const autoStartedRef = useRef(false)
   const { handleSubscribe, isLoading } = useSubscription()
 
   const plansList = Object.values(SUBSCRIPTION_PLANS)
 
+  useEffect(() => {
+    if (!isAuthenticated) return
+    if ((queryPlan === "PRO" || queryPlan === "FAMILY") && !autoStartedRef.current) {
+      autoStartedRef.current = true
+      setSelectedPlan(queryPlan)
+      setBillingCycle(queryCycle === "yearly" ? "yearly" : "monthly")
+      setAutoSubscribe(true)
+    }
+  }, [queryPlan, queryCycle, isAuthenticated])
+
+  useEffect(() => {
+    if (!autoSubscribe || !selectedPlan) return
+
+    if (!isAuthenticated) {
+      const next = encodeURIComponent(`/precos?plan=${selectedPlan}&cycle=${billingCycle}`)
+      window.location.href = `/cadastro?plan=${selectedPlan}&cycle=${billingCycle}&next=${next}`
+      return
+    }
+
+    if (isLoading) return
+
+    const interval = window.setInterval(() => {
+      let current = progress + 5
+      if (current > 100) current = 100
+      setProgress(current)
+
+      if (current >= 100) {
+        clearInterval(interval)
+        setAutoSubscribe(false)
+
+        const plan = SUBSCRIPTION_PLANS[selectedPlan]
+        handleSubscribe(plan, billingCycle)
+      }
+    }, 75)
+
+    return () => clearInterval(interval)
+  }, [autoSubscribe, selectedPlan, billingCycle, handleSubscribe, isLoading, isAuthenticated, progress])
+
   return (
     <div className="min-h-screen pt-24">
-      {/* Hero */}
+      {progress > 0 && (
+        <div className="fixed top-0 left-0 right-0 h-1 bg-primary/20 z-50">
+          <div className="h-full bg-primary transition-all" style={{ width: `${progress}%` }} />
+        </div>
+      )}
       <section className="relative py-20 overflow-hidden text-center">
         <div className="container relative mx-auto px-4">
           <span className="inline-block text-primary font-medium text-sm uppercase tracking-wider mb-4">
@@ -59,7 +114,6 @@ export function PricingPage() {
         </div>
       </section>
 
-      {/* Plans */}
       <section className="py-12">
         <div className="container mx-auto px-4">
           <div className="grid gap-8 lg:grid-cols-3 max-w-6xl mx-auto items-start">
@@ -112,15 +166,28 @@ export function PricingPage() {
 
                 <Button
                   variant={plan.popular ? "default" : "outline"}
-                  className="w-full h-12 text-base font-medium rounded-xl"
+                  className="relative w-full h-12 text-base font-medium rounded-xl overflow-hidden"
                   disabled={isLoading}
-                  onClick={() => handleSubscribe(plan, billingCycle)}
+                  onClick={() => {
+                    if (!isAuthenticated) {
+                      const next = encodeURIComponent(`/precos?plan=${plan.id}&cycle=${billingCycle}`)
+                      window.location.href = `/cadastro?plan=${plan.id}&cycle=${billingCycle}&next=${next}`
+                      return
+                    }
+
+                    setSelectedPlan(plan.id)
+                  }}
                 >
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    plan.cta
-                  )}
+                  <span className="relative z-10">
+                    {isLoading || (selectedPlan === plan.id) ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2 inline-block" />
+                        {plan.cta}
+                      </>
+                    ) : (
+                      plan.cta
+                    )}
+                  </span>
                 </Button>
               </div>
             ))}
@@ -128,7 +195,6 @@ export function PricingPage() {
         </div>
       </section>
 
-      {/* Comparison table */}
       <section className="py-24 bg-secondary/30">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto overflow-x-auto">
@@ -156,7 +222,6 @@ export function PricingPage() {
         </div>
       </section>
 
-      {/* FAQ */}
       <section className="py-24">
         <div className="container mx-auto px-4 max-w-2xl">
           <h2 className="text-center text-3xl font-medium mb-12">Perguntas frequentes</h2>

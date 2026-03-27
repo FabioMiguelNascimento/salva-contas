@@ -14,7 +14,8 @@ export function useSubscription() {
 
   const handleSubscribe = async (plan: PlanConfig, cycle: BillingCycle) => {
     if (!isAuthenticated) {
-      window.location.href = `/cadastro?plan=${plan.id}&cycle=${cycle}`
+      const next = encodeURIComponent(`/precos?plan=${plan.id}&cycle=${cycle}`)
+      window.location.href = `/cadastro?plan=${plan.id}&cycle=${cycle}&next=${next}`
       return
     }
 

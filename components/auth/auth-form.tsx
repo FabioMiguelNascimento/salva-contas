@@ -16,6 +16,10 @@ interface AuthFormProps {
 
 export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter()
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams()
+  const planFromQuery = searchParams.get("plan")
+  const cycleFromQuery = searchParams.get("cycle")
+  const nextFromQuery = searchParams.get("next")
   const { login, register } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -26,6 +30,18 @@ export function AuthForm({ mode }: AuthFormProps) {
     email: "",
     password: "",
   })
+
+  const preserveQuery = () => {
+    const params = new URLSearchParams()
+    if (planFromQuery) params.set('plan', planFromQuery)
+    if (cycleFromQuery) params.set('cycle', cycleFromQuery)
+    if (nextFromQuery) params.set('next', nextFromQuery)
+    const queryString = params.toString()
+    return queryString ? `?${queryString}` : ''
+  }
+
+  const loginHref = `/entrar${preserveQuery()}`
+  const registerHref = `/cadastro${preserveQuery()}`
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -43,10 +59,17 @@ export function AuthForm({ mode }: AuthFormProps) {
 
     setIsLoading(true)
 
+    const resolvedCycle = cycleFromQuery === "yearly" ? "yearly" : "monthly"
+    const resolvedPlan = planFromQuery ? planFromQuery : undefined
+    const fallback = resolvedPlan
+      ? `/precos?plan=${resolvedPlan}&cycle=${resolvedCycle}`
+      : "/app/dashboard"
+    const redirectTo = nextFromQuery || fallback
+
     try {
       if (isLogin) {
         await login({ email: formData.email, password: formData.password })
-        router.push("/app/dashboard")
+        router.push(redirectTo)
       } else {
         const result = await register({
           name: formData.name || undefined,
@@ -57,7 +80,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         if (result.needsEmailConfirmation) {
           setNeedsEmailConfirmation(true)
         } else {
-          router.push("/app/dashboard")
+          router.push(redirectTo)
         }
       }
     } catch (err) {
@@ -258,7 +281,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           <p className="mt-10 text-center text-sm text-muted-foreground">
             {isLogin ? "Não tem uma conta? " : "Já tem uma conta? "}
             <Link
-              href={isLogin ? "/cadastro" : "/entrar"}
+              href={isLogin ? registerHref : loginHref}
               className="font-medium text-primary hover:text-primary/80 transition-colors"
             >
               {isLogin ? "Criar conta gratuita" : "Entrar"}
