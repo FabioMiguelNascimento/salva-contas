@@ -2,10 +2,10 @@
 
 import AppearanceCard from "@/components/settings/appearance-card";
 import FamilyShareCard from "@/components/settings/family-share-card";
+import { MercadoPagoSettings } from "@/components/settings/mercado-pago-settings";
 import NotificationsCard from "@/components/settings/notifications-card";
 import ProfileCard from "@/components/settings/profile-card";
 import SecurityCard from "@/components/settings/security-card";
-import { StripeSettings } from "@/components/settings/stripe-settings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/use-auth";
 import { useEffect, useState } from "react";
@@ -117,7 +117,7 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
   );
 
   const familyShareCard = <FamilyShareCard />;
-  const stripeSettings = <StripeSettings />;
+  const mercadoPagoSettings = <MercadoPagoSettings />;
 
   if (selectedTab) {
     return (
@@ -126,7 +126,7 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
         {selectedTab === 'appearance' && appearanceCard}
         {selectedTab === 'notifications' && notificationsCard}
         {selectedTab === 'security' && securityCard}
-        {selectedTab === 'billing' && stripeSettings}
+        {selectedTab === 'billing' && mercadoPagoSettings}
         {selectedTab === 'family' && familyShareCard}
       </div>
     );
@@ -138,7 +138,7 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
       {appearanceCard}
       {notificationsCard}
       {securityCard}
-      {stripeSettings}
+      {mercadoPagoSettings}
       {familyShareCard}
     </>
   );
@@ -161,7 +161,7 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
             <TabsContent value="appearance">{appearanceCard}</TabsContent>
             <TabsContent value="notifications">{notificationsCard}</TabsContent>
             <TabsContent value="security">{securityCard}</TabsContent>
-            <TabsContent value="billing">{stripeSettings}</TabsContent>
+            <TabsContent value="billing">{mercadoPagoSettings}</TabsContent>
             <TabsContent value="family">{familyShareCard}</TabsContent>
           </div>
         </Tabs>

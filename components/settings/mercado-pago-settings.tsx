@@ -2,16 +2,16 @@
 
 import { Button } from "@/components/ui/button"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card"
 import { useSubscription } from "@/hooks/use-subscription"
 import { CreditCard, ExternalLink, Loader2, Sparkles } from "lucide-react"
 
-export function StripeSettings() {
+export function MercadoPagoSettings() {
   const { currentPlan, handleManageBilling, isLoading } = useSubscription()
 
   return (
@@ -21,7 +21,7 @@ export function StripeSettings() {
           <div className="space-y-1">
             <CardTitle>Plano e Faturamento</CardTitle>
             <CardDescription>
-              Gerencie sua assinatura e métodos de pagamento.
+              Gerencie sua assinatura no Mercado Pago.
             </CardDescription>
           </div>
           <div className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 ${
@@ -39,9 +39,9 @@ export function StripeSettings() {
               <CreditCard className="h-5 w-5 text-muted-foreground" />
             </div>
             <div>
-              <p className="text-sm font-medium">Portal do Cliente Stripe</p>
+              <p className="text-sm font-medium">Portal do Mercado Pago</p>
               <p className="text-xs text-muted-foreground">
-                Cancele, altere seu plano ou atualize seu cartão.
+                Acesse o gerenciamento de assinatura e faturamento direto no Mercado Pago.
               </p>
             </div>
           </div>
@@ -57,7 +57,7 @@ export function StripeSettings() {
             ) : (
               <ExternalLink className="h-4 w-4 mr-2" />
             )}
-            Gerenciar no Stripe
+            Gerenciar no Mercado Pago
           </Button>
         </div>
 
@@ -65,7 +65,7 @@ export function StripeSettings() {
           <div className="text-center p-6 rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5">
             <Sparkles className="h-8 w-8 text-primary mx-auto mb-3" />
             <h4 className="text-sm font-semibold mb-1">Evolua seu controle</h4>
-            <p className="text-xs text-muted-foreground mb-4 max-w-[240px] mx-auto">
+            <p className="text-xs text-muted-foreground mb-4 max-w-60 mx-auto">
               Libere cofrinhos ilimitados, IA avançada e histórico completo.
             </p>
             <Button size="sm" className="rounded-full" asChild>

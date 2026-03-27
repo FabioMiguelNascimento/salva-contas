@@ -4,7 +4,7 @@ export interface User {
   email: string;
   linkedToId?: string | null;
   planTier?: 'FREE' | 'PRO' | 'FAMILY';
-  stripeCustomerId?: string | null;
+  mpCustomerId?: string | null;
   createdAt?: string;
   emailConfirmedAt?: string | null;
 }

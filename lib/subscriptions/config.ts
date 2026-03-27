@@ -9,7 +9,7 @@ export interface PlanConfig {
     monthly: number;
     yearly: number;
   };
-  priceId: {
+  mpPlanId: {
     monthly: string;
     yearly: string;
   };
@@ -24,7 +24,7 @@ export const SUBSCRIPTION_PLANS: Record<PlanTier, PlanConfig> = {
     name: 'Grátis',
     description: 'Para começar a organizar',
     price: { monthly: 0, yearly: 0 },
-    priceId: { monthly: '', yearly: '' },
+    mpPlanId: { monthly: '', yearly: '' },
     features: [
       'Até 3 cofrinhos',
       'Histórico de 3 meses',
@@ -40,9 +40,9 @@ export const SUBSCRIPTION_PLANS: Record<PlanTier, PlanConfig> = {
     name: 'Pro',
     description: 'Controle total das finanças',
     price: { monthly: 19.9, yearly: 14.9 },
-    priceId: {
-      monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_MONTHLY || '',
-      yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_PRO_YEARLY || '',
+    mpPlanId: {
+      monthly: process.env.NEXT_PUBLIC_MP_PLAN_PRO_MONTHLY || process.env.NEXT_PUBLIC_MERCADO_PAGO_PRO_MONTHLY || '',
+      yearly: process.env.NEXT_PUBLIC_MP_PLAN_PRO_YEARLY || process.env.NEXT_PUBLIC_MERCADO_PAGO_PRO_YEARLY || '',
     },
     features: [
       'Cofrinhos ilimitados',
@@ -61,9 +61,9 @@ export const SUBSCRIPTION_PLANS: Record<PlanTier, PlanConfig> = {
     name: 'Família',
     description: 'Finanças em conjunto',
     price: { monthly: 39.9, yearly: 29.9 },
-    priceId: {
-      monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_FAMILY_MONTHLY || '',
-      yearly: process.env.NEXT_PUBLIC_STRIPE_PRICE_FAMILY_YEARLY || '',
+    mpPlanId: {
+      monthly: process.env.NEXT_PUBLIC_MP_PLAN_FAMILY_MONTHLY || process.env.NEXT_PUBLIC_MERCADO_PAGO_FAMILY_MONTHLY || '',
+      yearly: process.env.NEXT_PUBLIC_MP_PLAN_FAMILY_YEARLY || process.env.NEXT_PUBLIC_MERCADO_PAGO_FAMILY_YEARLY || '',
     },
     features: [
       'Tudo do Pro',

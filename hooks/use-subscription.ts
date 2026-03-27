@@ -1,15 +1,14 @@
 "use client"
 
-import { useState } from "react"
-import { useAuth } from "./use-auth"
-import { stripeService } from "@/services/stripe"
-import { toast } from "sonner"
 import { BillingCycle, PlanConfig, SUBSCRIPTION_PLANS } from "@/lib/subscriptions/config"
+import { mercadoPagoService } from "@/services/mercado-pago"
+import { useState } from "react"
+import { toast } from "sonner"
+import { useAuth } from "./use-auth"
 
 export function useSubscription() {
   const { user, isAuthenticated } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
-  const [loadingPriceId, setLoadingPriceId] = useState<string | null>(null)
 
   const currentPlan = SUBSCRIPTION_PLANS[user?.planTier || 'FREE']
 
@@ -24,48 +23,38 @@ export function useSubscription() {
       return
     }
 
-    const priceId = plan.priceId[cycle]
-    if (!priceId) {
-      toast.error("Este plano ainda não está configurado para cobrança.")
+    const mpPlanId = plan.mpPlanId[cycle]
+    if (!mpPlanId) {
+      toast.error("Este plano ainda não está configurado para cobrança do Mercado Pago.")
       return
     }
 
     try {
       setIsLoading(true)
-      setLoadingPriceId(priceId)
-      const { url } = await stripeService.createCheckoutSession(priceId)
+      const { url } = await mercadoPagoService.createCheckoutUrl(plan.id, cycle)
       window.location.href = url
     } catch (error: any) {
-      console.error("Stripe Checkout Error:", error)
+      console.error("Mercado Pago Checkout Error:", error)
       toast.error(error?.message || "Erro ao iniciar processo de pagamento.")
     } finally {
       setIsLoading(false)
-      setLoadingPriceId(null)
     }
   }
 
   const handleManageBilling = async () => {
-    if (!user?.stripeCustomerId) {
+    if (!user?.mpCustomerId) {
       toast.error("Você ainda não possui uma assinatura ativa para gerenciar.")
       return
     }
 
-    try {
-      setIsLoading(true)
-      const { url } = await stripeService.createPortalSession()
-      window.location.href = url
-    } catch (error: any) {
-      console.error("Stripe Portal Error:", error)
-      toast.error(error?.message || "Erro ao carregar portal de faturamento.")
-    } finally {
-      setIsLoading(false)
-    }
+    // Portal do Mercado Pago não é suportado diretamente ainda;
+    // redirecione o usuário para o painel oficial manualmente.
+    window.location.href = "https://www.mercadopago.com.br/";
   }
 
   return {
     currentPlan,
     isLoading,
-    loadingPriceId,
     handleSubscribe,
     handleManageBilling,
     isAuthenticated,

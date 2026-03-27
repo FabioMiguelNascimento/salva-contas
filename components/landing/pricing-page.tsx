@@ -1,11 +1,10 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Check, ChevronDown, Sparkles, Loader2 } from "lucide-react"
-import { useState } from "react"
 import { useSubscription } from "@/hooks/use-subscription"
-import { SUBSCRIPTION_PLANS, COMPARISON_FEATURES, PlanConfig, BillingCycle } from "@/lib/subscriptions/config"
-import Link from "next/link"
+import { BillingCycle, COMPARISON_FEATURES, SUBSCRIPTION_PLANS } from "@/lib/subscriptions/config"
+import { Check, ChevronDown, Loader2, Sparkles } from "lucide-react"
+import { useState } from "react"
 
 const faqs = [
   {
@@ -25,7 +24,7 @@ const faqs = [
 export function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<BillingCycle>("monthly")
   const [openFaq, setOpenFaq] = useState<number | null>(null)
-  const { handleSubscribe, loadingPriceId } = useSubscription()
+  const { handleSubscribe, isLoading } = useSubscription()
 
   const plansList = Object.values(SUBSCRIPTION_PLANS)
 
@@ -114,10 +113,10 @@ export function PricingPage() {
                 <Button
                   variant={plan.popular ? "default" : "outline"}
                   className="w-full h-12 text-base font-medium rounded-xl"
-                  disabled={loadingPriceId !== null}
+                  disabled={isLoading}
                   onClick={() => handleSubscribe(plan, billingCycle)}
                 >
-                  {loadingPriceId === plan.priceId[billingCycle] ? (
+                  {isLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
                   ) : (
                     plan.cta
