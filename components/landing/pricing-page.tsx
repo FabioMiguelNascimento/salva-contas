@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/auth-context"
 import { useSubscription } from "@/hooks/use-subscription"
 import { BillingCycle, COMPARISON_FEATURES, PlanTier, SUBSCRIPTION_PLANS } from "@/lib/subscriptions/config"
 import { Check, ChevronDown, Loader2, Sparkles } from "lucide-react"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 
 const faqs = [
   {
@@ -33,59 +33,21 @@ export function PricingPage() {
   )
   const [selectedPlan, setSelectedPlan] = useState<PlanTier | null>(queryPlan as PlanTier | null)
   const [openFaq, setOpenFaq] = useState<number | null>(null)
-  const [progress, setProgress] = useState(0)
-  const [autoSubscribe, setAutoSubscribe] = useState(false)
 
-  const autoStartedRef = useRef(false)
   const { handleSubscribe, isLoading } = useSubscription()
 
   const plansList = Object.values(SUBSCRIPTION_PLANS)
 
   useEffect(() => {
     if (!isAuthenticated) return
-    if ((queryPlan === "PRO" || queryPlan === "FAMILY") && !autoStartedRef.current) {
-      autoStartedRef.current = true
+    if (queryPlan === "PRO" || queryPlan === "FAMILY") {
       setSelectedPlan(queryPlan)
       setBillingCycle(queryCycle === "yearly" ? "yearly" : "monthly")
-      setAutoSubscribe(true)
     }
   }, [queryPlan, queryCycle, isAuthenticated])
 
-  useEffect(() => {
-    if (!autoSubscribe || !selectedPlan) return
-
-    if (!isAuthenticated) {
-      const next = encodeURIComponent(`/precos?plan=${selectedPlan}&cycle=${billingCycle}`)
-      window.location.href = `/cadastro?plan=${selectedPlan}&cycle=${billingCycle}&next=${next}`
-      return
-    }
-
-    if (isLoading) return
-
-    const interval = window.setInterval(() => {
-      let current = progress + 5
-      if (current > 100) current = 100
-      setProgress(current)
-
-      if (current >= 100) {
-        clearInterval(interval)
-        setAutoSubscribe(false)
-
-        const plan = SUBSCRIPTION_PLANS[selectedPlan]
-        handleSubscribe(plan, billingCycle)
-      }
-    }, 75)
-
-    return () => clearInterval(interval)
-  }, [autoSubscribe, selectedPlan, billingCycle, handleSubscribe, isLoading, isAuthenticated, progress])
-
   return (
     <div className="min-h-screen pt-24">
-      {progress > 0 && (
-        <div className="fixed top-0 left-0 right-0 h-1 bg-primary/20 z-50">
-          <div className="h-full bg-primary transition-all" style={{ width: `${progress}%` }} />
-        </div>
-      )}
       <section className="relative py-20 overflow-hidden text-center">
         <div className="container relative mx-auto px-4">
           <span className="inline-block text-primary font-medium text-sm uppercase tracking-wider mb-4">
@@ -176,6 +138,7 @@ export function PricingPage() {
                     }
 
                     setSelectedPlan(plan.id)
+                    handleSubscribe(plan, billingCycle)
                   }}
                 >
                   <span className="relative z-10">
