@@ -126,11 +126,6 @@ export async function addVaultYield(id: string, payload: VaultAmountPayload): Pr
   return normalizeVault(unwrapData(response.data));
 }
 
-export async function aiActionOnVault(id: string, payload: VaultAiActionPayload): Promise<Vault> {
-  const response = await apiClient.post<ApiResponse<ApiVault>>(`/vaults/${id}/ai-action`, payload);
-  return normalizeVault(unwrapData(response.data));
-}
-
 export async function aiCommand(text: string): Promise<Vault> {
   const response = await apiClient.post<ApiResponse<ApiVault>>('/vaults/ai-command', { text });
   return normalizeVault(unwrapData(response.data));
