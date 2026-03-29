@@ -27,7 +27,7 @@ export function PricingPage() {
   const queryPlan = searchParams.get("plan") as PlanTier | null
   const queryCycle = searchParams.get("cycle") as BillingCycle | null
 
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
   const [billingCycle, setBillingCycle] = useState<BillingCycle>(
     queryCycle === "yearly" ? "yearly" : "monthly",
   )
@@ -45,6 +45,16 @@ export function PricingPage() {
       setBillingCycle(queryCycle === "yearly" ? "yearly" : "monthly")
     }
   }, [queryPlan, queryCycle, isAuthenticated])
+
+  const isCurrentPlan = (planId: string) => {
+    if (!isAuthenticated || !user) return false;
+    const userTier = user.planTier || 'FREE';
+    const userCycle = user.billingCycle || 'monthly';
+
+    if (userTier === 'FREE' && planId === 'FREE') return true;
+
+    return userTier === planId && userCycle === billingCycle;
+  };
 
   return (
     <div className="min-h-screen pt-24">
@@ -127,9 +137,9 @@ export function PricingPage() {
                 </ul>
 
                 <Button
-                  variant={plan.popular ? "default" : "outline"}
+                  variant={isCurrentPlan(plan.id) ? "secondary" : (plan.popular ? "default" : "outline")}
                   className="relative w-full h-12 text-base font-medium rounded-xl overflow-hidden"
-                  disabled={isLoading}
+                  disabled={isLoading || isCurrentPlan(plan.id)}
                   onClick={() => {
                     if (!isAuthenticated) {
                       const next = encodeURIComponent(`/precos?plan=${plan.id}&cycle=${billingCycle}`)
@@ -142,7 +152,9 @@ export function PricingPage() {
                   }}
                 >
                   <span className="relative z-10">
-                    {isLoading || (selectedPlan === plan.id) ? (
+                    {isCurrentPlan(plan.id) ? (
+                      "Seu plano atual"
+                    ) : isLoading || (selectedPlan === plan.id) ? (
                       <>
                         <Loader2 className="h-4 w-4 animate-spin mr-2 inline-block" />
                         {plan.cta}

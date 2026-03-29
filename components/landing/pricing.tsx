@@ -1,12 +1,14 @@
-﻿"use client"
+"use client"
 
 import { Button } from "@/components/ui/button"
+import { useAuth } from "@/contexts/auth-context"
 import { Check, Sparkles } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 
 const plans = [
   {
+    id: "FREE",
     name: "Grátis",
     description: "A isca de hábito para começar",
     price: { monthly: 0, yearly: 0 },
@@ -25,6 +27,7 @@ const plans = [
     popular: false,
   },
   {
+    id: "PRO",
     name: "Pro",
     description: "Foco em automação para quem odeia planilha",
     price: { monthly: 19.90, yearly: 14.90 },
@@ -41,6 +44,7 @@ const plans = [
     popular: true,
   },
   {
+    id: "FAMILY",
     name: "Família",
     description: "Diferencial matador para casais",
     price: { monthly: 39.90, yearly: 29.90 },
@@ -59,6 +63,17 @@ const plans = [
 
 export function Pricing() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly")
+  const { isAuthenticated, user } = useAuth()
+
+  const isCurrentPlan = (planId: string) => {
+    if (!isAuthenticated || !user) return false;
+    const userTier = user.planTier || 'FREE';
+    const userCycle = user.billingCycle || 'monthly';
+
+    if (userTier === 'FREE' && planId === 'FREE') return true;
+
+    return userTier === planId && userCycle === billingCycle;
+  };
 
   return (
     <section id="preços" className="relative py-32 overflow-hidden">
@@ -200,11 +215,16 @@ export function Pricing() {
 
               {/* CTA */}
               <Button
-                variant={plan.popular ? "default" : "outline"}
+                variant={isCurrentPlan(plan.id) ? "secondary" : (plan.popular ? "default" : "outline")}
                 className="w-full h-12 text-base font-medium rounded-xl"
-                asChild
+                asChild={!isCurrentPlan(plan.id)}
+                disabled={isCurrentPlan(plan.id)}
               >
-                <Link href="/cadastro">{plan.cta}</Link>
+                {isCurrentPlan(plan.id) ? (
+                  "Seu plano atual"
+                ) : (
+                  <Link href="/cadastro">{plan.cta}</Link>
+                )}
               </Button>
             </div>
           ))}
