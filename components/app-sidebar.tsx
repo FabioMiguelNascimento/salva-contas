@@ -23,55 +23,10 @@ import type { ComponentType, SVGProps } from "react";
 
 interface NavItem {
   label: string;
-  href: string;
+  href?: string;
   icon: ComponentType<SVGProps<SVGSVGElement>>;
-  description: string;
+  onClick?: () => void;
 }
-
-const baseNavItems: NavItem[] = [
-  {
-    label: "Dashboard",
-    href: "/app/dashboard",
-    icon: LayoutDashboard,
-    description: "Resumo financeiro, KPIs e alertas",
-  },
-  {
-    label: "Contas a Pagar",
-    href: "/app/contas",
-    icon: CalendarClock,
-    description: "Boletos, obrigacoes e agendamentos",
-  },
-  {
-    label: "Assinaturas",
-    href: "/app/assinaturas",
-    icon: Repeat,
-    description: "Compras recorrentes automatizadas",
-  },
-  {
-    label: "Cartões",
-    href: "/app/cartoes",
-    icon: CreditCard,
-    description: "Gerencie seus cartões de crédito",
-  },
-  {
-    label: "Orçamentos",
-    href: "/app/orcamentos",
-    icon: HandCoins,
-    description: "Limites por categoria",
-  },
-  {
-    label: "Cofrinhos",
-    href: "/app/cofrinhos",
-    icon: PiggyBank,
-    description: "Objetivos e reservas financeiras",
-  },
-  {
-    label: "Extrato / Transações",
-    href: "/app/extrato",
-    icon: ReceiptText,
-    description: "Histórico completo e filtros",
-  },
-];
 
 interface AppSidebarProps {
   onOpenSettings: (tab?: string) => void;
@@ -92,9 +47,16 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
         .toUpperCase()
     : "??";
 
-  const navItems = baseNavItems.map((item) => ({
-    ...item,
-  }));
+  const navItems: NavItem[] = [
+    { label: "Dashboard", href: "/app/dashboard", icon: LayoutDashboard },
+    { label: "Contas a Pagar", href: "/app/contas", icon: CalendarClock },
+    { label: "Assinaturas", href: "/app/assinaturas", icon: Repeat },
+    { label: "Cartões", href: "/app/cartoes", icon: CreditCard },
+    { label: "Orçamentos", href: "/app/orcamentos", icon: HandCoins },
+    { label: "Cofrinhos", href: "/app/cofrinhos", icon: PiggyBank },
+    { label: "Extrato / Transações", href: "/app/extrato", icon: ReceiptText },
+    { label: "Assistente Boletinho", icon: Sparkles, onClick: onOpenAiAdvisor },
+  ];
 
   return (
     <Sidebar collapsible="icon">
@@ -122,25 +84,32 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
             <SidebarMenu>
               {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = pathname === item.href;
+                const isActive = item.href ? pathname === item.href : false;
+                
                 return (
-                  <SidebarMenuItem key={item.href}>
-                    <SidebarMenuButton asChild isActive={isActive} tooltip={item.label}>
-                      <Link href={item.href}>
-                        <Icon />
-                        <span>{item.label}</span>
-                      </Link>
+                  <SidebarMenuItem key={item.label}>
+                    <SidebarMenuButton 
+                      asChild={!!item.href} 
+                      isActive={isActive} 
+                      tooltip={item.label}
+                      onClick={item.onClick}
+                      className={item.onClick ? "cursor-pointer" : ""}
+                    >
+                      {item.href ? (
+                        <Link href={item.href}>
+                          <Icon />
+                          <span>{item.label}</span>
+                        </Link>
+                      ) : (
+                        <>
+                          <Icon />
+                          <span>{item.label}</span>
+                        </>
+                      )}
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
               })}
-
-              <SidebarMenuItem>
-                <SidebarMenuButton onClick={onOpenAiAdvisor} className="cursor-pointer" tooltip="Assistente Boletinho">
-                  <Sparkles />
-                  <span>Assistente Boletinho</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
