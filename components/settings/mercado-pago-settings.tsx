@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card"
 import { useSubscription } from "@/hooks/use-subscription"
 import { CreditCard, ExternalLink, Loader2, Sparkles } from "lucide-react"
+import { UsageMeter } from "../usage-meter"
 
 export function MercadoPagoSettings() {
   const { currentPlan, handleManageBilling, isLoading } = useSubscription()
@@ -21,7 +22,7 @@ export function MercadoPagoSettings() {
           <div className="space-y-1">
             <CardTitle>Plano e Faturamento</CardTitle>
             <CardDescription>
-              Gerencie sua assinatura no Mercado Pago.
+              Gerencie sua assinatura e acompanhe seu uso mensal.
             </CardDescription>
           </div>
           <div className={`px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5 ${
@@ -41,7 +42,7 @@ export function MercadoPagoSettings() {
             <div>
               <p className="text-sm font-medium">Portal do Mercado Pago</p>
               <p className="text-xs text-muted-foreground">
-                Acesse o gerenciamento de assinatura e faturamento direto no Mercado Pago.
+                Acesse o gerenciamento de assinatura direto no Mercado Pago.
               </p>
             </div>
           </div>
@@ -57,8 +58,12 @@ export function MercadoPagoSettings() {
             ) : (
               <ExternalLink className="h-4 w-4 mr-2" />
             )}
-            Gerenciar no Mercado Pago
+            Gerenciar Assinatura
           </Button>
+        </div>
+
+        <div className="pt-2">
+          <UsageMeter />
         </div>
 
         {currentPlan.id === 'FREE' && (

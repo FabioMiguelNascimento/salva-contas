@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -81,7 +81,6 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
-  // const { pendingBills } = useTransactions();
 
   const userInitials = user?.name
     ? user.name
@@ -94,10 +93,6 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
 
   const navItems = baseNavItems.map((item) => ({
     ...item,
-    // badge:
-    //   item.href === "/contas" && pendingBills.length > 0
-    //     ? `${pendingBills.length}`
-    // : undefined,
   }));
 
   return (
@@ -135,7 +130,6 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
                         <span>{item.label}</span>
                       </Link>
                     </SidebarMenuButton>
-                    {/* {item.badge && <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>} */}
                   </SidebarMenuItem>
                 );
               })}
@@ -194,4 +188,3 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
     </Sidebar>
   );
 }
-
