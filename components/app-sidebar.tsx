@@ -14,6 +14,7 @@ import {
     SidebarMenuItem
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/contexts/auth-context";
+import { getPlanLabel } from "@/lib/utils";
 import { CalendarClock, CreditCard, HandCoins, LayoutDashboard, LogOut, PiggyBank, ReceiptText, Repeat, Settings, Sparkles, User, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -156,7 +157,9 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                     <span className="truncate font-medium">{user?.name ?? "Usuario"}</span>
-                    <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
+                    <span className="truncate text-xs text-primary font-semibold uppercase tracking-wider">
+                      Plano {getPlanLabel(user?.planTier)}
+                    </span>
                   </div>
                 </SidebarMenuButton>
               </DropdownMenuTrigger>

@@ -37,3 +37,15 @@ export function getTransactionCategoryLabel(
 ) {
   return transaction.categoryName ?? transaction.categoryRel?.name ?? transaction.category
 }
+
+export function getPlanLabel(planTier?: string) {
+  if (!planTier) return "Grátis";
+  
+  const labels: Record<string, string> = {
+    FREE: "Grátis",
+    PRO: "Pro",
+    FAMILY: "Família",
+  };
+
+  return labels[planTier.toUpperCase()] ?? planTier;
+}

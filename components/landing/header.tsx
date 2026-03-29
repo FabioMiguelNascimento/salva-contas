@@ -1,9 +1,10 @@
-﻿"use client"
+"use client"
 
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
 import { useAuth } from "@/hooks/use-auth"
+import { getPlanLabel } from "@/lib/utils"
 import { Menu, X } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
@@ -65,14 +66,17 @@ export function Header() {
 
           {isAuthenticated ? (
             <div className="hidden md:flex items-center gap-3">
-              <Button variant="ghost" className="px-5" asChild>
-                <Link href="/app/dashboard">
-                  <Avatar>
-                    <AvatarFallback>{userInitials}</AvatarFallback>
+              <Button variant="ghost" className="px-5 h-auto py-2" asChild>
+                <Link href="/app/dashboard" className="flex items-center gap-2">
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback className="text-[10px]">{userInitials}</AvatarFallback>
                   </Avatar>
                   <div className="text-left">
-                    <div className="text-sm font-medium text-foreground">
+                    <div className="text-sm font-medium text-foreground leading-none mb-1">
                       {user?.name || user?.email || "usuário"}
+                    </div>
+                    <div className="text-[10px] text-primary font-bold uppercase tracking-wider">
+                      Plano {getPlanLabel(user?.planTier)}
                     </div>
                   </div>
                 </Link>
@@ -126,7 +130,7 @@ export function Header() {
                     <div className="font-semibold text-foreground">
                       Olá, {user?.name || user?.email || "usuário"}
                     </div>
-                    <div className="text-xs text-muted-foreground">Logado</div>
+                    <div className="text-xs text-primary font-bold uppercase">Plano {getPlanLabel(user?.planTier)}</div>
                   </div>
                 </div>
                 <button
@@ -161,7 +165,7 @@ export function Header() {
                   className="mt-2 w-full rounded-xl py-3 text-base font-semibold"
                   asChild
                 >
-                  <Link href="/cadastro">ComeÃ§ar gratis</Link>
+                  <Link href="/cadastro">Começar gratis</Link>
                 </Button>
               </div>
             </nav>
@@ -171,5 +175,3 @@ export function Header() {
     </header>
   )
 }
-
-
