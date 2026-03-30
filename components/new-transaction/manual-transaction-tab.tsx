@@ -12,6 +12,8 @@ type ManualTransactionTabProps = {
   manualDescription: string;
   onManualDescriptionChange: (value: string) => void;
   manualAmount: string;
+  manualInstallments: string;
+  onManualInstallmentsChange: (value: string) => void;
   onManualAmountChange: (value: string) => void;
   manualCategoryId: string | null;
   onManualCategoryIdChange: (value: string | null) => void;
@@ -26,6 +28,8 @@ export function ManualTransactionTab({
   onManualDescriptionChange,
   manualAmount,
   onManualAmountChange,
+  manualInstallments,
+  onManualInstallmentsChange,
   manualCategoryId,
   onManualCategoryIdChange,
   manualType,
@@ -65,6 +69,24 @@ export function ManualTransactionTab({
               placeholder="0,00"
               className="rounded-sm"
             />
+          </div>
+
+          <div className="space-y-1">
+            <Label htmlFor="manual-installments" className="text-xs uppercase tracking-wider text-muted-foreground">
+              Parcelas (opcional)
+            </Label>
+            <Input
+              id="manual-installments"
+              type="number"
+              min={1}
+              value={manualInstallments}
+              onChange={(e) => onManualInstallmentsChange(e.target.value)}
+              placeholder="1"
+              className="rounded-sm"
+            />
+            <p className="text-xs text-muted-foreground">
+              Caso seja compra parcelada, informe o número de parcelas.
+            </p>
           </div>
 
           <div className="space-y-1 sm:col-span-2">

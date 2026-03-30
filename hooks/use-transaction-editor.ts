@@ -1,10 +1,10 @@
 import type { SplitRow } from "@/components/new-transaction/split-payment-builder";
 import { useTransactions } from "@/context/transactions-context";
 import type { PaymentMethod, Transaction } from "@/types/finance";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function useTransactionEditor() {
-  const { updateExistingTransaction } = useTransactions();
+  const { updateExistingTransaction, fetchInstallmentTransactions } = useTransactions();
   const [open, setOpen] = useState(false);
   const [transaction, setTransaction] = useState<Transaction | undefined>();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -21,6 +21,8 @@ export function useTransactionEditor() {
   const [editSplits, setEditSplits] = useState<SplitRow[]>([]);
   const [editType, setEditType] = useState("expense");
   const [editStatus, setEditStatus] = useState("paid");
+  const [installmentTransactions, setInstallmentTransactions] = useState<Transaction[]>([]);
+  const [isLoadingInstallments, setIsLoadingInstallments] = useState(false);
 
   const openEditor = useCallback((tx: Transaction) => {
     setTransaction(tx);
@@ -56,6 +58,19 @@ export function useTransactionEditor() {
     setOpen(true);
   }, []);
 
+  useEffect(() => {
+    if (!transaction || !transaction.installmentGroupId) {
+      setInstallmentTransactions([]);
+      setIsLoadingInstallments(false);
+      return;
+    }
+
+    setIsLoadingInstallments(true);
+    fetchInstallmentTransactions(transaction.id)
+      .then((result) => setInstallmentTransactions(result))
+      .catch(() => setInstallmentTransactions([]))
+      .finally(() => setIsLoadingInstallments(false));
+  }, [transaction, fetchInstallmentTransactions]);
   const closeEditor = useCallback(() => {
     setOpen(false);
     setTransaction(undefined);
@@ -130,6 +145,8 @@ export function useTransactionEditor() {
     setEditSplits,
     setEditType,
     setEditStatus,
+    installmentTransactions,
+    isLoadingInstallments,
     openEditor,
     closeEditor,
     handleSubmit,

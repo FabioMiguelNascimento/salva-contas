@@ -7,14 +7,14 @@ import { TransactionDetails } from "@/components/new-transaction/transaction-det
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
+    Sheet,
+    SheetBody,
+    SheetContent,
+    SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
 } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useTransactions } from "@/context/transactions-context";
@@ -44,6 +44,8 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
   const [selectedCreditCardId, setSelectedCreditCardId] = useState<string | null>(null);
   const [selectedDebitCardId, setSelectedDebitCardId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<"credit_card" | "debit" | "pix" | "cash" | "transfer" | "other">("cash");
+  const [manualInstallments, setManualInstallments] = useState<string>("");
+  const [aiInstallments, setAiInstallments] = useState<string>("");
   const [isSplitMode, setIsSplitMode] = useState(false);
   const [splits, setSplits] = useState<SplitRow[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,6 +66,8 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
     setSelectedCreditCardId(null);
     setSelectedDebitCardId(null);
     setPaymentMethod("cash");
+    setManualInstallments("");
+    setAiInstallments("");
     setIsSplitMode(false);
     setSplits([]);
     setIsSubmitting(false);
@@ -91,6 +95,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
           date: selectedDate ? format(selectedDate, "yyyy-MM-dd") : undefined,
           creditCardId: paymentMethod === "credit_card" ? (selectedCreditCardId ?? undefined) : undefined,
           debitCardId: paymentMethod === "debit" ? (selectedDebitCardId ?? undefined) : undefined,
+          installments: aiInstallments ? Number(aiInstallments) : undefined,
         });
 
         setSuccessMessage("Transação enviada! A IA já está organizando tudo por aqui.");
@@ -114,6 +119,12 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
         }
         if (!isSplitMode && paymentMethod === "debit" && !selectedDebitCardId) {
           setError("Selecione um cartão de débito.");
+          return;
+        }
+
+        const installmentsValue = Number(manualInstallments);
+        if (manualInstallments && (!Number.isInteger(installmentsValue) || installmentsValue < 1)) {
+          setError("Informe um número de parcelas válido (inteiro maior que 0).");
           return;
         }
 
@@ -160,6 +171,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
           status: manualStatus,
           dueDate: isScheduled && selectedDate ? format(selectedDate, "yyyy-MM-dd") : undefined,
           paymentDate: !isScheduled && selectedDate ? format(selectedDate, "yyyy-MM-dd") : undefined,
+          installments: manualInstallments ? Number(manualInstallments) : undefined,
           creditCardId: !isSplitMode && paymentMethod === "credit_card" ? (selectedCreditCardId ?? undefined) : undefined,
           debitCardId: !isSplitMode && paymentMethod === "debit" ? (selectedDebitCardId ?? undefined) : undefined,
           splits: isSplitMode
@@ -224,6 +236,8 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
                 }}
                 textInput={textInput}
                 onTextInputChange={setTextInput}
+                installments={aiInstallments}
+                onInstallmentsChange={setAiInstallments}
               />
 
               <ManualTransactionTab
@@ -231,6 +245,8 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
                 onManualDescriptionChange={setManualDescription}
                 manualAmount={manualAmount}
                 onManualAmountChange={setManualAmount}
+                manualInstallments={manualInstallments}
+                onManualInstallmentsChange={setManualInstallments}
                 manualCategoryId={manualCategoryId}
                 onManualCategoryIdChange={setManualCategoryId}
                 manualType={manualType}

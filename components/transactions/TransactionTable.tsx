@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
-import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
+import { cn, getTransactionCategoryLabel, getTransactionStatusLabel, parseDateOnly } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -79,10 +79,17 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
                   <button
                     type="button"
                     onClick={() => copyTransactionId(transaction)}
-                    className="block w-full truncate text-left font-semibold hover:underline decoration-dotted"
+                    className="flex w-full items-center gap-2 text-left hover:underline decoration-dotted"
                     title="Clique para copiar o ID da transação"
                   >
-                    {transaction.description}
+                    <span className="block min-w-0 truncate font-semibold">
+                      {transaction.description}
+                    </span>
+                    {transaction.installmentCurrent && transaction.installments ? (
+                      <Badge variant="secondary" className="text-[11px] px-2 py-0.5">
+                        {transaction.installmentCurrent}/{transaction.installments}
+                      </Badge>
+                    ) : null}
                   </button>
                 </div>
               </TableCell>

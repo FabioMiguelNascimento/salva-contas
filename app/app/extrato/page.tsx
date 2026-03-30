@@ -170,6 +170,8 @@ function ExtratoPageContent() {
         editPaymentMethod={editor.editPaymentMethod}
         editIsSplitMode={editor.editIsSplitMode}
         editSplits={editor.editSplits}
+        installmentTransactions={editor.installmentTransactions}
+        isLoadingInstallments={editor.isLoadingInstallments}
         setEditDescription={editor.setEditDescription}
         setEditAmount={editor.setEditAmount}
         setEditType={editor.setEditType}

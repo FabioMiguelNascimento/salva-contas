@@ -2,16 +2,17 @@
 
 import { fetchCategories } from "@/services/categories";
 import {
-  deleteTransaction,
-  fetchTransactions,
-  processTransaction,
-  updateTransaction
+    deleteTransaction,
+    fetchInstallmentTransactions,
+    fetchTransactions,
+    processTransaction,
+    updateTransaction,
 } from "@/services/transactions";
 import type {
-  ProcessTransactionClientPayload,
-  Transaction,
-  TransactionCategory,
-  UpdateTransactionPayload,
+    ProcessTransactionClientPayload,
+    Transaction,
+    TransactionCategory,
+    UpdateTransactionPayload,
 } from "@/types/finance";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useFinancePeriod } from "./finance-period-context";
@@ -29,6 +30,7 @@ interface TransactionsContextValue {
   updateExistingTransaction: (id: string, payload: UpdateTransactionPayload) => Promise<Transaction | void>;
   markAsPaid: (id: string) => Promise<Transaction | void>;
   removeTransaction: (id: string) => Promise<void>;
+  fetchInstallmentTransactions: (transactionId: string) => Promise<Transaction[]>;
 }
 
 const TransactionsContext = createContext<TransactionsContextValue | null>(null);
@@ -94,6 +96,10 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
     return transaction;
   }, [triggerRefresh]);
 
+  const fetchInstallments = useCallback(async (transactionId: string) => {
+    return await fetchInstallmentTransactions(transactionId);
+  }, []);
+
   const markAsPaid = useCallback(async (id: string) => {
     const now = new Date().toISOString();
     const payload: UpdateTransactionPayload = {
@@ -125,6 +131,7 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
         updateExistingTransaction,
         markAsPaid,
         removeTransaction,
+        fetchInstallmentTransactions: fetchInstallments,
       }}
     >
       {children}

@@ -26,6 +26,7 @@ export type ManualTransactionPayload = {
   status: TransactionStatus;
   dueDate?: string;
   paymentDate?: string;
+  installments?: number;
   creditCardId?: string;
   debitCardId?: string;
   splits?: Array<{
@@ -56,6 +57,10 @@ const normalizeTransaction = (transaction: ApiTransaction): Transaction => {
     creditCardId: transaction.creditCardId ?? transaction.creditCard?.id ?? null,
     debitCard: transaction.debitCard ?? null,
     debitCardId: transaction.debitCardId ?? transaction.debitCard?.id ?? null,
+    installments: transaction.installments ?? null,
+    installmentGroupId: (transaction as any).installmentGroupId ?? null,
+    installmentCurrent: (transaction as any).installmentCurrent ?? null,
+    purchaseDate: (transaction as any).purchaseDate ?? null,
     createdById: transaction.createdById ?? null,
     createdByName: transaction.createdByName ?? null,
   };
@@ -75,6 +80,15 @@ export async function fetchTransactions(filters: TransactionFilters) {
 
   const transactions = unwrapData(response.data);
   return (transactions ?? []).map(normalizeTransaction);
+}
+
+export async function fetchInstallmentTransactions(transactionId: string) {
+  const response = await apiClient.get<ApiResponse<ApiTransaction[]>>(
+    `/transactions/${transactionId}/installments`,
+  );
+
+  const data = unwrapData(response.data);
+  return (Array.isArray(data) ? data : []).map(normalizeTransaction);
 }
 
 export async function processTransaction(payload: ProcessTransactionClientPayload) {
@@ -102,6 +116,10 @@ export async function processTransaction(payload: ProcessTransactionClientPayloa
 
   if (payload.debitCardId) {
     formData.append("debitCardId", payload.debitCardId);
+  }
+
+  if (payload.installments && payload.installments > 0) {
+    formData.append("installments", String(payload.installments));
   }
 
   const response = await apiClient.post<ApiResponse<ApiTransaction | ApiTransaction[]>>("/transactions", formData, {

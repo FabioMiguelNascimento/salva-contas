@@ -49,3 +49,14 @@ export function getPlanLabel(planTier?: string) {
 
   return labels[planTier.toUpperCase()] ?? planTier;
 }
+
+export function getTransactionStatusLabel(status?: string | null) {
+  if (!status) return "—";
+
+  const labels: Record<string, string> = {
+    paid: "Pago",
+    pending: "Pendente",
+  };
+
+  return labels[status] ?? status;
+}

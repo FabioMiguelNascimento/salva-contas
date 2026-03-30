@@ -129,6 +129,10 @@ export interface Transaction {
   attachmentUrl?: string | null; // URL pré-assinada gerada pelo backend
 
   splits?: TransactionSplit[];
+  installments?: number | null;
+  installmentGroupId?: string | null;
+  installmentCurrent?: number | null;
+  purchaseDate?: string | null;
 
   createdAt?: string;
   updatedAt?: string;
@@ -315,6 +319,7 @@ export interface ProcessTransactionClientPayload {
   date?: string | null;
   creditCardId?: string;
   debitCardId?: string;
+  installments?: number | null;
 }
 
 // Budget types

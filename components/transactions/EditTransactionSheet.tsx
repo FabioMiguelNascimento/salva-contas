@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Textarea } from "@/components/ui/textarea";
+import { Skeleton } from "@/components/ui/skeleton";
+import { cn, getTransactionStatusLabel } from "@/lib/utils";
 import { PAYMENT_METHOD_LABELS, PaymentMethod, Transaction } from "@/types/finance";
 import { SplitSquareHorizontal } from "lucide-react";
+import { Badge } from "../ui/badge";
 
 const PAYMENT_METHODS = Object.entries(PAYMENT_METHOD_LABELS) as [PaymentMethod, string][];
 
@@ -41,6 +43,8 @@ interface Props {
   setEditPaymentMethod: (v: PaymentMethod) => void;
   setEditIsSplitMode: (v: boolean) => void;
   setEditSplits: (splits: SplitRow[]) => void;
+  installmentTransactions: Transaction[];
+  isLoadingInstallments: boolean;
   onClose: () => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
@@ -72,6 +76,8 @@ export function EditTransactionSheet({
   setEditPaymentMethod,
   setEditIsSplitMode,
   setEditSplits,
+  installmentTransactions,
+  isLoadingInstallments,
   onClose,
   onSubmit,
 }: Props) {
@@ -208,8 +214,48 @@ export function EditTransactionSheet({
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Notas internas</Label>
-              <Textarea placeholder="Adicione um contexto adicional" disabled />
+              <Label>Parcelas</Label>
+              {isLoadingInstallments ? (
+                <div className="space-y-2">
+                  <Skeleton className="h-8 w-full rounded-md" />
+                  <Skeleton className="h-8 w-full rounded-md" />
+                  <Skeleton className="h-8 w-full rounded-md" />
+                </div>
+              ) : installmentTransactions && installmentTransactions.length > 0 ? (
+                <div className="overflow-x-auto border border-border rounded-lg">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted text-left text-xs uppercase tracking-wide">
+                      <tr>
+                        <th className="px-2 py-2">#</th>
+                        <th className="px-2 py-2">Valor</th>
+                        <th className="px-2 py-2">Vencimento</th>
+                        <th className="px-2 py-2">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {installmentTransactions.map((installment) => (
+                        <tr key={installment.id} className="border-t border-border">
+                          <td className="px-2 py-2">{installment.installmentCurrent}</td>
+                          <td className="px-2 py-2">{installment.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
+                          <td className="px-2 py-2">{installment.dueDate ? new Date(installment.dueDate).toLocaleDateString("pt-BR") : "—"}</td>
+                          <td className="px-2 py-2"><Badge
+                            className={cn(
+                              "text-xs",
+                              installment.type === "income"
+                                ? "bg-emerald-100 text-emerald-800"
+                                : "bg-destructive/15 text-destructive"
+                            )}
+                          >
+                            {getTransactionStatusLabel(installment.status)}
+                          </Badge></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">Nenhuma parcela</p>
+              )}
             </div>
 
             {error && <p className="text-sm text-destructive">{error}</p>}
