@@ -3,12 +3,14 @@
 import { AppShell } from "@/components/app-shell";
 import { AttachmentViewer } from "@/components/attachment-viewer";
 import { DatePicker } from "@/components/date-picker";
+import { DynamicIcon } from "@/components/dynamic-icon";
 import { PageHeader } from "@/components/page-header";
 import { SummaryCard } from "@/components/summary-card";
 import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -22,7 +24,7 @@ import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { differenceInCalendarDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { AlertTriangle, Calendar, CheckCircle2, FileText, PencilLine, ShieldCheck } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle2, FileText, MoreHorizontal, PencilLine, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -158,10 +160,10 @@ function ContasPageContent() {
         </CardHeader>
         <CardContent>
           <ScrollArea className="hidden md:block">
-            <Table>
+            <Table className="min-w-[1100px]">
               <TableHeader>
                 <TableRow>
-                  <TableHead>Descricao</TableHead>
+                  <TableHead>Descrição</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Valor</TableHead>
                   <TableHead>Vencimento</TableHead>
@@ -183,17 +185,23 @@ function ContasPageContent() {
                     const categoryLabel = getTransactionCategoryLabel(bill);
                     return (
                       <TableRow key={bill.id}>
-                        <TableCell>
-                          <div>
+                        <TableCell className="max-w-[320px]">
+                          <div className="min-w-0">
                             <button
                               type="button"
                               onClick={() => copyTransactionId(bill)}
-                              className="font-semibold text-left hover:underline decoration-dotted"
+                              className="block w-full truncate font-semibold text-left hover:underline decoration-dotted"
                               title="Clique para copiar o ID da transacao"
                             >
                               {bill.description}
                             </button>
-                            <p className="text-xs text-muted-foreground">{categoryLabel}</p>
+                            <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                              <DynamicIcon
+                                name={bill.categoryRel?.icon ?? "tag"}
+                                className="h-3.5 w-3.5 shrink-0 text-muted-foreground"
+                              />
+                              <span className="truncate">{categoryLabel}</span>
+                            </p>
                             {bill.createdByName ? (
                               <p className="text-[11px] text-muted-foreground">Criado por {bill.createdByName}</p>
                             ) : null}
@@ -205,18 +213,31 @@ function ContasPageContent() {
                         <TableCell>{currencyFormatter.format(bill.amount)}</TableCell>
                         <TableCell>{bill.dueDate ? format(parseDateOnly(bill.dueDate)!, "dd/MM", { locale: ptBR }) : "—"}</TableCell>
                         <TableCell>{formatDaysRemaining(bill)}</TableCell>
-                        <TableCell className="flex justify-end gap-2">
-                          {bill.attachmentUrl && (
-                            <Button size="sm" variant="ghost" onClick={() => setAttachmentViewer({ open: true, bill })}>
-                              <FileText className="h-3.5 w-3.5" />
-                            </Button>
-                          )}
-                          <Button size="sm" onClick={() => setPayDialog({ open: true, bill })}>
-                            Pagar agora
-                          </Button>
-                          <Button size="sm" variant="outline" onClick={() => openEditSheet(bill)}>
-                            <PencilLine className="mr-2 h-3.5 w-3.5" /> Editar
-                          </Button>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Ações</span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {bill.attachmentUrl && (
+                                <DropdownMenuItem onClick={() => setAttachmentViewer({ open: true, bill })}>
+                                  <FileText className="mr-2 h-4 w-4" />
+                                  Ver anexo
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem onClick={() => setPayDialog({ open: true, bill })}>
+                                <CheckCircle2 className="mr-2 h-4 w-4" />
+                                Marcar como pago
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => openEditSheet(bill)}>
+                                <PencilLine className="mr-2 h-4 w-4" />
+                                Editar
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     );
@@ -251,7 +272,13 @@ function ContasPageContent() {
                           >
                             {bill.description}
                           </button>
-                          <p className="text-xs text-muted-foreground">{categoryLabel}</p>
+                          <p className="mt-1 flex items-center gap-1.5 text-xs text-muted-foreground">
+                            <DynamicIcon
+                              name={bill.categoryRel?.icon ?? "tag"}
+                              className="h-3.5 w-3.5 shrink-0 text-muted-foreground"
+                            />
+                            <span className="truncate">{categoryLabel}</span>
+                          </p>
                           {bill.createdByName ? (
                             <p className="text-[11px] text-muted-foreground">Criado por {bill.createdByName}</p>
                           ) : null}
