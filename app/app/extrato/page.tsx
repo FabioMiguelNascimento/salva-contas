@@ -28,6 +28,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 
 import type { Transaction } from "@/types/finance";
+import { CardsProvider } from "@/context/cards-context";
 
 function ExtratoPageContent() {
   const {
@@ -201,9 +202,11 @@ function ExtratoPageContent() {
 export default function ExtratoPage() {
   return (
     <TransactionsProvider>
-      <AppShell>
-        <ExtratoPageContent />
-      </AppShell>
+      <CardsProvider >
+        <AppShell>
+          <ExtratoPageContent />
+        </AppShell>
+      </CardsProvider>
     </TransactionsProvider>
   );
 }

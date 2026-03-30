@@ -24,7 +24,6 @@ import type {
   UpdateCreditCardPayload,
   UpdateDebitCardPayload,
 } from "@/types/finance";
-import { usePathname } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 interface CardsStats {
@@ -66,9 +65,6 @@ const getHighUsageCards = (cards: CreditCard[]) =>
   }).length;
 
 export function CardsProvider({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  const isCardsRoute = pathname.startsWith("/app/cartoes");
-
   const [creditCards, setCreditCards] = useState<CreditCard[]>([]);
   const [debitCards, setDebitCards] = useState<DebitCard[]>([]);
   const [creditCardMetrics, setCreditCardMetrics] = useState<CreditCardMetrics | null>(null);
@@ -77,7 +73,6 @@ export function CardsProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    if (!isCardsRoute) return;
     setIsLoading(true);
     try {
       const [cards, debits, creditMetrics, debitMetrics] = await Promise.all([
@@ -96,7 +91,7 @@ export function CardsProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  }, [isCardsRoute]);
+  }, []);
 
   const lastRefreshLoad = useRef<any>(null);
 
