@@ -1,65 +1,13 @@
 "use client"
 
+import { PlansGrid } from "@/components/landing/plans-grid"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/auth-context"
-import { Check, Sparkles } from "lucide-react"
-import Link from "next/link"
+import { SUBSCRIPTION_PLANS } from "@/lib/subscriptions/config"
+import { Check } from "lucide-react"
 import { useState } from "react"
 
-const plans = [
-  {
-    id: "FREE",
-    name: "Grátis",
-    description: "A isca de hábito para começar",
-    price: { monthly: 0, yearly: 0 },
-    features: [
-      { label: "Cadastro manual de despesas e receitas", included: true },
-      { label: "Acesso apenas ao mês atual + últimos 3 meses", included: true },
-      { label: "Até 3 Cofrinhos", included: true },
-      { label: "Apenas 1 usuário (sem partilha)", included: true },
-      { label: "Boletinho Básico (suporte de uso; sem dados do banco)", included: true },
-      { label: "Leitura de recibos com IA", included: false },
-      { label: "Consultor Boletinho IA avançado", included: false },
-      { label: "Histórico completo", included: false },
-      { label: "Cofrinhos ilimitados", included: false },
-    ],
-    cta: "Começar grátis",
-    popular: false,
-  },
-  {
-    id: "PRO",
-    name: "Pro",
-    description: "Foco em automação para quem odeia planilha",
-    price: { monthly: 19.90, yearly: 14.90 },
-    features: [
-      { label: "Leitura de recibos com IA (até 100/mês)", included: true },
-      { label: "Consultor Boletinho IA avançado com dados do Prisma", included: true },
-      { label: "Histórico de transações liberado desde o início", included: true },
-      { label: "Cofrinhos ilimitados", included: true },
-      { label: "Até 5 usuários (sem partilha)", included: false },
-      { label: "Contas vinculadas e convites por ID", included: false },
-      { label: "Auditoria de gastos (Blame)", included: false },
-    ],
-    cta: "Assinar Pro",
-    popular: true,
-  },
-  {
-    id: "FAMILY",
-    name: "Família",
-    description: "Diferencial matador para casais",
-    price: { monthly: 39.90, yearly: 29.90 },
-    features: [
-      { label: "Tudo do plano Pro", included: true },
-      { label: "Até 5 usuários (contas vinculadas)", included: true },
-      { label: "Auditoria de gastos (Blame)", included: true },
-      { label: "Leitura de recibos com IA ampliada (250/mês)", included: true },
-      { label: "Cofrinhos compartilhados", included: true },
-      { label: "Dashboard familiar e metas conjuntas", included: true },
-    ],
-    cta: "Assinar Família",
-    popular: false,
-  },
-]
+const plans = Object.values(SUBSCRIPTION_PLANS)
 
 export function Pricing() {
   const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly")
@@ -124,111 +72,21 @@ export function Pricing() {
           </div>
         </div>
 
-        {/* Plans */}
-        <div className="grid gap-8 lg:grid-cols-3 max-w-6xl mx-auto items-start">
-          {plans.map((plan) => (
-            <div
-              key={plan.name}
-              className={`relative rounded-3xl p-8 transition-all duration-300 ${
-                plan.popular
-                  ? "bg-card border-2 border-primary/40 ring-1 ring-primary/15 scale-[1.03] shadow-2xl lg:-my-4"
-                  : "bg-card border-2 border-border shadow-sm hover:border-primary/25 hover:shadow-xl"
-              }`}
-            >
-              {/* Popular badge */}
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground text-xs font-semibold px-4 py-2 rounded-full shadow-lg shadow-primary/30">
-                    <Sparkles className="h-3.5 w-3.5" />
-                    Mais popular
-                  </span>
-                </div>
-              )}
+        <PlansGrid
+          plans={plans}
+          billingCycle={billingCycle}
+          onBillingCycleChange={setBillingCycle}
+          isCurrentPlan={isCurrentPlan}
+          onPlanSelect={(plan) => {
+            if (!isAuthenticated) {
+              const next = encodeURIComponent(`/precos?plan=${plan.id}&cycle=${billingCycle}`)
+              window.location.href = `/cadastro?plan=${plan.id}&cycle=${billingCycle}&next=${next}`
+              return
+            }
 
-              {/* Plan header */}
-              <div className="mb-8">
-                <h3 className="text-2xl font-bold text-foreground">
-                  {plan.name}
-                </h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {plan.description}
-                </p>
-              </div>
-
-              {/* Price */}
-              <div className="mb-8">
-                <div className="flex items-baseline gap-1">
-                  <span className="text-sm text-muted-foreground">
-                    R$
-                  </span>
-                  <span className="text-5xl font-bold tracking-tight text-foreground">
-                    {plan.price[billingCycle].toFixed(2).split(".")[0]}
-                  </span>
-                  <span className="text-2xl font-bold text-foreground">
-                    ,{plan.price[billingCycle].toFixed(2).split(".")[1]}
-                  </span>
-                  <span className="text-sm ml-1 text-muted-foreground">
-                    /mes
-                  </span>
-                </div>
-                {billingCycle === "yearly" && plan.price.yearly > 0 && (
-                  <p className="text-xs mt-2 text-muted-foreground">
-                    Cobrado R$ {(plan.price.yearly * 12).toFixed(2).replace(".", ",")} à vista (equiv. a R$ {plan.price.yearly.toFixed(2).replace(".", ",")}/mês)
-                  </p>
-                )}
-              </div>
-
-              {/* Features */}
-              <ul className="mb-8 space-y-4">
-                {plan.features.map((feature) => (
-                  <li
-                    key={feature.label}
-                    className="flex items-start gap-3"
-                  >
-                    <div
-                      className={`mt-0.5 rounded-full p-1 ${
-                        feature.included
-                          ? "bg-primary/10"
-                          : "bg-muted-foreground/10"
-                      }`}
-                    >
-                      <Check
-                        className={`h-3.5 w-3.5 ${
-                          feature.included
-                            ? "text-primary"
-                            : "text-muted-foreground"
-                        }`}
-                      />
-                    </div>
-                    <span
-                      className={`text-sm leading-relaxed ${
-                        feature.included
-                          ? "text-foreground/80"
-                          : "text-muted-foreground line-through"
-                      }`}
-                    >
-                      {feature.label}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-
-              {/* CTA */}
-              <Button
-                variant={isCurrentPlan(plan.id) ? "secondary" : (plan.popular ? "default" : "outline")}
-                className="w-full h-12 text-base font-medium rounded-xl"
-                asChild={!isCurrentPlan(plan.id)}
-                disabled={isCurrentPlan(plan.id)}
-              >
-                {isCurrentPlan(plan.id) ? (
-                  "Seu plano atual"
-                ) : (
-                  <Link href="/cadastro">{plan.cta}</Link>
-                )}
-              </Button>
-            </div>
-          ))}
-        </div>
+            window.location.href = `/app/assinaturas?plan=${plan.id}&cycle=${billingCycle}`
+          }}
+        />
 
         {/* Trust badges */}
         <div className="mt-16 text-center">

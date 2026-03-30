@@ -1,10 +1,11 @@
 "use client"
 
+import { PlansGrid } from "@/components/landing/plans-grid"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/auth-context"
 import { useSubscription } from "@/hooks/use-subscription"
 import { BillingCycle, COMPARISON_FEATURES, PlanTier, SUBSCRIPTION_PLANS } from "@/lib/subscriptions/config"
-import { Check, ChevronDown, Loader2, Sparkles } from "lucide-react"
+import { Check, ChevronDown, Lock } from "lucide-react"
 import { useEffect, useState } from "react"
 
 const faqs = [
@@ -56,6 +57,30 @@ export function PricingPage() {
     return userTier === planId && userCycle === billingCycle;
   };
 
+  const renderComparisonValue = (value: string) => {
+    const normalized = value.toLowerCase()
+
+    if (normalized.includes('bloqueado')) {
+      return (
+        <span className="inline-flex items-center justify-center gap-1 text-muted-foreground">
+          <Lock className="h-4 w-4" />
+          {value.replace(/bloqueado/i, 'Bloqueado')}
+        </span>
+      )
+    }
+
+    if (normalized.includes('liberado')) {
+      return (
+        <span className="inline-flex items-center justify-center gap-1 text-emerald-500 font-medium">
+          <Check className="h-4 w-4" />
+          {value.replace(/liberado/i, 'Liberado')}
+        </span>
+      )
+    }
+
+    return <span className="inline-flex items-center justify-center gap-1">{value}</span>
+  }
+
   return (
     <div className="min-h-screen pt-24">
       <section className="relative py-20 overflow-hidden text-center">
@@ -88,85 +113,22 @@ export function PricingPage() {
 
       <section className="py-12">
         <div className="container mx-auto px-4">
-          <div className="grid gap-8 lg:grid-cols-3 max-w-6xl mx-auto items-start">
-            {plansList.map((plan) => (
-              <div
-                key={plan.id}
-                className={`relative rounded-3xl p-8 transition-all ${
-                  plan.popular
-                    ? "bg-card border-2 border-primary/40 ring-1 ring-primary/15 scale-[1.03] shadow-2xl lg:-my-4"
-                    : "bg-card border-2 border-border shadow-sm hover:border-primary/25"
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                    <span className="inline-flex items-center gap-1.5 bg-primary text-primary-foreground text-xs font-semibold px-4 py-2 rounded-full shadow-lg">
-                      <Sparkles className="h-3.5 w-3.5" />
-                      Mais popular
-                    </span>
-                  </div>
-                )}
+          <PlansGrid
+            plans={plansList}
+            billingCycle={billingCycle}
+            onBillingCycleChange={setBillingCycle}
+            isCurrentPlan={isCurrentPlan}
+            onPlanSelect={(plan) => {
+              if (!isAuthenticated) {
+                const next = encodeURIComponent(`/precos?plan=${plan.id}&cycle=${billingCycle}`)
+                window.location.href = `/cadastro?plan=${plan.id}&cycle=${billingCycle}&next=${next}`
+                return
+              }
 
-                <div className="mb-8">
-                  <h3 className="text-2xl font-bold text-foreground">{plan.name}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{plan.description}</p>
-                </div>
-
-                <div className="mb-8">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-sm text-muted-foreground">R$</span>
-                    <span className="text-5xl font-bold tracking-tight text-foreground">
-                      {plan.price[billingCycle].toFixed(2).split(".")[0]}
-                    </span>
-                    <span className="text-2xl font-bold text-foreground">
-                      ,{plan.price[billingCycle].toFixed(2).split(".")[1]}
-                    </span>
-                    <span className="text-sm ml-1 text-muted-foreground">/mês</span>
-                  </div>
-                </div>
-
-                <ul className="mb-8 space-y-4">
-                  {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-3">
-                      <div className="mt-0.5 rounded-full p-1 bg-primary/10">
-                        <Check className="h-3.5 w-3.5 text-primary" />
-                      </div>
-                      <span className="text-sm text-foreground/80">{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Button
-                  variant={isCurrentPlan(plan.id) ? "secondary" : (plan.popular ? "default" : "outline")}
-                  className="relative w-full h-12 text-base font-medium rounded-xl overflow-hidden"
-                  disabled={isLoading || isCurrentPlan(plan.id)}
-                  onClick={() => {
-                    if (!isAuthenticated) {
-                      const next = encodeURIComponent(`/precos?plan=${plan.id}&cycle=${billingCycle}`)
-                      window.location.href = `/cadastro?plan=${plan.id}&cycle=${billingCycle}&next=${next}`
-                      return
-                    }
-
-                    setSelectedPlan(plan.id)
-                    handleSubscribe(plan, billingCycle)
-                  }}
-                >
-                  <span className="relative z-10">
-                    {isCurrentPlan(plan.id) ? (
-                      "Seu plano atual"
-                    ) : isLoading || (selectedPlan === plan.id) ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin mr-2 inline-block" />
-                        {plan.cta}
-                      </>
-                    ) : (
-                      plan.cta
-                    )}
-                  </span>
-                </Button>
-              </div>
-            ))}
-          </div>
+              setSelectedPlan(plan.id)
+              handleSubscribe(plan, billingCycle)
+            }}
+          />
         </div>
       </section>
 
@@ -186,9 +148,9 @@ export function PricingPage() {
                 {COMPARISON_FEATURES.map((feature, index) => (
                   <tr key={feature.name} className={index % 2 === 0 ? "bg-card/50" : ""}>
                     <td className="py-4 px-4 text-foreground font-medium">{feature.name}</td>
-                    <td className="text-center py-4 px-4 text-muted-foreground">{feature.FREE}</td>
-                    <td className="text-center py-4 px-4 text-foreground font-medium">{feature.PRO}</td>
-                    <td className="text-center py-4 px-4 text-muted-foreground">{feature.FAMILY}</td>
+                    <td className="text-center py-4 px-4">{renderComparisonValue(feature.FREE)}</td>
+                    <td className="text-center py-4 px-4">{renderComparisonValue(feature.PRO)}</td>
+                    <td className="text-center py-4 px-4">{renderComparisonValue(feature.FAMILY)}</td>
                   </tr>
                 ))}
               </tbody>
