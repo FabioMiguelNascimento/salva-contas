@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api-client';
-import type { AcceptInviteResponse, FamilyMembersResponse, GenerateInviteResponse } from '@/types/invites';
+import type { AcceptInviteResponse, FamilyInviteTokensResponse, FamilyMembersResponse, GenerateInviteResponse } from '@/types/invites';
 
 type ApiResponse<T> = T | { data: T };
 
@@ -22,6 +22,16 @@ export async function acceptInvite(token: string): Promise<AcceptInviteResponse>
 
 export async function previewInvite(token: string): Promise<{ ownerName: string; expiresAt: string }> {
   const response = await apiClient.get<ApiResponse<{ ownerName: string; expiresAt: string }>>(`/invites/preview/${token}`);
+  return unwrapData(response.data);
+}
+
+export async function getFamilyInviteTokens(): Promise<FamilyInviteTokensResponse> {
+  const response = await apiClient.get<ApiResponse<FamilyInviteTokensResponse>>('/invites/tokens');
+  return unwrapData(response.data);
+}
+
+export async function removeFamilyMember(memberId: string): Promise<{ success: boolean }> {
+  const response = await apiClient.delete<ApiResponse<{ success: boolean }>>(`/invites/members/${memberId}`);
   return unwrapData(response.data);
 }
 

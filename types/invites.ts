@@ -10,6 +10,24 @@ export interface FamilyMembersResponse {
   isOwner: boolean;
 }
 
+export interface FamilyInviteToken {
+  id: string;
+  token: string;
+  status: 'pending' | 'accepted' | 'declined' | 'cancelled';
+  expiresAt: string;
+  acceptedAt?: string | null;
+  acceptedBy?: {
+    id: string;
+    name?: string | null;
+    email?: string | null;
+  } | null;
+}
+
+export interface FamilyInviteTokensResponse {
+  activeInvites: FamilyInviteToken[];
+  acceptedInvites: FamilyInviteToken[];
+}
+
 export interface GenerateInviteResponse {
   token: string;
   inviteUrl: string;

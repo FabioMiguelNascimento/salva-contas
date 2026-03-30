@@ -4,10 +4,9 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { useAuth } from '@/hooks/use-auth';
-import { generateInvite, getFamilyMembers } from '@/services/family-invites';
-import { Link2, Lock, RefreshCw, Sparkles, Users } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useFamilyInvite } from '@/context/family-invite-context';
+import { Link2, Lock, RefreshCw, Sparkles, Trash2, Users } from 'lucide-react';
+import { useEffect } from 'react';
 
 function getInitials(name?: string | null, email?: string | null) {
   const source = (name || email || 'U').trim();
@@ -17,45 +16,32 @@ function getInitials(name?: string | null, email?: string | null) {
 }
 
 export default function FamilyShareCard() {
-  const { user } = useAuth();
-  const [inviteUrl, setInviteUrl] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isLoadingMembers, setIsLoadingMembers] = useState(false);
-  const [family, setFamily] = useState<{ owner: any; members: any[]; isOwner: boolean } | null>(null);
-
-  const isFamilyPlan = user?.planTier === 'FAMILY';
-
-  const loadMembers = async () => {
-    if (!isFamilyPlan) return;
-    try {
-      setIsLoadingMembers(true);
-      const data = await getFamilyMembers();
-      setFamily(data);
-    } catch (error: any) {
-      const { toast } = await import('sonner');
-      toast.error(error?.message || 'Não foi possível carregar os membros vinculados.');
-    } finally {
-      setIsLoadingMembers(false);
-    }
-  };
+  const {
+    family,
+    inviteTokens,
+    inviteUrl,
+    isFamilyPlan,
+    isLoadingMembers,
+    isLoadingTokens,
+    isGenerating,
+    refresh,
+    loadMembers,
+    loadInviteTokens,
+    generateInvite,
+    clearInviteUrl,
+    removeFamilyMember,
+  } = useFamilyInvite();
 
   useEffect(() => {
-    loadMembers();
-  }, [isFamilyPlan]);
+    if (!isFamilyPlan) return;
+
+    void refresh();
+  }, [isFamilyPlan, refresh]);
+
 
   const handleGenerateInvite = async () => {
-    try {
-      setIsGenerating(true);
-      const { inviteUrl } = await generateInvite();
-      setInviteUrl(inviteUrl);
-      const { toast } = await import('sonner');
-      toast.success('Link de convite gerado.');
-    } catch (error: any) {
-      const { toast } = await import('sonner');
-      toast.error(error?.message || 'Não foi possível gerar o convite.');
-    } finally {
-      setIsGenerating(false);
-    }
+    const result = await generateInvite();
+    if (!result) return;
   };
 
   const handleCopy = async () => {
@@ -63,7 +49,7 @@ export default function FamilyShareCard() {
     try {
       await navigator.clipboard.writeText(inviteUrl);
       const { toast } = await import('sonner');
-      toast.success('Link copiado para a area de transferencia.');
+      toast.success('Link copiado para a área de transferência.');
     } catch {
       const { toast } = await import('sonner');
       toast.error('Não foi possível copiar o link.');
@@ -124,7 +110,7 @@ export default function FamilyShareCard() {
           <Button onClick={handleGenerateInvite} disabled={isGenerating}>
             {isGenerating ? 'Gerando...' : 'Gerar link de convite'}
           </Button>
-          <Button variant="outline" onClick={loadMembers} disabled={isLoadingMembers}>
+          <Button variant="outline" onClick={async () => { await Promise.all([loadMembers(), loadInviteTokens()]); }} disabled={isLoadingMembers || isLoadingTokens}>
             <RefreshCw className="mr-2 h-4 w-4" />
             Atualizar membros
           </Button>
@@ -142,6 +128,56 @@ export default function FamilyShareCard() {
             </div>
           </div>
         ) : null}
+
+        <div className="space-y-4">
+          <h4 className="text-sm font-medium">Tokens de convite gerados</h4>
+          {isLoadingTokens ? (
+            <p className="text-sm text-muted-foreground">Carregando tokens...</p>
+          ) : (
+            <>
+              <div className="rounded-lg border p-3">
+                <p className="text-xs text-muted-foreground mb-2">Convites ativos</p>
+                {!inviteTokens || !inviteTokens.activeInvites.length ? (
+                  <p className="text-sm text-muted-foreground">Nenhum convite ativo no momento.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {inviteTokens.activeInvites.map((invite) => (
+                      <div key={invite.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border rounded p-2">
+                        <span className="text-xs break-all">{invite.token}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-muted-foreground">
+                            Expira: {new Date(invite.expiresAt).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="rounded-lg border p-3">
+                <p className="text-xs text-muted-foreground mb-2">Convites aceitos</p>
+                {!inviteTokens || !inviteTokens.acceptedInvites.length ? (
+                  <p className="text-sm text-muted-foreground">Nenhum convite aceito ainda.</p>
+                ) : (
+                  <div className="space-y-2">
+                    {inviteTokens.acceptedInvites.map((invite) => (
+                      <div key={invite.id} className="flex flex-col gap-1 border rounded p-2">
+                        <p className="text-xs font-medium">{invite.token}</p>
+                        <span className="text-xs text-muted-foreground">
+                          Aceito em: {invite.acceptedAt ? new Date(invite.acceptedAt).toLocaleString() : 'N/A'}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          Por: {invite.acceptedBy?.name || invite.acceptedBy?.email || 'Usuário desconhecido'}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
 
         <div className="space-y-2">
           <p className="text-sm font-medium">Quem tem acesso</p>
@@ -166,14 +202,24 @@ export default function FamilyShareCard() {
             {family?.members?.length ? (
               <div className="space-y-2">
                 {family.members.map((member) => (
-                  <div key={member.id} className="flex items-center gap-2">
-                    <Avatar className="h-7 w-7">
-                      <AvatarFallback>{getInitials(member.name, member.email)}</AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <p className="text-sm">{member.name || 'Sem nome'}</p>
-                      <p className="text-xs text-muted-foreground">{member.email || 'Sem email'}</p>
+                  <div key={member.id} className="flex items-center gap-2 justify-between">
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-7 w-7">
+                        <AvatarFallback>{getInitials(member.name, member.email)}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="text-sm">{member.name || 'Sem nome'}</p>
+                        <p className="text-xs text-muted-foreground">{member.email || 'Sem email'}</p>
+                      </div>
                     </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-red-500 hover:bg-red-50"
+                      onClick={() => removeFamilyMember(member.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 ))}
               </div>
