@@ -236,13 +236,22 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
                 ))}
 
                 {isLoading && (
-                  <div className="flex items-center gap-2 rounded-2xl bg-white/70 px-4 py-3 shadow-inner">
-                    <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse" />
-                    <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse delay-75" />
-                    <span className="h-2 w-2 rounded-full bg-emerald-600 animate-pulse delay-150" />
-                    <span className="text-sm text-emerald-700">
-                      {status === 'sending' ? 'Enviando...' : 'Aguardando resposta...'}
-                    </span>
+                  <div className="flex w-full justify-start items-end gap-2 mb-4">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-emerald-500 to-emerald-700 text-white shadow-sm ring-2 ring-white">
+                      <span className="text-sm font-bold">B</span>
+                    </div>
+                    <div className="relative px-4 py-3 bg-white border border-emerald-100 rounded-2xl rounded-bl-none shadow-sm flex items-center gap-1">
+                      <div className="absolute -left-2 bottom-0 h-4 w-4 text-white">
+                        <svg width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M16 16H0V0C0 0 2 12 16 16Z" fill="currentColor" />
+                          <path d="M16 16H0V0C0 0 2 12 16 16Z" fill="white" />
+                          <path d="M16 16H0V0C0 0 2 12 16 16Z" fill="none" stroke="#ecfdf5" strokeWidth="0.5" />
+                        </svg>
+                      </div>
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-typing-dot" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-typing-dot delay-200" />
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 animate-typing-dot delay-400" />
+                    </div>
                   </div>
                 )}
               </div>

@@ -34,20 +34,40 @@ export default function AiAdvisorMessageBubble({
   const isAssistant = message.role === "assistant";
 
   return (
-    <div className={`flex w-full min-w-0 ${isAssistant ? "justify-start" : "justify-end"}`}>
+    <div className={`flex w-full ${isAssistant ? "justify-start" : "justify-end"} items-end gap-2 mb-4`}>
+      {isAssistant && (
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-emerald-500 to-emerald-700 text-white shadow-sm ring-2 ring-white">
+          <span className="text-sm font-bold">B</span>
+        </div>
+      )}
+      
       <div
-        className={`${
+        className={`relative max-w-[85%] sm:max-w-[75%] px-4 py-2.5 shadow-sm ${
           isAssistant
-            ? "w-full min-w-0 max-w-[86%]"
-            : "w-auto max-w-[72%] sm:max-w-[68%]"
-              } overflow-x-hidden rounded-2xl px-3 py-3 ${
-          isAssistant
-            ? "bg-white border border-emerald-100 shadow-sm text-slate-800"
-            : "bg-emerald-600 text-white shadow-sm"
+            ? "bg-white border border-emerald-100 text-slate-800 rounded-2xl rounded-bl-none"
+            : "bg-emerald-600 text-white rounded-2xl rounded-br-none"
         }`}
       >
+        {isAssistant && (
+          <div className="absolute -left-2 bottom-0 h-4 w-4 text-white">
+            <svg width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 16H0V0C0 0 2 12 16 16Z" fill="currentColor" />
+              <path d="M16 16H0V0C0 0 2 12 16 16Z" fill="white" />
+              <path d="M16 16H0V0C0 0 2 12 16 16Z" fill="none" stroke="#ecfdf5" strokeWidth="0.5" />
+            </svg>
+          </div>
+        )}
+
+        {!isAssistant && (
+          <div className="absolute -right-2 bottom-0 h-4 w-4 text-emerald-600">
+            <svg width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0 16H16V0C16 0 14 12 0 16Z" fill="currentColor" />
+            </svg>
+          </div>
+        )}
+
         {isAssistant ? (
-          <div className="prose prose-sm max-w-none wrap-break-word prose-p:my-1.5 prose-li:my-0.5 prose-headings:my-1 text-slate-800">
+          <div className="prose prose-sm max-w-none wrap-break-word prose-p:my-1 prose-li:my-0.5 prose-headings:my-1 text-slate-800">
             <ReactMarkdown>{message.content}</ReactMarkdown>
           </div>
         ) : (
@@ -57,13 +77,13 @@ export default function AiAdvisorMessageBubble({
         {message.attachments?.length ? (
           <div className="mt-2 flex flex-wrap gap-2">
             {message.attachments.map((attachment) => (
-              <div key={attachment.url} className="relative w-24 overflow-hidden rounded-xl border border-slate-200 bg-white">
+              <div key={attachment.url} className="relative w-24 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xs">
                 {attachment.type.startsWith("image/") ? (
                   <img src={attachment.url} alt={attachment.name} className="h-24 w-24 object-cover" />
                 ) : (
                   <div className="flex h-24 w-24 items-center justify-center text-xs text-slate-500">{attachment.name}</div>
                 )}
-                <div className="absolute bottom-0 left-0 right-0 bg-black/50 px-1 py-0.5 text-[10px] text-white">{attachment.name}</div>
+                <div className="absolute bottom-0 left-0 right-0 bg-black/50 px-1 py-0.5 text-[10px] text-white backdrop-blur-xs">{attachment.name}</div>
               </div>
             ))}
           </div>
@@ -71,13 +91,14 @@ export default function AiAdvisorMessageBubble({
 
         {isAssistant &&
           (message.visualizations || []).map((visual, index) => (
-            <AiAdvisorVisualizationRenderer
-              key={`${message.id}-${visual.toolName}-${index}`}
-              visualization={visual}
-              status={message.visualizationStatuses?.[String(index)] ?? "idle"}
-              onConfirmVisualization={(preparedPayload) => onConfirmVisualization(message.id, index, preparedPayload)}
-              onCancelVisualization={() => onCancelVisualization(message.id, index)}
-            />
+            <div key={`${message.id}-${visual.toolName}-${index}`} className="mt-3">
+              <AiAdvisorVisualizationRenderer
+                visualization={visual}
+                status={message.visualizationStatuses?.[String(index)] ?? "idle"}
+                onConfirmVisualization={(preparedPayload) => onConfirmVisualization(message.id, index, preparedPayload)}
+                onCancelVisualization={() => onCancelVisualization(message.id, index)}
+              />
+            </div>
           ))}
       </div>
     </div>
