@@ -19,6 +19,7 @@ const TOKEN_KEY = "salva_contas_token";
 const REFRESH_TOKEN_KEY = "salva_contas_refresh_token";
 const USER_KEY = "salva_contas_user";
 const EXPIRES_AT_KEY = "salva_contas_expires_at";
+const AI_ADVISOR_MESSAGES = "ai-advisor-messages"
 
 const TOKEN_REFRESH_MARGIN = 5 * 60 * 1000;
 
@@ -62,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(EXPIRES_AT_KEY);
     localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(AI_ADVISOR_MESSAGES)
     if (refreshTimeoutRef.current) {
       clearTimeout(refreshTimeoutRef.current);
       refreshTimeoutRef.current = null;
