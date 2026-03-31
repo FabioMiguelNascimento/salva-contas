@@ -1,16 +1,16 @@
-﻿import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
-import { DynamicIcon } from "@/components/dynamic-icon";
+﻿import { DynamicIcon } from "@/components/dynamic-icon";
+import { CardFlagStack } from "@/components/transactions/CardFlagStack";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
-import { cn, getTransactionCategoryLabel, getTransactionStatusLabel, parseDateOnly } from "@/lib/utils";
+import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -110,16 +110,7 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
                 </Badge>
               </TableCell>
               <TableCell>
-                {transaction.creditCard ? (
-                  <div className="flex items-center gap-2">
-                    <CardFlagIcon flag={transaction.creditCard.flag} className="h-5 w-auto" />
-                    <span className="text-xs text-muted-foreground">
-                      {transaction.creditCard.name}
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-xs text-muted-foreground">—</span>
-                )}
+                <CardFlagStack transaction={transaction} />
               </TableCell>
               <TableCell>
                 <Badge

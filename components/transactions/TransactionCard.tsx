@@ -1,11 +1,11 @@
-﻿import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
+﻿import { CardFlagStack } from "@/components/transactions/CardFlagStack";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { currencyFormatter } from "@/lib/subscriptions/constants";
 import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
@@ -32,6 +32,7 @@ function formatDate(tx: Transaction) {
   }
   return "—";
 }
+
 
 export function TransactionCard({
   transaction,
@@ -73,16 +74,8 @@ export function TransactionCard({
                 <span>Criado por {transaction.createdByName}</span>
               </>
             ) : null}
-            {transaction.creditCard && (
-              <>
-                <span>•</span>
-                <div className="flex items-center gap-1">
-                  <CardFlagIcon flag={transaction.creditCard.flag} className="h-3.5 w-auto" />
-                  <span>{transaction.creditCard.name}</span>
-                </div>
-              </>
-            )}
-          </div>
+            <span>•</span>
+            <CardFlagStack transaction={transaction} />          </div>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
