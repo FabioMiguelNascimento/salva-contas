@@ -1,7 +1,7 @@
 "use client";
 
 import { Filter } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/app-shell";
 import { AttachmentViewer } from "@/components/attachment-viewer";
@@ -18,7 +18,6 @@ import { PaginationControls } from "@/components/transactions/PaginationControls
 import { TransactionCard } from "@/components/transactions/TransactionCard";
 import { TransactionTable } from "@/components/transactions/TransactionTable";
 
-import { usePaginatedList } from "@/hooks/use-paginated-list";
 import { useTransactionEditor } from "@/hooks/use-transaction-editor";
 import { useTransactionFilters } from "@/hooks/use-transaction-filters";
 
@@ -27,15 +26,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 
-import type { Transaction } from "@/types/finance";
 import { CardsProvider } from "@/context/cards-context";
+import type { Transaction } from "@/types/finance";
 
 function ExtratoPageContent() {
   const {
-    transactions,
+    transactions: serverTransactions,
     isLoading,
     categories,
     removeTransaction,
+    totalPages,
+    currentPage,
+    refresh,
   } = useTransactions();
 
   const { filters, setFilters } = useFinancePeriod();
@@ -46,19 +48,24 @@ function ExtratoPageContent() {
     setStatus,
     setSearch,
     goToPage,
-    filteredTransactions,
   } = useTransactionFilters();
-
-  const { paginated: paginatedTransactions, totalPages } = usePaginatedList(
-    filteredTransactions,
-    urlFilters.page,
-    15
-  );
 
   const editor = useTransactionEditor();
   const [deleteDialog, setDeleteDialog] = useState<{ open: boolean; transaction?: Transaction }>({ open: false });
   const [attachmentViewer, setAttachmentViewer] = useState<{ open: boolean; transaction?: Transaction }>({ open: false });
   const [isProcessing, setIsProcessing] = useState(false);
+
+  useEffect(() => {
+    void refresh(urlFilters.page, {
+      type: urlFilters.type !== "all" ? (urlFilters.type as "expense" | "income") : undefined,
+      status: urlFilters.status !== "all" ? (urlFilters.status as "paid" | "pending") : undefined,
+      categoryId: urlFilters.categoryId || undefined,
+      month: filters.month,
+      year: filters.year,
+      startDate: undefined,
+      endDate: undefined,
+    });
+  }, [refresh, urlFilters.page, urlFilters.type, urlFilters.status, urlFilters.categoryId, filters.month, filters.year]);
 
 
   const handleDelete = async () => {
@@ -105,7 +112,7 @@ function ExtratoPageContent() {
         <CardContent>
           <div className="hidden overflow-x-auto md:block">
             <TransactionTable
-              transactions={paginatedTransactions}
+              transactions={serverTransactions}
               isLoading={isLoading}
               onEdit={editor.openEditor}
               onDelete={(tx) => setDeleteDialog({ open: true, transaction: tx })}
@@ -118,8 +125,8 @@ function ExtratoPageContent() {
               Array.from({ length: 4 }).map((_, idx) => (
                 <Skeleton key={idx} className="h-28 w-full rounded-2xl" />
               ))
-            ) : paginatedTransactions.length ? (
-              paginatedTransactions.map((tx) => (
+            ) : serverTransactions.length ? (
+              serverTransactions.map((tx) => (
                 <TransactionCard
                   key={tx.id}
                   transaction={tx}
@@ -141,9 +148,9 @@ function ExtratoPageContent() {
       </Card>
 
       <PaginationControls
-        currentPage={urlFilters.page}
+        currentPage={currentPage}
         totalPages={totalPages}
-        disabled={filteredTransactions.length === 0}
+        disabled={isLoading || serverTransactions.length === 0}
         onPageChange={goToPage}
       />
 

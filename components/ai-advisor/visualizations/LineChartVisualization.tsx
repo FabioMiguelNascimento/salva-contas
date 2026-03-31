@@ -1,6 +1,15 @@
 ﻿"use client";
 
 import type { AiVisualization } from "@/types/finance";
+import {
+    CartesianGrid,
+    Line,
+    LineChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
+} from "recharts";
 import type { VisualizationStatus } from "./types";
 
 interface LineChartVisualizationProps {
@@ -89,16 +98,44 @@ export default function LineChartVisualization({
   onCancel,
   requiresConfirmation,
 }: LineChartVisualizationProps) {
-  const points = Array.isArray((visualization.payload as any).points)
+  const rawPoints = Array.isArray((visualization.payload as any).points)
     ? ((visualization.payload as any).points as Array<{ date?: string; total?: number | string }>)
+    : Array.isArray((visualization.payload as any).items)
+    ? ((visualization.payload as any).items as Array<{ date?: string; total?: number | string; amount?: number | string }>)
     : [];
 
-  const total = points.reduce((sum, point) => sum + parseAmount(point.total), 0);
-  const peak = points.reduce((max, point) => Math.max(max, parseAmount(point.total)), 0);
+  const points = rawPoints.map((point) => ({
+    date: point.date ?? "",
+    total: parseAmount(point.total ?? point.amount),
+  }));
+
+  const total = points.reduce((sum, point) => sum + point.total, 0);
+  const peak = points.reduce((max, point) => Math.max(max, point.total), 0);
 
   return (
     <div className="mt-3 w-full min-w-0 overflow-x-hidden rounded-xl border border-gray-100 bg-white p-3">
       <p className="mb-2 text-xs font-semibold text-gray-600">{visualization.title}</p>
+
+      <div className="h-60 w-full mb-3">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={points}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+            <YAxis tickFormatter={(value) => formatCurrency(value)} tick={{ fontSize: 12 }} />
+            <Tooltip formatter={(value: any) => formatCurrency(value)} />
+            <Line
+              type="monotone"
+              dataKey="total"
+              stroke="#10b981"
+              strokeWidth={2}
+              dot={{ r: 2 }}
+              activeDot={{ r: 5 }}
+              isAnimationActive={false}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+
       <div className="mb-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-3">
         <div className="rounded-lg bg-emerald-50 p-2">
           <p className="text-xs text-emerald-700">Período</p>
@@ -109,7 +146,7 @@ export default function LineChartVisualization({
           <p className="font-semibold text-slate-800">{formatCurrency(total)}</p>
         </div>
         <div className="rounded-lg bg-rose-50 p-2">
-          <p className="text-xs text-rose-700">Pico diario</p>
+          <p className="text-xs text-rose-700">Pico diário</p>
           <p className="font-semibold text-rose-800">{formatCurrency(peak)}</p>
         </div>
       </div>

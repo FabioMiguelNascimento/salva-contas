@@ -84,15 +84,27 @@ export default function DonutChartVisualization({
   requiresConfirmation,
 }: DonutChartVisualizationProps) {
   const items = Array.isArray((visualization.payload as any).items)
-    ? ((visualization.payload as any).items as Array<{ category?: string; total?: number | string }>)
+    ? ((visualization.payload as any).items as Array<{
+        category?: string;
+        total?: number | string;
+        expenses?: number | string;
+        net?: number | string;
+      }>)
     : [];
+
+  const getItemValue = (item: any) => {
+    if (item.total !== undefined && item.total !== null) return parseAmount(item.total);
+    if (item.expenses !== undefined && item.expenses !== null) return parseAmount(item.expenses);
+    if (item.net !== undefined && item.net !== null) return parseAmount(item.net);
+    return 0;
+  };
 
   const donutData = items.map((item) => ({
     category: item.category || "Sem categoria",
-    total: parseAmount(item.total),
+    total: getItemValue(item),
   }));
 
-  const total = items.reduce((sum, item) => sum + parseAmount(item.total), 0);
+  const total = items.reduce((sum, item) => sum + getItemValue(item), 0);
 
   return (
     <div className="mt-3 w-full min-w-0 overflow-x-hidden rounded-xl bg-white p-3">

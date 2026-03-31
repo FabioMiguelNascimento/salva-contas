@@ -100,6 +100,29 @@ export interface DebitCard {
 }
 
 export interface Transaction {
+  paymentMethods?: Array<{
+    id: string;
+    amount: number;
+    paymentMethod: PaymentMethod;
+    creditCard?: {
+      id: string;
+      name: string;
+      lastFourDigits: string;
+      flag?: CreditCardFlag;
+    };
+    debitCard?: {
+      id: string;
+      name: string;
+      lastFourDigits: string;
+      flag?: CreditCardFlag;
+    };
+  }>;
+  splits?: TransactionSplit[];
+}
+
+export type TransactionDetailsPayload = Transaction;
+
+export interface Transaction {
   id: string;
   userId?: string | null;
   createdById?: string | null;

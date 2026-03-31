@@ -73,13 +73,46 @@ const unwrapData = <T>(payload: ApiResponse<T>): T => {
   return payload as T;
 };
 
-export async function fetchTransactions(filters: TransactionFilters) {
-  const response = await apiClient.get<ApiResponse<ApiTransaction[]>>("/transactions", {
+export type TransactionsResponse = {
+  data: Transaction[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+};
+
+export async function fetchTransactions(filters: TransactionFilters): Promise<TransactionsResponse> {
+  const response = await apiClient.get<ApiResponse<{ data: ApiTransaction[]; meta: { total: number; page: number; limit: number; totalPages: number } }>>("/transactions", {
     params: filters,
   });
 
-  const transactions = unwrapData(response.data);
-  return (transactions ?? []).map(normalizeTransaction);
+  const raw = response.data as any;
+  let data: ApiTransaction[] = [];
+  let meta = { total: 0, page: 1, limit: 15, totalPages: 1 };
+
+  if (raw && typeof raw === "object") {
+    if (Array.isArray(raw.data) && raw.meta) {
+      data = raw.data;
+      meta = raw.meta;
+    } else if (Array.isArray(raw)) {
+      data = raw;
+      meta = { total: raw.length, page: filters.page ?? 1, limit: filters.limit ?? 15, totalPages: Math.max(Math.ceil(raw.length / (filters.limit ?? 15)), 1) };
+    } else if (raw.data && Array.isArray(raw.data.data) && raw.data.meta) {
+      // Caso envolvido no wrapper extra
+      data = raw.data.data;
+      meta = raw.data.meta;
+    } else if (!Array.isArray(raw.data) && raw.data && raw.meta) {
+      data = raw.data;
+      meta = raw.meta;
+    }
+  }
+
+  return {
+    data: (data ?? []).map(normalizeTransaction),
+    meta,
+  };
 }
 
 export async function fetchInstallmentTransactions(transactionId: string) {

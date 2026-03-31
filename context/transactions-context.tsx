@@ -2,20 +2,32 @@
 
 import { fetchCategories } from "@/services/categories";
 import {
-    deleteTransaction,
-    fetchInstallmentTransactions,
-    fetchTransactions,
-    processTransaction,
-    updateTransaction,
+  deleteTransaction,
+  fetchInstallmentTransactions,
+  fetchTransactions,
+  processTransaction,
+  updateTransaction,
 } from "@/services/transactions";
 import type {
-    ProcessTransactionClientPayload,
-    Transaction,
-    TransactionCategory,
-    UpdateTransactionPayload,
+  ProcessTransactionClientPayload,
+  Transaction,
+  TransactionCategory,
+  UpdateTransactionPayload,
 } from "@/types/finance";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { useFinancePeriod } from "./finance-period-context";
+
+type TransactionQueryParams = {
+  page?: number;
+  limit?: number;
+  categoryId?: string;
+  type?: "expense" | "income";
+  status?: "paid" | "pending";
+  month?: number;
+  year?: number;
+  startDate?: string;
+  endDate?: string;
+};
 
 interface TransactionsContextValue {
   isLoading: boolean;
@@ -25,7 +37,9 @@ interface TransactionsContextValue {
   transactions: Transaction[];
   pendingBills: Transaction[];
   categories: TransactionCategory[];
-  refresh: (force?: boolean) => Promise<void>;
+  totalPages: number;
+  currentPage: number;
+  refresh: (page?: number, filters?: TransactionQueryParams) => Promise<void>;
   processUnstructuredTransaction: (payload: ProcessTransactionClientPayload) => Promise<Transaction | void>;
   updateExistingTransaction: (id: string, payload: UpdateTransactionPayload) => Promise<Transaction | void>;
   markAsPaid: (id: string) => Promise<Transaction | void>;
@@ -40,20 +54,24 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<TransactionCategory[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastSync, setLastSync] = useState<string | null>(null);
 
-  const refresh = useCallback(async () => {
+  const refresh = useCallback(async (page = 1, extraFilters: TransactionQueryParams = {}) => {
     setIsSyncing(true);
     try {
       const [transactionsResponse, categoriesResponse] = await Promise.all([
-        fetchTransactions(filters),
+        fetchTransactions({ ...filters, page, limit: 15, ...extraFilters }),
         fetchCategories(),
       ]);
 
-      setTransactions(transactionsResponse);
+      setTransactions(transactionsResponse.data);
+      setTotalPages(transactionsResponse.meta.totalPages);
+      setCurrentPage(transactionsResponse.meta.page);
       setCategories(categoriesResponse);
       setLastSync(new Date().toISOString());
       setError(null);
@@ -125,8 +143,8 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
         lastSync,
         transactions,
         pendingBills,
-        categories,
-        refresh,
+        categories,        totalPages,
+        currentPage,        refresh,
         processUnstructuredTransaction,
         updateExistingTransaction,
         markAsPaid,
