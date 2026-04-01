@@ -10,16 +10,30 @@ import {
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuItem
+  SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import UserInitials from "@/components/ui/user-initials";
 import { useAuth } from "@/contexts/auth-context";
 import { getPlanLabel } from "@/lib/utils";
-import { CalendarClock, CreditCard, HandCoins, LayoutDashboard, LogOut, PiggyBank, ReceiptText, Repeat, Settings, Sparkles, User, Users } from "lucide-react";
+import {
+  CalendarClock,
+  CreditCard,
+  HandCoins,
+  LayoutDashboard,
+  LogOut,
+  PiggyBank,
+  ReceiptText,
+  Repeat,
+  Settings,
+  Sparkles,
+  User,
+  Users,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import type { ComponentType, SVGProps } from "react";
+import { type ComponentType, type SVGProps } from "react";
+import { ReportsSidebarItem } from "./reports-sidebar-item";
 
 interface NavItem {
   label: string;
@@ -76,12 +90,12 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = item.href ? pathname === item.href : false;
-                
+
                 return (
                   <SidebarMenuItem key={item.label}>
-                    <SidebarMenuButton 
-                      asChild={!!item.href} 
-                      isActive={isActive} 
+                    <SidebarMenuButton
+                      asChild={!!item.href}
+                      isActive={isActive}
                       tooltip={item.label}
                       onClick={item.onClick}
                       className={item.onClick ? "cursor-pointer" : ""}
@@ -101,6 +115,8 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
                   </SidebarMenuItem>
                 );
               })}
+
+              <ReportsSidebarItem />
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -112,7 +128,11 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size="lg" tooltip={user?.name ?? "Usuario"}>
-                  <UserInitials name={user?.name} email={user?.email} className="size-8 -group-data-[collapsible=icon]:translate-x-1" />
+                  <UserInitials
+                    name={user?.name}
+                    email={user?.email}
+                    className="size-8 -group-data-[collapsible=icon]:translate-x-1"
+                  />
                   <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                     <span className="truncate font-medium">{user?.name ?? "Usuario"}</span>
                     <span className="truncate text-xs text-primary font-semibold uppercase tracking-wider">

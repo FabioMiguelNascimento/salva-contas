@@ -1,6 +1,11 @@
 import { format, parseISO } from "date-fns";
 import { ptBR } from "date-fns/locale";
 
+export function parseDate(value?: string | Date | null): Date | undefined {
+  if (!value) return undefined;
+  return parseDateOnly(value) ?? undefined;
+}
+
 export function parseDateOnly(value: string | Date | null | undefined): Date | null {
   if (!value) return null;
   const str = typeof value === "string" ? value : value.toISOString();
