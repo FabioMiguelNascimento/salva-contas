@@ -11,7 +11,7 @@ import {
     SheetTitle,
 } from '@/components/ui/sheet';
 import { useCardsHook } from '@/hooks/use-cards';
-import { formatDebitCardNumber, getDebitFlagLabel } from '@/lib/debit-cards/constants';
+import { formatDebitCardNumber, getFlagLabel } from '@/lib/card-utils';
 import type { DebitCard } from '@/types/finance';
 import { useState } from 'react';
 
@@ -53,7 +53,7 @@ export function DebitCardDeleteSheet({ card, open, onOpenChange }: DebitCardDele
           <div className="rounded-xl border border-destructive/20 bg-destructive/5 p-4">
             <p className="font-semibold">{card.name}</p>
             <p className="text-sm text-muted-foreground">
-              {getDebitFlagLabel(card.flag)} • {formatDebitCardNumber(card.lastFourDigits)}
+              {getFlagLabel(card.flag)} • {formatDebitCardNumber(card.lastFourDigits)}
             </p>
           </div>
         </SheetBody>

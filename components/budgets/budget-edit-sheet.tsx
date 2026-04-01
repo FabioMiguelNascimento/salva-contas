@@ -13,16 +13,12 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet";
 import type { BudgetEditorHook } from "@/hooks/use-budget-editor";
+import { formatCurrency } from "@/lib/currency-utils";
 import { Loader2 } from "lucide-react";
 
 interface BudgetEditSheetProps {
   editor: BudgetEditorHook;
 }
-
-const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
 
 export function BudgetEditSheet({ editor }: BudgetEditSheetProps) {
   const { editing, values, isSubmitting, error, actions } = editor;
@@ -66,7 +62,7 @@ export function BudgetEditSheet({ editor }: BudgetEditSheetProps) {
                 required
               />
               <p className="text-xs text-muted-foreground">
-                Valor atual: {currencyFormatter.format(editing?.amount ?? 0)}
+                Valor atual: {formatCurrency(editing?.amount ?? 0)}
               </p>
             </div>
 

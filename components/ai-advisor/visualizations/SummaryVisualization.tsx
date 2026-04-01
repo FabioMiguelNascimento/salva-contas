@@ -1,5 +1,6 @@
 ﻿"use client";
 
+import { formatCurrency } from "@/lib/currency-utils";
 import type { AiVisualization } from "@/types/finance";
 import type { VisualizationStatus } from "./types";
 
@@ -11,34 +12,7 @@ interface SummaryVisualizationProps {
   requiresConfirmation: boolean;
 }
 
-const parseAmount = (value: unknown): number => {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return value;
-  }
 
-  if (typeof value === "string") {
-    const normalized = value
-      .trim()
-      .replace(/\s/g, "")
-      .replace(/R\$/gi, "")
-      .replace(/\.(?=\d{3}(?:\D|$))/g, "")
-      .replace(/,/g, ".");
-
-    const parsed = Number(normalized);
-    if (Number.isFinite(parsed)) {
-      return parsed;
-    }
-  }
-
-  return 0;
-};
-
-const formatCurrency = (value: unknown): string => {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(parseAmount(value));
-};
 
 function renderConfirmationActions(
   status: VisualizationStatus,

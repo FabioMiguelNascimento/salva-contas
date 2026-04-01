@@ -3,20 +3,20 @@
 import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { Button } from "@/components/ui/button";
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
+    Command,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
 } from "@/components/ui/command";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
 } from "@/components/ui/popover";
 import { useCardsHook } from "@/hooks/use-cards";
-import { formatCardNumber } from "@/lib/credit-cards/constants";
+import { formatCardNumber } from "@/lib/card-utils";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown, CreditCard } from "lucide-react";
 import { useState } from "react";

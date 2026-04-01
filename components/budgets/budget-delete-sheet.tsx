@@ -11,16 +11,12 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet";
 import type { BudgetEditorHook } from "@/hooks/use-budget-editor";
+import { formatCurrency } from "@/lib/currency-utils";
 import { AlertTriangle, Loader2 } from "lucide-react";
 
-interface BudgetDeleteSheetProps {
+interface BudgetDeleteSheetProps 
   editor: BudgetEditorHook;
 }
-
-const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
 
 export function BudgetDeleteSheet({ editor }: BudgetDeleteSheetProps) {
   const { deleteTarget, isSubmitting, error, actions } = editor;
@@ -54,7 +50,7 @@ export function BudgetDeleteSheet({ editor }: BudgetDeleteSheetProps) {
             </div>
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Limite</p>
-              <p className="font-medium">{currencyFormatter.format(deleteTarget?.amount ?? 0)}</p>
+              <p className="font-medium">{formatCurrency(deleteTarget?.amount ?? 0)}</p>
             </div>
             <div className="space-y-1">
               <p className="text-sm text-muted-foreground">Período</p>

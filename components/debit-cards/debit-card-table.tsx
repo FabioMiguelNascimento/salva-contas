@@ -10,7 +10,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { formatDebitCardNumber, getDebitFlagLabel, getDebitStatusLabel, getDebitStatusVariant } from '@/lib/debit-cards/constants';
+import { formatDebitCardNumber, getFlagLabel, getStatusLabel, getStatusVariant } from '@/lib/card-utils';
 import { cn } from '@/lib/utils';
 import type { DebitCard } from '@/types/finance';
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
@@ -44,7 +44,7 @@ export function DebitCardTable({ debitCards, onEdit, onDelete }: DebitCardTableP
         {debitCards.map((card) => (
           <TableRow key={card.id}>
             <TableCell>
-              <div className="max-w-[240px] min-w-0">
+              <div className="max-w-60 min-w-0">
                 <p className="truncate font-semibold">{card.name}</p>
                 <p className="truncate text-xs text-muted-foreground">{formatDebitCardNumber(card.lastFourDigits)}</p>
               </div>
@@ -52,20 +52,20 @@ export function DebitCardTable({ debitCards, onEdit, onDelete }: DebitCardTableP
             <TableCell>
               <div className="flex items-center gap-2">
                 <CardFlagIcon flag={card.flag} className="h-6 w-auto" />
-                <span className="text-xs text-muted-foreground">{getDebitFlagLabel(card.flag)}</span>
+                <span className="text-xs text-muted-foreground">{getFlagLabel(card.flag)}</span>
               </div>
             </TableCell>
             <TableCell>
               <Badge
                 className={cn(
                   'text-xs',
-                  getDebitStatusVariant(card.status) === 'success' && 'bg-emerald-100 text-emerald-800',
-                  getDebitStatusVariant(card.status) === 'warning' && 'bg-yellow-100 text-yellow-800',
-                  getDebitStatusVariant(card.status) === 'danger' && 'bg-destructive/15 text-destructive',
-                  getDebitStatusVariant(card.status) === 'muted' && 'bg-muted text-muted-foreground'
+                  getStatusVariant(card.status) === 'success' && 'bg-emerald-100 text-emerald-800',
+                  getStatusVariant(card.status) === 'warning' && 'bg-yellow-100 text-yellow-800',
+                  getStatusVariant(card.status) === 'danger' && 'bg-destructive/15 text-destructive',
+                  getStatusVariant(card.status) === 'muted' && 'bg-muted text-muted-foreground'
                 )}
               >
-                {getDebitStatusLabel(card.status)}
+                {getStatusLabel(card.status)}
               </Badge>
             </TableCell>
             <TableCell>

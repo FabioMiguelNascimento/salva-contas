@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InfoPopover } from "@/components/ui/info-popover";
 import { Skeleton } from "@/components/ui/skeleton";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
 import React from "react";
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
@@ -57,7 +57,7 @@ function SpendingBarChart({ data }: { data: { day: string; amount: number }[] })
           <Tooltip
             cursor={{ fill: "rgba(244, 63, 94, 0.08)" }}
             formatter={(value: number | string | undefined) =>
-              currencyFormatter.format(Number(value ?? 0))
+              formatCurrency(Number(value ?? 0))
             }
             labelFormatter={(label) => `Dia ${label}`}
             contentStyle={{

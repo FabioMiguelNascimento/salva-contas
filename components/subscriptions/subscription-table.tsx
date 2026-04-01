@@ -9,7 +9,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
 import { getFrequencyLabel, getScheduleLabel } from "@/lib/subscriptions/utils";
 import type { Subscription } from "@/types/finance";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
@@ -48,7 +48,7 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
                 </p>
               </div>
             </TableCell>
-            <TableCell>{currencyFormatter.format(subscription.amount)}</TableCell>
+            <TableCell>{formatCurrency(subscription.amount)}</TableCell>
             <TableCell className="text-muted-foreground">{getScheduleLabel(subscription)}</TableCell>
             <TableCell>
               {subscription.category ? (

@@ -1,8 +1,8 @@
 "use client"
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent } from "@/components/ui/sheet"
+import UserInitials from "@/components/ui/user-initials"
 import { useAuth } from "@/hooks/use-auth"
 import { getPlanLabel } from "@/lib/utils"
 import { Menu, X } from "lucide-react"
@@ -19,14 +19,6 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const { user, isAuthenticated, logout } = useAuth()
-  const userInitials = user?.name
-    ? user.name
-      .split(" ")
-      .map((n) => n[0])
-      .slice(0, 2)
-      .join("")
-      .toUpperCase()
-    : "US"
 
   useEffect(() => {
     const handleScroll = () => {
@@ -68,9 +60,7 @@ export function Header() {
             <div className="hidden md:flex items-center gap-3">
               <Button variant="ghost" className="px-5 h-auto py-2" asChild>
                 <Link href="/app/dashboard" className="flex items-center gap-2">
-                  <Avatar className="h-8 w-8">
-                    <AvatarFallback className="text-[10px]">{userInitials}</AvatarFallback>
-                  </Avatar>
+                  <UserInitials name={user?.name} email={user?.email} />
                   <div className="text-left">
                     <div className="text-sm font-medium text-foreground leading-none mb-1">
                       {user?.name || user?.email || "usuário"}
@@ -80,9 +70,6 @@ export function Header() {
                     </div>
                   </div>
                 </Link>
-              </Button>
-              <Button variant="outline" className="px-5" onClick={logout}>
-                Sair
               </Button>
             </div>
           ) : (
@@ -122,10 +109,8 @@ export function Header() {
           >
             {isAuthenticated && (
               <div className="mb-3 rounded-xl border border-border bg-muted/10 p-3 text-sm">
-                <div className="flex items-center gap-2">
-                  <Avatar>
-                    <AvatarFallback>{userInitials}</AvatarFallback>
-                  </Avatar>
+                  <div className="flex items-center gap-2">
+                  <UserInitials name={user?.name} email={user?.email} />
                   <div>
                     <div className="font-semibold text-foreground">
                       Olá, {user?.name || user?.email || "usuário"}
@@ -133,13 +118,6 @@ export function Header() {
                     <div className="text-xs text-primary font-bold uppercase">Plano {getPlanLabel(user?.planTier)}</div>
                   </div>
                 </div>
-                <button
-                  onClick={logout}
-                  className="mt-2 text-xs font-semibold text-primary underline"
-                  type="button"
-                >
-                  Sair
-                </button>
               </div>
             )}
             <nav className="flex flex-col gap-2">

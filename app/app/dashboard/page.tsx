@@ -16,25 +16,26 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
 } from "@/components/ui/select";
 import { DashboardProvider, useDashboard } from "@/context/dashboard-context";
 import { useFinancePeriod } from "@/context/finance-period-context";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { currencyFormatter, getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
+import { getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
 import { cn, parseDateOnly } from "@/lib/utils";
 import { differenceInCalendarDays, eachDayOfInterval, endOfMonth, format, isSameMonth, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
-  ArrowDownRight,
-  ArrowUpRight,
-  CalendarIcon,
-  PiggyBank,
-  Wallet2
+    ArrowDownRight,
+    ArrowUpRight,
+    CalendarIcon,
+    PiggyBank,
+    Wallet2
 } from "lucide-react";
 import { useMemo } from "react";
 import type { DateRange } from "react-day-picker";
@@ -328,7 +329,7 @@ function DashboardContent() {
             variant="expense"
             icon={ArrowDownRight}
             title={hasDateRange ? "Total gasto no periodo" : "Total gasto no mes"}
-            value={currencyFormatter.format(metrics?.financials.expenses ?? 0)}
+            value={formatCurrency(metrics?.financials.expenses ?? 0)}
             change={`${(metrics?.financials.expensesChangePercent ?? 0) > 0 ? '+' : ''}${metrics?.financials.expensesChangePercent ?? 0}% ${comparisonLabel}`}
             sparklineData={sparklineExpense}
             isLoading={isLoading}
@@ -337,7 +338,7 @@ function DashboardContent() {
             variant="income"
             icon={ArrowUpRight}
             title={hasDateRange ? "Receitas no periodo" : "Receitas no mes"}
-            value={currencyFormatter.format(metrics?.financials.income ?? 0)}
+            value={formatCurrency(metrics?.financials.income ?? 0)}
             change={`${(metrics?.financials.incomeChangePercent ?? 0) > 0 ? '+' : ''}${metrics?.financials.incomeChangePercent ?? 0}% ${comparisonLabel}`}
             sparklineData={sparklineIncome}
             isLoading={isLoading}
@@ -346,7 +347,7 @@ function DashboardContent() {
             variant="balance"
             icon={Wallet2}
             title={hasDateRange ? "Saldo disponivel no periodo" : "Saldo disponivel"}
-            value={currencyFormatter.format(metrics?.financials.availableBalance ?? metrics?.financials.balance ?? 0)}
+            value={formatCurrency(metrics?.financials.availableBalance ?? metrics?.financials.balance ?? 0)}
             change={`${(metrics?.financials.balanceChangePercent ?? 0) > 0 ? '+' : ''}${metrics?.financials.balanceChangePercent ?? 0}% ${comparisonLabel}`}
             sparklineData={sparklineBalance}
             isLoading={isLoading}
@@ -354,7 +355,7 @@ function DashboardContent() {
           <SummaryCard
             icon={PiggyBank}
             title="Dinheiro guardado"
-            value={currencyFormatter.format(metrics?.financials.savedAmount ?? 0)}
+            value={formatCurrency(metrics?.financials.savedAmount ?? 0)}
             helper="Total em cofrinhos"
             variant="success"
             isLoading={isLoading}

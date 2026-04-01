@@ -19,7 +19,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { TransactionsProvider, useTransactions } from "@/context/transactions-context";
 import { usePendingBills } from "@/hooks/use-pending-bills";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
 import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { differenceInCalendarDays, format } from "date-fns";
@@ -110,14 +110,14 @@ function ContasPageContent() {
         <SummaryCard
           icon={Calendar}
           title="Total pendente"
-          value={currencyFormatter.format(summary.total)}
+          value={formatCurrency(summary.total)}
           helper="Inclui todos os lancamentos aguardando pagamento"
         />
         <SummaryCard
           icon={AlertTriangle}
           title="Atrasados"
           value={`${summary.overdueCount} boletos`}
-          helper={currencyFormatter.format(summary.overdueAmount)}
+          helper={formatCurrency(summary.overdueAmount)}
           variant="danger"
         />
         <SummaryCard
@@ -210,7 +210,7 @@ function ContasPageContent() {
                         <TableCell>
                           <StatusBadge bill={bill} />
                         </TableCell>
-                        <TableCell>{currencyFormatter.format(bill.amount)}</TableCell>
+                        <TableCell>{formatCurrency(bill.amount)}</TableCell>
                         <TableCell>{bill.dueDate ? format(parseDateOnly(bill.dueDate)!, "dd/MM", { locale: ptBR }) : "—"}</TableCell>
                         <TableCell>{formatDaysRemaining(bill)}</TableCell>
                         <TableCell className="text-right">
@@ -288,7 +288,7 @@ function ContasPageContent() {
                       <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
                         <div>
                           <p className="text-muted-foreground">Valor</p>
-                          <p>{currencyFormatter.format(bill.amount)}</p>
+                          <p>{formatCurrency(bill.amount)}</p>
                         </div>
                         <div>
                           <p className="text-muted-foreground">Vence</p>

@@ -11,8 +11,8 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet";
 import { useCardsHook } from "@/hooks/use-cards";
-import { formatCardNumber, getFlagLabel } from "@/lib/credit-cards/constants";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCardNumber, getFlagLabel } from "@/lib/card-utils";
+import { formatCurrency } from "@/lib/currency-utils";
 import type { CreditCard } from "@/types/finance";
 import { useState } from "react";
 
@@ -57,7 +57,7 @@ export function CreditCardDeleteSheet({ card, open, onOpenChange }: CreditCardDe
               {getFlagLabel(card.flag)} • {formatCardNumber(card.lastFourDigits)}
             </p>
             <p className="mt-2 text-sm">
-              Limite: <span className="font-medium">{currencyFormatter.format(card.limit)}</span>
+              Limite: <span className="font-medium">{formatCurrency(card.limit)}</span>
             </p>
           </div>
           <p className="text-sm text-muted-foreground">

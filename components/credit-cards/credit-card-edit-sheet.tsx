@@ -21,7 +21,7 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet";
 import { useCardsHook } from "@/hooks/use-cards";
-import { creditCardFlags, creditCardStatuses } from "@/lib/credit-cards/constants";
+import { cardFlags, cardStatuses } from "@/lib/card-utils";
 import type { CreditCard, CreditCardFlag, CreditCardStatus } from "@/types/finance";
 import { useEffect, useState } from "react";
 
@@ -108,7 +108,7 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {creditCardFlags.map((option) => (
+                    {cardFlags.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         <div className="flex items-center gap-2">
                           <CardFlagIcon flag={option.value} className="h-4 w-auto" />
@@ -178,7 +178,7 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {creditCardStatuses.map((option) => (
+                  {cardStatuses.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>

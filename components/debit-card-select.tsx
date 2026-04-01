@@ -16,7 +16,7 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import { useCardsHook } from '@/hooks/use-cards';
-import { formatDebitCardNumber } from '@/lib/debit-cards/constants';
+import { formatCardNumber } from '@/lib/card-utils';
 import { cn } from '@/lib/utils';
 import { Check, ChevronsUpDown, CreditCard } from 'lucide-react';
 import { useState } from 'react';
@@ -61,7 +61,7 @@ export function DebitCardSelect({
               <span className="truncate">{selectedCard.name}</span>
               {selectedCard.lastFourDigits && (
                 <span className="text-xs text-muted-foreground">
-                  {formatDebitCardNumber(selectedCard.lastFourDigits)}
+                  {formatCardNumber(selectedCard.lastFourDigits)}
                 </span>
               )}
             </span>
@@ -123,7 +123,7 @@ export function DebitCardSelect({
                   <span className="flex-1 truncate">{card.name}</span>
                   {card.lastFourDigits && (
                     <span className="text-xs text-muted-foreground">
-                      {formatDebitCardNumber(card.lastFourDigits)}
+                      {formatCardNumber(card.lastFourDigits)}
                     </span>
                   )}
                   <Check

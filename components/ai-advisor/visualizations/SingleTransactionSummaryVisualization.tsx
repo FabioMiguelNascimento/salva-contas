@@ -1,8 +1,8 @@
 ﻿"use client";
 
+import { formatCurrency } from "@/lib/currency-utils";
+import { formatDate } from "@/lib/date-utils";
 import type { AiVisualization } from "@/types/finance";
-import { format, parseISO } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import type { VisualizationStatus } from "./types";
 
 interface SingleTransactionSummaryVisualizationProps {
@@ -13,51 +13,7 @@ interface SingleTransactionSummaryVisualizationProps {
   requiresConfirmation: boolean;
 }
 
-const formatDate = (value?: string | Date | null) => {
-  if (!value) return null;
-  try {
-    let date: Date;
-    if (typeof value === "string") {
-      date = parseISO(value);
-    } else if (value instanceof Date) {
-      date = value;
-    } else {
-      return String(value);
-    }
-    return format(date, "dd/MM/yyyy", { locale: ptBR });
-  } catch {
-    return String(value);
-  }
-};
 
-const parseAmount = (value: unknown): number => {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return value;
-  }
-
-  if (typeof value === "string") {
-    const normalized = value
-      .trim()
-      .replace(/\s/g, "")
-      .replace(/R\$/gi, "")
-      .replace(/\.(?=\d{3}(?:\D|$))/g, "")
-      .replace(/,/g, ".");
-
-    const parsed = Number(normalized);
-    if (Number.isFinite(parsed)) {
-      return parsed;
-    }
-  }
-
-  return 0;
-};
-
-const formatCurrency = (value: unknown): string => {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(parseAmount(value));
-};
 
 function renderConfirmationActions(
   status: VisualizationStatus,

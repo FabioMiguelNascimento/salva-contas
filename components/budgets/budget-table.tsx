@@ -17,6 +17,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import type { BudgetProgress } from "@/types/finance";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
@@ -26,11 +27,6 @@ interface BudgetTableProps {
   onEdit: (budget: BudgetProgress["budget"]) => void;
   onDelete: (budget: BudgetProgress["budget"]) => void;
 }
-
-const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
 
 export function BudgetTable({ budgetProgress, onEdit, onDelete }: BudgetTableProps) {
   if (budgetProgress.length === 0) {
@@ -83,10 +79,10 @@ export function BudgetTable({ budgetProgress, onEdit, onDelete }: BudgetTablePro
                 </div>
               </TableCell>
               <TableCell className="text-right font-medium">
-                {currencyFormatter.format(budget.amount)}
+                {formatCurrency(budget.amount)}
               </TableCell>
               <TableCell className={cn("text-right", isOverBudget && "text-destructive font-medium")}>
-                {currencyFormatter.format(spent)}
+                {formatCurrency(spent)}
               </TableCell>
               <TableCell
                 className={cn(
@@ -95,8 +91,8 @@ export function BudgetTable({ budgetProgress, onEdit, onDelete }: BudgetTablePro
                 )}
               >
                 {remaining >= 0
-                  ? currencyFormatter.format(remaining)
-                  : `-${currencyFormatter.format(Math.abs(remaining))}`}
+                  ? formatCurrency(remaining)
+                  : `-${formatCurrency(Math.abs(remaining))}`}
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">

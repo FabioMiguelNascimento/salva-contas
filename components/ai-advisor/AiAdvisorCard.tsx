@@ -6,6 +6,7 @@ import AiAdvisorToolsDropdown from '@/components/ai-advisor/AiAdvisorToolsDropdo
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import UserInitials from '@/components/ui/user-initials';
 import { chatWithAiAdvisor } from '@/services/ai-advisor';
 import { confirmTransaction } from '@/services/transactions';
 import type { AiVisualization } from '@/types/finance';
@@ -237,9 +238,7 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
 
                 {isLoading && (
                   <div className="flex w-full justify-start items-end gap-2 mb-4">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-emerald-500 to-emerald-700 text-white shadow-sm ring-2 ring-white">
-                      <span className="text-sm font-bold">B</span>
-                    </div>
+                    <UserInitials name="Boletinho" className="h-8 w-8 ring-white" />
                     <div className="relative px-4 py-3 bg-white border border-emerald-100 rounded-2xl rounded-bl-none shadow-sm flex items-center gap-1">
                       <div className="absolute -left-2 bottom-0 h-4 w-4 text-white">
                         <svg width="100%" height="100%" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -17,6 +17,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import type { Vault } from "@/types/finance";
 import {
@@ -36,11 +37,6 @@ interface VaultTableProps {
   onEdit: (vault: Vault) => void;
   onDelete: (vault: Vault) => void;
 }
-
-const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
 
 export function VaultTable({
   vaults,
@@ -83,7 +79,7 @@ export function VaultTable({
               </TableCell>
 
               <TableCell className="text-right font-medium">
-                {currencyFormatter.format(vault.currentAmount)}
+                {formatCurrency(vault.currentAmount)}
               </TableCell>
 
               <TableCell
@@ -93,7 +89,7 @@ export function VaultTable({
                 )}
               >
                 {hasTarget
-                  ? currencyFormatter.format(vault.targetAmount ?? 0)
+                  ? formatCurrency(vault.targetAmount ?? 0)
                   : "-"}
               </TableCell>
 

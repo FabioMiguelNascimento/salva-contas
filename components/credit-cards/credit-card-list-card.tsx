@@ -8,8 +8,8 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { formatCardNumber } from "@/lib/credit-cards/constants";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCardNumber } from "@/lib/card-utils";
+import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import type { CreditCard } from "@/types/finance";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
@@ -72,7 +72,7 @@ export function CreditCardListCard({ card, onEdit, onDelete }: CreditCardListCar
         <div className="flex items-center justify-between text-sm">
           <span className="text-white/70">Usado</span>
           <span className="font-bold text-white">
-            {currencyFormatter.format(usedAmount)} de {currencyFormatter.format(card.limit)}
+            {formatCurrency(usedAmount)} de {formatCurrency(card.limit)}
           </span>
         </div>
         <div className="h-2 w-full rounded-full bg-white/20 overflow-hidden">

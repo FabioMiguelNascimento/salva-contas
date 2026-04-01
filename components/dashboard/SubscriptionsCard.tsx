@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InfoPopover } from "@/components/ui/info-popover";
 import { Skeleton } from "@/components/ui/skeleton";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
 import type { Subscription } from "@/types/finance";
 import Link from "next/link";
 
@@ -39,7 +39,7 @@ export default function SubscriptionsCard({ subscriptions, monthlyTotal, isLoadi
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-xl bg-indigo-50 p-3">
               <div>
                 <p className="text-xs text-indigo-500 font-medium">Custo mensal estimado</p>
-                <p className="text-lg font-bold text-indigo-900">{currencyFormatter.format(monthlyTotal)}</p>
+                <p className="text-lg font-bold text-indigo-900">{formatCurrency(monthlyTotal)}</p>
               </div>
               <div className="text-left sm:text-right">
                 <p className="text-xs text-indigo-400">{subscriptions.length} assinatura{subscriptions.length !== 1 ? "s" : ""}</p>
@@ -58,7 +58,7 @@ export default function SubscriptionsCard({ subscriptions, monthlyTotal, isLoadi
                     <p className="truncate text-sm font-semibold text-gray-800">{sub.description}</p>
                     <p className="text-xs text-gray-400 capitalize">{sub.frequency === "monthly" ? "Mensal" : sub.frequency === "yearly" ? "Anual" : "Semanal"}</p>
                   </div>
-                  <p className="text-sm font-bold text-gray-900 shrink-0">{currencyFormatter.format(sub.amount)}</p>
+                  <p className="text-sm font-bold text-gray-900 shrink-0">{formatCurrency(sub.amount)}</p>
                 </div>
               ))}
             </div>

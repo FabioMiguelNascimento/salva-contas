@@ -2,6 +2,8 @@
 
 import AiAdvisorVisualizationRenderer from "@/components/ai-advisor/AiAdvisorVisualizationRenderer";
 import { VisualizationStatus } from "@/components/ai-advisor/visualizations/types";
+import UserInitials from "@/components/ui/user-initials";
+import { useAuth } from "@/hooks/use-auth";
 import { AiVisualization } from "@/types/finance";
 import ReactMarkdown from "react-markdown";
 
@@ -32,13 +34,12 @@ export default function AiAdvisorMessageBubble({
   onCancelVisualization,
 }: MessageBubbleProps) {
   const isAssistant = message.role === "assistant";
+  const { user } = useAuth();
 
   return (
     <div className={`flex w-full ${isAssistant ? "justify-start" : "justify-end"} items-end gap-2 mb-4`}>
       {isAssistant && (
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-linear-to-br from-emerald-500 to-emerald-700 text-white shadow-sm ring-2 ring-white">
-          <span className="text-sm font-bold">B</span>
-        </div>
+        <UserInitials name="Boletinho" className="h-8 w-8" />
       )}
       
       <div

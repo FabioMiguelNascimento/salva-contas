@@ -21,8 +21,7 @@ import {
     SheetTitle,
 } from '@/components/ui/sheet';
 import { useCardsHook } from '@/hooks/use-cards';
-import { creditCardFlags } from '@/lib/credit-cards/constants';
-import { debitCardStatuses } from '@/lib/debit-cards/constants';
+import { cardFlags, cardStatuses } from '@/lib/card-utils';
 import type { CreditCardFlag, DebitCard, DebitCardStatus } from '@/types/finance';
 import { useEffect, useState } from 'react';
 
@@ -100,7 +99,7 @@ export function DebitCardEditSheet({ card, open, onOpenChange }: DebitCardEditSh
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {creditCardFlags.map((option) => (
+                    {cardFlags.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         <div className="flex items-center gap-2">
                           <CardFlagIcon flag={option.value} className="h-4 w-auto" />
@@ -131,7 +130,7 @@ export function DebitCardEditSheet({ card, open, onOpenChange }: DebitCardEditSh
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {debitCardStatuses.map((option) => (
+                  {cardStatuses.map((option) => (
                     <SelectItem key={option.value} value={option.value}>
                       {option.label}
                     </SelectItem>
@@ -154,4 +153,3 @@ export function DebitCardEditSheet({ card, open, onOpenChange }: DebitCardEditSh
     </Sheet>
   );
 }
-

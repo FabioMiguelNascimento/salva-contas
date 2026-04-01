@@ -1,14 +1,15 @@
 ﻿"use client";
 
+import { formatCurrency, parseAmount } from "@/lib/currency-utils";
 import type { AiVisualization } from "@/types/finance";
 import {
-    CartesianGrid,
-    Line,
-    LineChart,
-    ResponsiveContainer,
-    Tooltip,
-    XAxis,
-    YAxis,
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
 import type { VisualizationStatus } from "./types";
 
@@ -20,34 +21,7 @@ interface LineChartVisualizationProps {
   requiresConfirmation: boolean;
 }
 
-const parseAmount = (value: unknown): number => {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return value;
-  }
 
-  if (typeof value === "string") {
-    const normalized = value
-      .trim()
-      .replace(/\s/g, "")
-      .replace(/R\$/gi, "")
-      .replace(/\.(?=\d{3}(?:\D|$))/g, "")
-      .replace(/,/g, ".");
-
-    const parsed = Number(normalized);
-    if (Number.isFinite(parsed)) {
-      return parsed;
-    }
-  }
-
-  return 0;
-};
-
-const formatCurrency = (value: unknown): string => {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(parseAmount(value));
-};
 
 function renderConfirmationActions(
   status: VisualizationStatus,
@@ -98,11 +72,12 @@ export default function LineChartVisualization({
   onCancel,
   requiresConfirmation,
 }: LineChartVisualizationProps) {
+  type PointLike = { date?: string; total?: number | string; amount?: number | string };
   const rawPoints = Array.isArray((visualization.payload as any).points)
-    ? ((visualization.payload as any).points as Array<{ date?: string; total?: number | string }>)
+    ? ((visualization.payload as any).points as PointLike[])
     : Array.isArray((visualization.payload as any).items)
-    ? ((visualization.payload as any).items as Array<{ date?: string; total?: number | string; amount?: number | string }>)
-    : [];
+    ? ((visualization.payload as any).items as PointLike[])
+    : ([] as PointLike[]);
 
   const points = rawPoints.map((point) => ({
     date: point.date ?? "",

@@ -1,19 +1,13 @@
 ﻿"use client";
 
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import UserInitials from '@/components/ui/user-initials';
 import { useFamilyInvite } from '@/context/family-invite-context';
 import { Link2, Lock, RefreshCw, Sparkles, Trash2, Users } from 'lucide-react';
 import { useEffect } from 'react';
 
-function getInitials(name?: string | null, email?: string | null) {
-  const source = (name || email || 'U').trim();
-  const parts = source.split(' ').filter(Boolean);
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return `${parts[0][0] || ''}${parts[1][0] || ''}`.toUpperCase();
-}
 
 export default function FamilyShareCard() {
   const {
@@ -186,9 +180,7 @@ export default function FamilyShareCard() {
             <div className="rounded-lg border p-3">
               <p className="text-xs text-muted-foreground mb-2">Conta principal</p>
               <div className="flex items-center gap-2">
-                <Avatar className="h-7 w-7">
-                  <AvatarFallback>{getInitials(family.owner.name, family.owner.email)}</AvatarFallback>
-                </Avatar>
+                <UserInitials name={family.owner.name} email={family.owner.email} />
                 <div>
                   <p className="text-sm font-medium">{family.owner.name || 'Sem nome'}</p>
                   <p className="text-xs text-muted-foreground">{family.owner.email || 'Sem email'}</p>
@@ -203,10 +195,8 @@ export default function FamilyShareCard() {
               <div className="space-y-2">
                 {family.members.map((member) => (
                   <div key={member.id} className="flex items-center gap-2 justify-between">
-                    <div className="flex items-center gap-2">
-                      <Avatar className="h-7 w-7">
-                        <AvatarFallback>{getInitials(member.name, member.email)}</AvatarFallback>
-                      </Avatar>
+                      <div className="flex items-center gap-2">
+                      <UserInitials name={member.name} email={member.email} />
                       <div>
                         <p className="text-sm">{member.name || 'Sem nome'}</p>
                         <p className="text-xs text-muted-foreground">{member.email || 'Sem email'}</p>

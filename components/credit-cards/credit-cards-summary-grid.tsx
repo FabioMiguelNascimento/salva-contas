@@ -1,6 +1,6 @@
 import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Card, CardContent } from "@/components/ui/card";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
 import { CreditCard as CreditCardIcon, TrendingDown, Wallet } from "lucide-react";
 
 interface CreditCardStats {
@@ -40,8 +40,8 @@ export function CreditCardsSummaryGrid({ stats }: CreditCardsSummaryGridProps) {
             Limites de credito
           </div>
           <div className="space-y-3">
-            <CardStat label="Limite total" value={currencyFormatter.format(stats.totalLimit)} />
-            <CardStat label="Limite disponivel" value={currencyFormatter.format(stats.totalAvailable)} />
+            <CardStat label="Limite total" value={formatCurrency(stats.totalLimit)} />
+            <CardStat label="Limite disponivel" value={formatCurrency(stats.totalAvailable)} />
           </div>
           <div className="flex-1" />
         </CardContent>
@@ -54,7 +54,7 @@ export function CreditCardsSummaryGrid({ stats }: CreditCardsSummaryGridProps) {
             Uso e alerta
           </div>
           <div className="space-y-3">
-            <CardStat label="Total utilizado" value={currencyFormatter.format(stats.totalUsed)} />
+            <CardStat label="Total utilizado" value={formatCurrency(stats.totalUsed)} />
             <CardStat label="Limite alto" value={stats.highUsageCards} />
           </div>
           <div className="flex-1" />

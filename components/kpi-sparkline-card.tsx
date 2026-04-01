@@ -3,10 +3,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { InfoPopover } from "@/components/ui/info-popover";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import type { ComponentType, SVGProps } from "react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip } from "recharts";
-
 export type SparklineVariant = "income" | "expense" | "balance";
 
 export interface SparklineDataPoint {
@@ -59,10 +59,7 @@ function SparklineTooltip({
 }) {
   if (!active || !payload?.length) return null;
   const point = payload[0];
-  const val = new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(point.value);
+  const val = formatCurrency(point.value);
   return (
     <div className="rounded-lg border border-gray-100 bg-white px-3 py-1.5 shadow-md text-xs">
       {point.payload.day && (

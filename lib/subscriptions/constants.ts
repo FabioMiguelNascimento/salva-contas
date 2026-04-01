@@ -47,10 +47,7 @@ export const months: MonthOption[] = [
   { value: 12, label: "Dezembro" },
 ];
 
-export const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
+export { currencyFormatter } from "@/lib/currency-utils";
 
 // Meses abreviados para filtros de período
 export const monthsShort = [

@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import CategoryDonut from "@/components/category-donut";
+import { parseNumber } from "@/lib/currency-utils";
 import type { AiVisualization } from "@/types/finance";
 import type { VisualizationStatus } from "./types";
 
@@ -12,27 +13,6 @@ interface DonutChartVisualizationProps {
   requiresConfirmation: boolean;
 }
 
-const parseAmount = (value: unknown): number => {
-  if (typeof value === "number" && Number.isFinite(value)) {
-    return value;
-  }
-
-  if (typeof value === "string") {
-    const normalized = value
-      .trim()
-      .replace(/\s/g, "")
-      .replace(/R\$/gi, "")
-      .replace(/\.(?=\d{3}(?:\D|$))/g, "")
-      .replace(/,/g, ".");
-
-    const parsed = Number(normalized);
-    if (Number.isFinite(parsed)) {
-      return parsed;
-    }
-  }
-
-  return 0;
-};
 
 function renderConfirmationActions(
   status: VisualizationStatus,
@@ -93,9 +73,9 @@ export default function DonutChartVisualization({
     : [];
 
   const getItemValue = (item: any) => {
-    if (item.total !== undefined && item.total !== null) return parseAmount(item.total);
-    if (item.expenses !== undefined && item.expenses !== null) return parseAmount(item.expenses);
-    if (item.net !== undefined && item.net !== null) return parseAmount(item.net);
+    if (item.total !== undefined && item.total !== null) return parseNumber(item.total);
+    if (item.expenses !== undefined && item.expenses !== null) return parseNumber(item.expenses);
+    if (item.net !== undefined && item.net !== null) return parseNumber(item.net);
     return 0;
   };
 

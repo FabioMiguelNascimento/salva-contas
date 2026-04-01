@@ -22,7 +22,7 @@ import {
     SheetTrigger,
 } from '@/components/ui/sheet';
 import { useCardsHook } from '@/hooks/use-cards';
-import { creditCardFlags } from '@/lib/credit-cards/constants';
+import { cardFlags } from '@/lib/card-utils';
 import type { CreateDebitCardPayload, CreditCardFlag } from '@/types/finance';
 import { PlusCircle } from 'lucide-react';
 import { useState } from 'react';
@@ -98,7 +98,7 @@ export function DebitCardCreateSheet() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {creditCardFlags.map((option) => (
+                    {cardFlags.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         <div className="flex items-center gap-2">
                           <CardFlagIcon flag={option.value} className="h-4 w-auto" />

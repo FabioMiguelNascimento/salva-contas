@@ -3,17 +3,16 @@ import { CardFlagStack } from "@/components/transactions/CardFlagStack";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
-import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency-utils";
+import { formatDate } from "@/lib/date-utils";
+import { cn, getTransactionCategoryLabel } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { FileText, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -25,15 +24,6 @@ interface Props {
   onViewAttachment?: (tx: Transaction) => void;
 }
 
-function formatDate(tx: Transaction) {
-  if (tx.paymentDate) {
-    return format(parseDateOnly(tx.paymentDate)!, "dd/MM/yyyy", { locale: ptBR });
-  }
-  if (tx.dueDate) {
-    return `${format(parseDateOnly(tx.dueDate)!, "dd/MM", { locale: ptBR })} (previsto)`;
-  }
-  return "—";
-}
 
 export function TransactionTable({ transactions, isLoading, onEdit, onDelete, onViewAttachment }: Props) {
   const pageSize = 15;
@@ -73,7 +63,9 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
         ) : transactions.length ? (
           transactions.map((transaction) => (
             <TableRow key={transaction.id}>
-              <TableCell className="text-xs text-muted-foreground">{formatDate(transaction)}</TableCell>
+              <TableCell className="text-xs text-muted-foreground">
+                {transaction.paymentDate ? formatDate(transaction.paymentDate) : transaction.dueDate ? `${formatDate(transaction.dueDate)} (previsto)` : "—"}
+              </TableCell>
               <TableCell className="max-w-[420px]">
                 <div className="min-w-0">
                   <button
@@ -133,7 +125,7 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
                 )}
               >
                 {transaction.type === "income" ? "+" : "-"}
-                {currencyFormatter.format(transaction.amount)}
+                {formatCurrency(transaction.amount)}
               </TableCell>
               <TableCell>
                 <DropdownMenu>

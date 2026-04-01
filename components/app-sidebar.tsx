@@ -1,18 +1,18 @@
 "use client";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem
 } from "@/components/ui/sidebar";
+import UserInitials from "@/components/ui/user-initials";
 import { useAuth } from "@/contexts/auth-context";
 import { getPlanLabel } from "@/lib/utils";
 import { CalendarClock, CreditCard, HandCoins, LayoutDashboard, LogOut, PiggyBank, ReceiptText, Repeat, Settings, Sparkles, User, Users } from "lucide-react";
@@ -37,15 +37,6 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
-
-  const userInitials = user?.name
-    ? user.name
-        .split(" ")
-        .map((n) => n[0])
-        .slice(0, 2)
-        .join("")
-        .toUpperCase()
-    : "??";
 
   const navItems: NavItem[] = [
     { label: "Dashboard", href: "/app/dashboard", icon: LayoutDashboard },
@@ -121,9 +112,7 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size="lg" tooltip={user?.name ?? "Usuario"}>
-                  <Avatar className="size-8 group-data-[collapsible=icon]:translate-x-0.5">
-                    <AvatarFallback className="bg-emerald-500/15 text-emerald-600">{userInitials}</AvatarFallback>
-                  </Avatar>
+                  <UserInitials name={user?.name} email={user?.email} className="size-8 -group-data-[collapsible=icon]:translate-x-1" />
                   <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
                     <span className="truncate font-medium">{user?.name ?? "Usuario"}</span>
                     <span className="truncate text-xs text-primary font-semibold uppercase tracking-wider">

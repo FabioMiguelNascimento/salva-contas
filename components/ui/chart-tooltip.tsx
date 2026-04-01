@@ -1,6 +1,6 @@
 "use client"
 
-import { currencyFormatter } from "@/lib/subscriptions/constants"
+import { formatCurrency } from "@/lib/currency-utils"
 import { cn } from "@/lib/utils"
 
 // Minimal, Recharts-compatible tooltip content styled like our TooltipContent
@@ -17,7 +17,7 @@ export function ChartTooltipContent({ active, payload, label }: any) {
         <div key={i} className="flex items-center gap-2">
           <div className="size-2 rounded-sm" style={{ background: p.payload?.color ?? p.color }} />
           <div className="flex-1 truncate text-sm font-medium">{p.name ?? p.dataKey}</div>
-          <div className="text-sm">{typeof p.value === "number" ? currencyFormatter.format(p.value) : String(p.value)}</div>
+          <div className="text-sm">{typeof p.value === "number" ? formatCurrency(p.value) : String(p.value)}</div>
         </div>
       ))}
     </div>

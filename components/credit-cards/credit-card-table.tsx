@@ -10,8 +10,8 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { formatCardNumber, getFlagLabel, getStatusLabel, getStatusVariant } from "@/lib/credit-cards/constants";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCardNumber, getFlagLabel, getStatusLabel, getStatusVariant } from "@/lib/card-utils";
+import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import type { CreditCard } from "@/types/finance";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
@@ -65,10 +65,10 @@ export function CreditCardTable({ creditCards, onEdit, onDelete }: CreditCardTab
                 </div>
               </TableCell>
               <TableCell className="text-right font-medium">
-                {currencyFormatter.format(card.limit)}
+                {formatCurrency(card.limit)}
               </TableCell>
               <TableCell className={cn("text-right font-medium", isHighUsage && "text-destructive")}>
-                {currencyFormatter.format(card.availableLimit)}
+                {formatCurrency(card.availableLimit)}
               </TableCell>
               <TableCell>Dia {card.closingDay}</TableCell>
               <TableCell>Dia {card.dueDay}</TableCell>

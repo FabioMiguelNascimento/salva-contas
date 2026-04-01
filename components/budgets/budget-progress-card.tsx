@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import type { BudgetProgress } from "@/types/finance";
 import { Pencil, Trash2 } from "lucide-react";
@@ -11,11 +12,6 @@ interface BudgetProgressCardProps {
   onEdit: (budget: BudgetProgress["budget"]) => void;
   onDelete: (budget: BudgetProgress["budget"]) => void;
 }
-
-const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
 
 export function BudgetProgressCard({ progress, onEdit, onDelete }: BudgetProgressCardProps) {
   const { budget, spent, remaining } = progress;
@@ -63,12 +59,12 @@ export function BudgetProgressCard({ progress, onEdit, onDelete }: BudgetProgres
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Gasto</span>
           <span className={cn("font-medium", isOverBudget && "text-destructive")}>
-            {currencyFormatter.format(spent)}
+            {formatCurrency(spent)}
           </span>
         </div>
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Limite</span>
-          <span className="font-medium">{currencyFormatter.format(budgetAmount)}</span>
+          <span className="font-medium">{formatCurrency(budgetAmount)}</span>
         </div>
         <Progress
           value={progressValue}
@@ -86,8 +82,8 @@ export function BudgetProgressCard({ progress, onEdit, onDelete }: BudgetProgres
             )}
           >
             {remaining >= 0
-              ? `${currencyFormatter.format(remaining)} disponível`
-              : `${currencyFormatter.format(Math.abs(remaining))} acima`}
+              ? `${formatCurrency(remaining)} disponível`
+              : `${formatCurrency(Math.abs(remaining))} acima`}
           </span>
         </div>
       </div>

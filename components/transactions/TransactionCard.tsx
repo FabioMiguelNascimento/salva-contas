@@ -2,37 +2,25 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
-import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency-utils";
+import { formatDate } from "@/lib/date-utils";
+import { cn, getTransactionCategoryLabel } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { FileText, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
-  transaction: Transaction;
-  onEdit: (tx: Transaction) => void;
-  onDelete: (tx: Transaction) => void;
-  onViewAttachment?: (tx: Transaction) => void;
-  isLoading: boolean;
+    transaction: Transaction;
+    onEdit: (tx: Transaction) => void;
+    onDelete: (tx: Transaction) => void;
+    onViewAttachment?: (tx: Transaction) => void;
+    isLoading: boolean;
 }
-
-function formatDate(tx: Transaction) {
-  if (tx.paymentDate) {
-    return format(parseDateOnly(tx.paymentDate)!, "dd/MM/yyyy", { locale: ptBR });
-  }
-  if (tx.dueDate) {
-    return `${format(parseDateOnly(tx.dueDate)!, "dd/MM", { locale: ptBR })} (previsto)`;
-  }
-  return "—";
-}
-
 
 export function TransactionCard({
   transaction,
@@ -54,6 +42,12 @@ export function TransactionCard({
     return <div className="h-28 w-full rounded-2xl bg-slate-100 animate-pulse" />;
   }
 
+  const displayDate = transaction.paymentDate
+    ? formatDate(transaction.paymentDate)
+    : transaction.dueDate
+    ? `${formatDate(transaction.dueDate)} (previsto)`
+    : "—";
+
   return (
     <div className="rounded-2xl border border-border/60 p-4">
       <div className="flex items-start justify-between gap-2">
@@ -67,7 +61,7 @@ export function TransactionCard({
             {transaction.description}
           </button>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>{formatDate(transaction)}</span>
+            <span>{displayDate}</span>
             {transaction.createdByName ? (
               <>
                 <span>•</span>
@@ -125,7 +119,7 @@ export function TransactionCard({
             )}
           >
             {transaction.type === "income" ? "+" : "-"}
-            {currencyFormatter.format(transaction.amount)}
+            {formatCurrency(transaction.amount)}
           </span>
         </div>
       </div>

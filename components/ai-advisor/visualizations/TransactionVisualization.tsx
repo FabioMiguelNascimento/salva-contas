@@ -2,6 +2,8 @@
 
 import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { DynamicIcon } from "@/components/dynamic-icon";
+import { formatCurrency } from "@/lib/currency-utils";
+import { formatDate as formatDateUtil } from "@/lib/date-utils";
 import type { AiVisualization, CreditCardFlag, PaymentMethod, TransactionDetailsPayload } from "@/types/finance";
 import { PAYMENT_METHOD_LABELS } from "@/types/finance";
 import { ArrowDown, ArrowUp } from "lucide-react";
@@ -61,22 +63,13 @@ function renderConfirmationActions(
 
 const formatDate = (value?: string | Date | null) => {
   if (!value) return null;
-  try {
-    const date = typeof value === "string" ? new Date(value) : value;
-    if (!(date instanceof Date) || Number.isNaN(date.getTime())) return String(value);
-    return date.toLocaleDateString("pt-BR");
-  } catch {
-    return String(value);
-  }
+  return formatDateUtil(value);
 };
 
-const formatCurrency = (value: unknown): string => {
+const formatCurrencyFn = (value: unknown): string => {
   const amount = typeof value === "number" ? value : Number(value);
   if (Number.isNaN(amount)) return "R$ 0,00";
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(amount);
+  return formatCurrency(amount);
 };
 
 const formatStatusLabel = (status?: string): string => {
@@ -143,7 +136,7 @@ export default function TransactionVisualization({
                 {transaction.categoryName ?? transaction.category ?? "Sem categoria"}
               </p>
               <p className="text-[28px] font-bold leading-tight tracking-tight text-white">
-                {formatCurrency(transaction.amount)}
+                {formatCurrencyFn(transaction.amount)}
               </p>
               <p className="text-sm text-white/80">
                 {transaction.description ?? "Sem descrição"}
@@ -253,7 +246,7 @@ export default function TransactionVisualization({
                       </div>
                     </div>
                     <p className="text-[14px] font-semibold text-slate-800">
-                      {formatCurrency(method.amount)}
+                      {formatCurrencyFn(method.amount)}
                     </p>
                   </div>
                 );

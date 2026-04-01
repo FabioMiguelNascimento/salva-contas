@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InfoPopover } from "@/components/ui/info-popover";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import type { CreditCard } from "@/types/finance";
 import Link from "next/link";
@@ -43,10 +43,10 @@ export default function CreditCardsCard({ activeCards, totalCreditLimit, totalCr
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between rounded-lg bg-muted/50 p-3">
               <div>
                 <p className="text-xs text-muted-foreground">Limite utilizado</p>
-                <p className="text-lg font-semibold">{currencyFormatter.format(totalCreditUsed)}</p>
+                <p className="text-xl font-semibold">{formatCurrency(totalCreditUsed)}</p>
               </div>
               <div className="text-left sm:text-right">
-                <p className="text-xs text-muted-foreground">de {currencyFormatter.format(totalCreditLimit)}</p>
+                <p className="text-xs text-muted-foreground">de {formatCurrency(totalCreditLimit)}</p>
                 <p className={cn("text-sm font-medium", creditUsagePercent > 80 ? "text-destructive" : creditUsagePercent > 50 ? "text-yellow-600" : "text-emerald-600")}>
                   {creditUsagePercent.toFixed(0)}% usado
                 </p>

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InfoPopover } from "@/components/ui/info-popover";
 import { Skeleton } from "@/components/ui/skeleton";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
 import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { format } from "date-fns";
@@ -38,17 +38,17 @@ function TransactionRow({ transaction }: { transaction: Transaction }) {
         />
       </div>
       <div className="min-w-0 flex-1 overflow-hidden">
-        <p className="text-sm font-medium text-gray-800 break-words whitespace-pre-wrap overflow-hidden">
+        <p className="text-sm font-medium text-gray-800 wrap-break-word whitespace-pre-wrap overflow-hidden">
           {transaction.description}
         </p>
-        <p className="text-xs text-gray-400 break-words whitespace-pre-wrap overflow-hidden">
+        <p className="text-xs text-gray-400 wrap-break-word whitespace-pre-wrap overflow-hidden">
           {categoryLabel} • {transaction.paymentDate ? format(parseDateOnly(transaction.paymentDate)!, "dd MMM", { locale: ptBR }) : "pendente"}
         </p>
       </div>
       <div className="text-right shrink-0">
         <p className={cn("text-sm font-semibold whitespace-nowrap", isIncome ? "text-emerald-600" : "text-rose-500")}>
           {isIncome ? "+" : "-"}
-          {currencyFormatter.format(transaction.amount)}
+          {formatCurrency(transaction.amount)}
         </p>
       </div>
     </div>

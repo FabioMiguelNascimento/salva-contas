@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InfoPopover } from "@/components/ui/info-popover";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import type { Budget } from "@/types/finance";
 import { PiggyBank } from "lucide-react";
@@ -66,7 +66,7 @@ export default function BudgetsCard({ budgetsWithUsage, isLoading }: BudgetsCard
                     )}
                   </div>
                   <span className="text-xs text-gray-400 shrink-0">
-                    {currencyFormatter.format(budget.spent)} / {currencyFormatter.format(budget.amount)}
+                    {formatCurrency(budget.spent)} / {formatCurrency(budget.amount)}
                   </span>
                 </div>
                 <Progress value={budget.usagePercent} className={cn("h-2", budget.isOverBudget && "[&>div]:bg-destructive")} />

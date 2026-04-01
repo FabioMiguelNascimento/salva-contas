@@ -4,7 +4,7 @@ import { DynamicIcon } from "@/components/dynamic-icon";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
 import type { Vault } from "@/types/finance";
 import { HandCoins, Landmark, TrendingUp } from "lucide-react";
 
@@ -36,7 +36,7 @@ export function VaultCard({
         <div>
           <CardTitle className="text-base">{vault.name}</CardTitle>
           <CardDescription>
-            Saldo atual: {currencyFormatter.format(vault.currentAmount)}
+            Saldo atual: {formatCurrency(vault.currentAmount)}
           </CardDescription>
         </div>
         <div
@@ -51,7 +51,7 @@ export function VaultCard({
         {progress !== null ? (
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
-              <span>Meta: {currencyFormatter.format(vault.targetAmount ?? 0)}</span>
+              <span>Meta: {formatCurrency(vault.targetAmount ?? 0)}</span>
               <span>{progress.toFixed(0)}%</span>
             </div>
             <Progress value={progress} />

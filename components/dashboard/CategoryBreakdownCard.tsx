@@ -4,7 +4,7 @@ import CategoryDonut from "@/components/category-donut";
 import ChartCard from "@/components/chart-card";
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { InfoPopover } from "@/components/ui/info-popover";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
 import type { CategoryBreakdownItem, TransactionCategory } from "@/types/finance";
 import Link from "next/link";
 
@@ -64,7 +64,7 @@ export default function CategoryBreakdownCard({ breakdown, total, categoriesMeta
 
                 <span className="text-sm font-medium truncate">{item.category}</span>
               </div>
-              <span className="text-sm text-muted-foreground shrink-0">{currencyFormatter.format(item.total)}</span>
+                <span className="text-sm text-muted-foreground shrink-0">{formatCurrency(item.total)}</span>
             </Link>
           );
         })}

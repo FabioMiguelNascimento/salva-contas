@@ -8,7 +8,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { formatDebitCardNumber, getDebitStatusLabel } from '@/lib/debit-cards/constants';
+import { formatDebitCardNumber, getStatusLabel } from '@/lib/card-utils';
 import { cn } from '@/lib/utils';
 import type { DebitCard } from '@/types/finance';
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
@@ -66,7 +66,7 @@ export function DebitCardListCard({ card, onEdit, onDelete }: DebitCardListCardP
       <div className="mt-4 flex items-center justify-between">
         <span className="text-xs text-white/60">Cartão de débito</span>
         <span className="text-xs font-medium text-white/80 bg-white/10 px-2 py-0.5 rounded-full">
-          {getDebitStatusLabel(card.status)}
+          {getStatusLabel(card.status)}
         </span>
       </div>
     </div>

@@ -1,7 +1,7 @@
 ﻿"use client";
 
 import { DynamicIcon } from "@/components/dynamic-icon";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
 import { AiVisualization } from "@/types/finance";
 import { VisualizationStatus } from "./types";
 
@@ -58,24 +58,24 @@ export default function VaultActionSummaryVisualization({
       <div className="rounded-xl border border-emerald-800 bg-emerald-900/60 p-3">
         <p className="text-xs font-medium uppercase tracking-widest text-emerald-300">{actionLabel}</p>
         <p className="mt-1 text-3xl font-extrabold text-emerald-300">
-          {isDeposit ? '+' : '-'} {currencyFormatter.format(actionDisplay)}
+          {isDeposit ? '+' : '-'} {formatCurrency(actionDisplay)}
         </p>
       </div>
 
       <div className="mt-3 grid grid-cols-2 gap-2">
         <div className="rounded-lg border border-emerald-800 bg-emerald-900/60 p-3">
           <p className="text-xs text-emerald-300">Já acumulado</p>
-          <p className="text-xl font-bold text-white">{currencyFormatter.format(currentAmount)}</p>
+          <p className="text-xl font-bold text-white">{formatCurrency(currentAmount)}</p>
         </div>
         <div className="rounded-lg border border-emerald-800 bg-emerald-900/60 p-3">
           <p className="text-xs text-emerald-300">Meta total</p>
-          <p className="text-xl font-bold text-white">{currencyFormatter.format(targetAmount)}</p>
+          <p className="text-xl font-bold text-white">{formatCurrency(targetAmount)}</p>
         </div>
       </div>
 
       <div className="mt-3 flex items-center justify-between rounded-lg border border-emerald-800 bg-emerald-900/60 p-3">
         <p className="text-sm font-medium text-emerald-300">Falta</p>
-        <p className="text-lg font-bold text-white">{currencyFormatter.format(missingAmount)}</p>
+        <p className="text-lg font-bold text-white">{formatCurrency(missingAmount)}</p>
       </div>
 
       <div className="mt-3 h-2 w-full rounded-full bg-white/10">

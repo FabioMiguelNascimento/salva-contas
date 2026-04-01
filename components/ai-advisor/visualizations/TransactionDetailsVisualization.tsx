@@ -1,9 +1,10 @@
 ﻿"use client";
 
 import { DynamicIcon } from "@/components/dynamic-icon";
+import { formatCurrency, parseNumber } from "@/lib/currency-utils";
+import { formatDate,  formatDate as formatDateUtil, parseDateOnly as parseDateOnlyUtil } from "@/lib/date-utils";
+import { getTransactionStatusLabel } from "@/lib/utils";
 import type { AiVisualization } from "@/types/finance";
-import { format, parseISO } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import type { VisualizationStatus } from "./types";
 
 interface TransactionDetailsVisualizationProps {
@@ -14,24 +15,7 @@ interface TransactionDetailsVisualizationProps {
   requiresConfirmation: boolean;
 }
 
-const formatDate = (value?: string | Date | null) => {
-  if (!value) return null;
-  try {
-    let date: Date;
-    if (typeof value === "string") {
-      date = parseISO(value);
-    } else if (value instanceof Date) {
-      date = value;
-    } else {
-      return String(value);
-    }
-    return format(date, "dd/MM/yyyy", { locale: ptBR });
-  } catch {
-    return String(value);
-  }
-};
-
-const parseAmount = (value: unknown): number => {
+const formatAmount = (value: unknown): number => {
   if (typeof value === "number" && Number.isFinite(value)) {
     return value;
   }
@@ -44,42 +28,14 @@ const parseAmount = (value: unknown): number => {
       .replace(/\.(?=\d{3}(?:\D|$))/g, "")
       .replace(/,/g, ".");
 
-    const parsed = Number(normalized);
-    if (Number.isFinite(parsed)) {
-      return parsed;
-    }
+    return parseNumber(normalized);
   }
 
   return 0;
 };
 
-const formatCurrency = (value: unknown): string => {
-  return new Intl.NumberFormat("pt-BR", {
-    style: "currency",
-    currency: "BRL",
-  }).format(parseAmount(value));
-};
-
-const formatStatusLabel = (status?: string | null): string => {
-  if (!status) return "";
-
-  const normalized = String(status).toLowerCase().trim();
-
-  switch (normalized) {
-    case "paid":
-      return "Pago";
-    case "pending":
-      return "Pendente";
-    case "overdue":
-      return "Atrasado";
-    case "cancelled":
-    case "canceled":
-      return "Cancelado";
-    case "received":
-      return "Recebido";
-    default:
-      return status;
-  }
+const formatAmountCurrency = (value: unknown): string => {
+  return formatCurrency(formatAmount(value));
 };
 
 function renderConfirmationActions(
@@ -147,7 +103,7 @@ export default function TransactionDetailsVisualization({
   const totalAmount =
     typeof payload.totalAmount === "number"
       ? Number(payload.totalAmount)
-      : items.reduce((sum, item) => sum + parseAmount(item.amount), 0);
+      : items.reduce((sum, item) => sum + formatAmount(item.amount), 0);
 
   return (
     <div className="mt-3 w-full min-w-0 overflow-x-hidden rounded-xl border border-gray-100 bg-white p-3">
@@ -159,7 +115,7 @@ export default function TransactionDetailsVisualization({
         </div>
         <div className="rounded-lg bg-slate-100 p-2 sm:col-span-2">
           <p className="text-xs text-slate-600">Valor total encontrado</p>
-          <p className="font-semibold text-slate-800">{formatCurrency(totalAmount)}</p>
+          <p className="font-semibold text-slate-800">{formatAmountCurrency(totalAmount)}</p>
         </div>
       </div>
 
@@ -180,7 +136,7 @@ export default function TransactionDetailsVisualization({
                   }`}
                 >
                   {item.type === "income" ? "+" : "-"}
-                  {formatCurrency(item.amount)}
+                  {formatAmountCurrency(item.amount)}
                 </p>
               </div>
               <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
@@ -201,7 +157,7 @@ export default function TransactionDetailsVisualization({
                 ) : null}
                 {item.status ? (
                   <span className="whitespace-nowrap text-slate-400">
-                    {formatStatusLabel(item.status)}
+                    {getTransactionStatusLabel(item.status)}
                   </span>
                 ) : null}
               </div>

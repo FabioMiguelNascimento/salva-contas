@@ -15,12 +15,8 @@ import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useBudgetEditor } from "@/hooks/use-budget-editor";
 import { useBudgetForm } from "@/hooks/use-budget-form";
 import { useBudgetsHook } from "@/hooks/use-budgets";
+import { formatCurrency } from "@/lib/currency-utils";
 import { AlertTriangle, CheckCircle2, PiggyBank, TrendingDown } from "lucide-react";
-
-const currencyFormatter = new Intl.NumberFormat("pt-BR", {
-  style: "currency",
-  currency: "BRL",
-});
 
 function BudgetsPageContent() {
   const { budgetProgress, stats, isLoading, createBudgetRule, updateBudgetRule, deleteBudgetRule, filters } = useBudgetsHook();
@@ -54,12 +50,12 @@ function BudgetsPageContent() {
           icon={PiggyBank}
           title="Orcamentos ativos"
           value={stats.totalBudgets}
-          helper={`Total de ${currencyFormatter.format(stats.totalBudgeted)} planejado`}
+          helper={`Total de ${formatCurrency(stats.totalBudgeted)} planejado`}
         />
         <SummaryCard
           icon={TrendingDown}
           title="Total gasto"
-          value={currencyFormatter.format(stats.totalSpent)}
+          value={formatCurrency(stats.totalSpent)}
           helper={`${stats.averagePercentage.toFixed(0)}% do orcamento total`}
           variant={stats.averagePercentage > 100 ? "danger" : "default"}
         />

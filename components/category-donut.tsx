@@ -1,6 +1,6 @@
 "use client"
 
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
 import { useRouter } from "next/navigation";
 
 export type CategoryDonutItem = { category: string; total: number };
@@ -22,7 +22,7 @@ export function CategoryDonut({ data, total }: { data: CategoryDonutItem[]; tota
           <div className="h-full w-full rounded-full bg-muted/30" />
           <div className="absolute inset-4 sm:inset-6 flex flex-col items-center justify-center rounded-full bg-card text-center">
             <span className="text-[8px] sm:text-xs uppercase tracking-widest text-muted-foreground">Total</span>
-            <strong className="text-sm sm:text-lg">{currencyFormatter.format(total)}</strong>
+            <strong className="text-sm sm:text-lg">{formatCurrency(total)}</strong>
           </div>
         </div>
       </div>
@@ -48,13 +48,13 @@ export function CategoryDonut({ data, total }: { data: CategoryDonutItem[]; tota
                 <Cell key={`cell-${index}`} fill={entry.color} />
               ))}
             </Pie>
-            <Tooltip wrapperStyle={{zIndex: 1000}} content={<ChartTooltipContent />} formatter={(value: any) => currencyFormatter.format(value)} />
+            <Tooltip wrapperStyle={{zIndex: 1000}} content={<ChartTooltipContent />} formatter={(value: any) => formatCurrency(value)} />
           </PieChart>
         </ResponsiveContainer>
 
         <div className="absolute inset-4 sm:inset-6 flex flex-col items-center justify-center rounded-full bg-card text-center z-0 pointer-events-none">
           <span className="text-[8px] sm:text-xs uppercase tracking-widest text-muted-foreground">Total</span>
-          <strong className="text-sm sm:text-lg">{currencyFormatter.format(total)}</strong>
+          <strong className="text-sm sm:text-lg">{formatCurrency(total)}</strong>
         </div>
       </div>
     </div>

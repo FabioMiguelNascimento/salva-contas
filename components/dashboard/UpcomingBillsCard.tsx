@@ -3,7 +3,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { InfoPopover } from "@/components/ui/info-popover";
 import { Skeleton } from "@/components/ui/skeleton";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
 import { cn, parseDateOnly } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { differenceInCalendarDays, format, isPast } from "date-fns";
@@ -56,7 +56,7 @@ function BillRow({ bill }: { bill: Transaction }) {
 
       {/* Right side: amount + date */}
       <div className="shrink-0 text-right">
-        <p className="text-sm font-bold text-gray-900">{currencyFormatter.format(bill.amount)}</p>
+        <p className="text-sm font-bold text-gray-900">{formatCurrency(bill.amount)}</p>
         <p
           className={cn(
             "text-xs font-semibold mt-0.5 px-2 py-0.5 rounded-full inline-block",

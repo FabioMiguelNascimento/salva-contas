@@ -8,7 +8,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
 import { getFrequencyLabel, getScheduleLabel } from "@/lib/subscriptions/utils";
 import type { Subscription } from "@/types/finance";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
@@ -57,7 +57,7 @@ export function SubscriptionListCard({ subscription, onEdit, onDelete }: Subscri
         </DropdownMenu>
       </div>
       <div className="mt-3 flex items-center justify-between">
-        <strong className="font-bold text-gray-900">{currencyFormatter.format(subscription.amount)}</strong>
+        <strong className="font-bold text-gray-900">{formatCurrency(subscription.amount)}</strong>
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="text-xs">
             {getFrequencyLabel(subscription.frequency)}

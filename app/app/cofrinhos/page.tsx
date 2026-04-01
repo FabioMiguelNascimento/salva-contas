@@ -12,7 +12,7 @@ import { VaultFormSheet } from "@/components/vaults/vault-form-sheet";
 import { VaultTable } from "@/components/vaults/vault-table";
 import { useVaults, VaultsProvider } from "@/context/vaults-context";
 import { TopbarAction } from "@/contexts/topbar-action-context";
-import { currencyFormatter } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
 import type { Vault } from "@/types/finance";
 import { PiggyBank, PlusCircle, Target, Wallet2 } from "lucide-react";
 import { useState } from "react";
@@ -117,14 +117,14 @@ function VaultsPageContent() {
         <SummaryCard
           icon={PiggyBank}
           title="Dinheiro guardado"
-          value={currencyFormatter.format(stats.savedAmount)}
+          value={formatCurrency(stats.savedAmount)}
           helper="Total alocado em cofrinhos"
           variant="success"
         />
         <SummaryCard
           icon={Wallet2}
           title="Saldo disponivel"
-          value={currencyFormatter.format(stats.availableBalance)}
+          value={formatCurrency(stats.availableBalance)}
           helper="Saldo fora dos cofrinhos"
         />
       </SummaryCardsGrid>

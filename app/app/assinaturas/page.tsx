@@ -17,7 +17,8 @@ import { useSubscriptionEditor } from "@/hooks/use-subscription-editor";
 import { useSubscriptionFilters } from "@/hooks/use-subscription-filters";
 import { useSubscriptionForm } from "@/hooks/use-subscription-form";
 import { useSubscriptionsHook } from "@/hooks/use-subscriptions";
-import { currencyFormatter, frequencyOptions } from "@/lib/subscriptions/constants";
+import { formatCurrency } from "@/lib/currency-utils";
+import { frequencyOptions } from "@/lib/subscriptions/constants";
 import { PlusCircle, Shield, Zap } from "lucide-react";
 
 function SubscriptionsPageContent() {
@@ -52,7 +53,7 @@ function SubscriptionsPageContent() {
         <SummaryCard
           icon={Shield}
           title="Comprometido/mes"
-          value={currencyFormatter.format(stats.totalAmount)}
+          value={formatCurrency(stats.totalAmount)}
           helper="Soma considerando valores atuais"
         />
         {frequencyOptions.slice(0, 2).map((option) => (
