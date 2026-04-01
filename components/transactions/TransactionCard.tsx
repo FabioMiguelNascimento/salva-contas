@@ -45,7 +45,7 @@ export function TransactionCard({
   const displayDate = transaction.paymentDate
     ? formatDate(transaction.paymentDate)
     : transaction.dueDate
-    ? `${formatDate(transaction.dueDate)} (previsto)`
+    ? `${formatDate(transaction.dueDate)}`
     : "—";
 
   return (

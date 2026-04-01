@@ -33,6 +33,7 @@ function ExtratoPageContent() {
   const {
     transactions: serverTransactions,
     isLoading,
+    isSyncing,
     categories,
     removeTransaction,
     totalPages,
@@ -46,6 +47,7 @@ function ExtratoPageContent() {
     filters: urlFilters,
     setType,
     setStatus,
+    setCategory,
     setSearch,
     goToPage,
   } = useTransactionFilters();
@@ -57,6 +59,7 @@ function ExtratoPageContent() {
 
   useEffect(() => {
     void refresh(urlFilters.page, {
+      query: urlFilters.search || undefined,
       type: urlFilters.type !== "all" ? (urlFilters.type as "expense" | "income") : undefined,
       status: urlFilters.status !== "all" ? (urlFilters.status as "paid" | "pending") : undefined,
       categoryId: urlFilters.categoryId || undefined,
@@ -65,7 +68,7 @@ function ExtratoPageContent() {
       startDate: undefined,
       endDate: undefined,
     });
-  }, [refresh, urlFilters.page, urlFilters.type, urlFilters.status, urlFilters.categoryId, filters.month, filters.year]);
+  }, [refresh, urlFilters.page, urlFilters.search, urlFilters.type, urlFilters.status, urlFilters.categoryId, filters.month, filters.year]);
 
 
   const handleDelete = async () => {
@@ -102,9 +105,13 @@ function ExtratoPageContent() {
             status={urlFilters.status}
             month={filters.month}
             year={filters.year}
+            categoryId={urlFilters.categoryId}
+            categories={categories}
+            isSearching={isSyncing}
             onSearchChange={setSearch}
             onMonthChange={(v) => setFilters({ ...filters, month: v })}
             onYearChange={(v) => setFilters({ ...filters, year: v })}
+            onCategoryChange={setCategory}
             onTypeChange={setType}
             onStatusChange={setStatus}
           />

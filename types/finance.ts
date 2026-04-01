@@ -294,6 +294,7 @@ export interface VaultHistoryQuery {
 export interface TransactionFilters {
   month: number;
   year: number;
+  query?: string;
   startDate?: string;
   endDate?: string;
   status?: TransactionStatus;

@@ -64,7 +64,7 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
           transactions.map((transaction) => (
             <TableRow key={transaction.id}>
               <TableCell className="text-xs text-muted-foreground">
-                {transaction.paymentDate ? formatDate(transaction.paymentDate) : transaction.dueDate ? `${formatDate(transaction.dueDate)} (previsto)` : "—"}
+                {transaction.paymentDate ? formatDate(transaction.paymentDate) : transaction.dueDate ? `${formatDate(transaction.dueDate)}` : "—"}
               </TableCell>
               <TableCell className="max-w-[420px]">
                 <div className="min-w-0">

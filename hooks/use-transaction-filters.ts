@@ -1,8 +1,6 @@
 import { useFinancePeriod } from "@/context/finance-period-context";
-import { useTransactions } from "@/context/transactions-context";
-import { removeAccents } from "@/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 
 export type TransactionFilters = {
   search: string;
@@ -12,13 +10,11 @@ export type TransactionFilters = {
   categoryId: string | null;
 };
 
-export function useTransactionFilters(pageSize = 8) {
-  const { categories, transactions } = useTransactions();
+export function useTransactionFilters() {
   const { filters, setFilters } = useFinancePeriod();
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
-  const searchTimeoutRef = useRef<number | null>(null);
 
   const paramSearch = searchParams.get("search") ?? "";
   const paramType = (searchParams.get("type") as string) ?? "all";
@@ -62,6 +58,10 @@ export function useTransactionFilters(pageSize = 8) {
     updateQuery({ status: value === "all" ? null : value, page: 1 });
   };
 
+  const setCategory = (value: string | null) => {
+    updateQuery({ categoryId: value || null, page: 1 });
+  };
+
   const setSearch = (value: string) => {
     updateQuery({ search: value || null, page: 1 }, { replace: true });
   };
@@ -79,41 +79,12 @@ export function useTransactionFilters(pageSize = 8) {
     [paramSearch, paramType, paramStatus, paramPage, paramCategoryId]
   );
 
-  const filteredTransactions = useMemo(() => {
-    const categoryName = paramCategoryId
-      ? categories.find((c) => c.id === paramCategoryId)?.name
-      : undefined;
-
-    return transactions.filter((transaction) => {
-      const term = (paramSearch || "").trim().toLowerCase();
-      const normalizedTerm = term ? removeAccents(term) : "";
-
-      const description = transaction.description || "";
-      const categoryText = transaction.category || "";
-
-      const combined = `${description} ${categoryText}`;
-      const normalizedCombined = removeAccents(combined.toLowerCase());
-
-      const matchesSearch = normalizedTerm
-        ? normalizedCombined.includes(normalizedTerm)
-        : true;
-
-      const matchesType = paramType === "all" || transaction.type === paramType;
-      const matchesStatus = paramStatus === "all" || transaction.status === paramStatus;
-      const matchesCategory = paramCategoryId
-        ? transaction.categoryId === paramCategoryId ||
-          (categoryName ? categoryText === categoryName : false)
-        : true;
-      return matchesSearch && matchesType && matchesStatus && matchesCategory;
-    });
-  }, [transactions, paramSearch, paramType, paramStatus, paramCategoryId, categories]);
-
   return {
     filters: filtersObj,
     setType,
     setStatus,
+    setCategory,
     setSearch,
     goToPage,
-    filteredTransactions,
   };
 }

@@ -50,7 +50,7 @@ export default function CategoryBreakdownCard({ breakdown, total, categoriesMeta
           return (
             <Link
               key={item.category}
-              href={`/extrato?categoryId=${encodeURIComponent(matched?.id ?? item.category)}`}
+              href={`/app/extrato?categoryId=${encodeURIComponent(matched?.id ?? item.category)}&page=1`}
               className="flex items-center justify-between gap-2 hover:bg-muted/30 rounded-md px-2 py-1"
             >
               <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">

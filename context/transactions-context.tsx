@@ -14,12 +14,14 @@ import type {
   TransactionCategory,
   UpdateTransactionPayload,
 } from "@/types/finance";
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useFinancePeriod } from "./finance-period-context";
 
 type TransactionQueryParams = {
   page?: number;
   limit?: number;
+  query?: string;
   categoryId?: string;
   type?: "expense" | "income";
   status?: "paid" | "pending";
@@ -51,51 +53,72 @@ const TransactionsContext = createContext<TransactionsContextValue | null>(null)
 
 export function TransactionsProvider({ children }: { children: React.ReactNode }) {
   const { filters, refreshTicket, triggerRefresh } = useFinancePeriod();
+  const queryClient = useQueryClient();
 
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [categories, setCategories] = useState<TransactionCategory[]>([]);
-  const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [lastSync, setLastSync] = useState<string | null>(null);
-
-  const refresh = useCallback(async (page = 1, extraFilters: TransactionQueryParams = {}) => {
-    setIsSyncing(true);
-    try {
-      const [transactionsResponse, categoriesResponse] = await Promise.all([
-        fetchTransactions({ ...filters, page, limit: 15, ...extraFilters }),
-        fetchCategories(),
-      ]);
-
-      setTransactions(transactionsResponse.data);
-      setTotalPages(transactionsResponse.meta.totalPages);
-      setCurrentPage(transactionsResponse.meta.page);
-      setCategories(categoriesResponse);
-      setLastSync(new Date().toISOString());
-      setError(null);
-    } catch (err) {
-      console.error("Falha ao sincronizar dados", err);
-      setError(err instanceof Error ? err.message : "Não foi possível sincronizar com a API.");
-    } finally {
-      setIsLoading(false);
-      setIsSyncing(false);
-    }
-  }, [filters]);
-
-  const lastRefreshParams = useRef<{ refresh: any; refreshTicket: number } | null>(null);
+  const [queryParams, setQueryParams] = useState<TransactionQueryParams>({
+    page: 1,
+    limit: 15,
+    month: filters.month,
+    year: filters.year,
+    startDate: filters.startDate,
+    endDate: filters.endDate,
+    categoryId: filters.categoryId,
+  });
 
   useEffect(() => {
-    if (
-      lastRefreshParams.current?.refresh === refresh &&
-      lastRefreshParams.current?.refreshTicket === refreshTicket
-    ) {
-      return;
-    }
-    lastRefreshParams.current = { refresh, refreshTicket };
-    void refresh();
-  }, [refresh, refreshTicket]);
+    setQueryParams((prev) => ({
+      ...prev,
+      month: filters.month,
+      year: filters.year,
+      startDate: filters.startDate,
+      endDate: filters.endDate,
+      categoryId: filters.categoryId ?? prev.categoryId,
+    }));
+  }, [filters.month, filters.year, filters.startDate, filters.endDate, filters.categoryId]);
+
+  const categoriesQuery = useQuery({
+    queryKey: ["transaction-categories"],
+    queryFn: fetchCategories,
+    staleTime: 10 * 60_000,
+  });
+
+  const transactionsQuery = useQuery({
+    queryKey: ["transactions", queryParams, refreshTicket],
+    queryFn: () =>
+      fetchTransactions({
+        ...queryParams,
+        page: queryParams.page ?? 1,
+        limit: queryParams.limit ?? 15,
+        month: queryParams.month ?? filters.month,
+        year: queryParams.year ?? filters.year,
+      } as any),
+    placeholderData: keepPreviousData,
+  });
+
+  const refresh = useCallback(async (page = 1, extraFilters: TransactionQueryParams = {}) => {
+    setQueryParams((prev) => ({
+      ...prev,
+      page,
+      limit: 15,
+      ...extraFilters,
+    }));
+  }, []);
+
+  const transactions = transactionsQuery.data?.data ?? [];
+  const categories = categoriesQuery.data ?? [];
+  const totalPages = transactionsQuery.data?.meta.totalPages ?? 1;
+  const currentPage = transactionsQuery.data?.meta.page ?? queryParams.page ?? 1;
+  const isLoading = transactionsQuery.isLoading;
+  const isSyncing = transactionsQuery.isFetching || categoriesQuery.isFetching;
+  const error =
+    (transactionsQuery.error instanceof Error
+      ? transactionsQuery.error.message
+      : categoriesQuery.error instanceof Error
+        ? categoriesQuery.error.message
+        : null) ?? null;
+  const lastSync = transactionsQuery.dataUpdatedAt
+    ? new Date(transactionsQuery.dataUpdatedAt).toISOString()
+    : null;
 
   const pendingBills = useMemo(
     () => transactions.filter((transaction) => transaction.status === "pending"),
@@ -105,14 +128,16 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
   const processUnstructuredTransaction = useCallback(async (payload: ProcessTransactionClientPayload) => {
     const transaction = await processTransaction(payload);
     triggerRefresh();
+    await queryClient.invalidateQueries({ queryKey: ["transactions"] });
     return transaction;
-  }, [triggerRefresh]);
+  }, [queryClient, triggerRefresh]);
 
   const updateExistingTransaction = useCallback(async (id: string, payload: UpdateTransactionPayload) => {
     const transaction = await updateTransaction(id, payload);
     triggerRefresh();
+    await queryClient.invalidateQueries({ queryKey: ["transactions"] });
     return transaction;
-  }, [triggerRefresh]);
+  }, [queryClient, triggerRefresh]);
 
   const fetchInstallments = useCallback(async (transactionId: string) => {
     return await fetchInstallmentTransactions(transactionId);
@@ -126,13 +151,15 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
     };
     const transaction = await updateTransaction(id, payload);
     triggerRefresh();
+    await queryClient.invalidateQueries({ queryKey: ["transactions"] });
     return transaction;
-  }, [triggerRefresh]);
+  }, [queryClient, triggerRefresh]);
 
   const removeTransaction = useCallback(async (id: string) => {
     await deleteTransaction(id);
     triggerRefresh();
-  }, [triggerRefresh]);
+    await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+  }, [queryClient, triggerRefresh]);
 
   return (
     <TransactionsContext.Provider
@@ -143,8 +170,10 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
         lastSync,
         transactions,
         pendingBills,
-        categories,        totalPages,
-        currentPage,        refresh,
+        categories,
+        totalPages,
+        currentPage,
+        refresh,
         processUnstructuredTransaction,
         updateExistingTransaction,
         markAsPaid,
