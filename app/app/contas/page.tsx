@@ -33,7 +33,7 @@ const filterTabs = [
   { value: "all", label: "Todas" },
   { value: "overdue", label: "Atrasadas" },
   { value: "today", label: "Vencem hoje" },
-  { value: "upcoming", label: "Proximos 3 dias" },
+  { value: "upcoming", label: "Próximos 3 dias" },
 ] as const;
 
 function ContasPageContent() {
@@ -92,9 +92,9 @@ function ContasPageContent() {
   const copyTransactionId = async (bill: Transaction) => {
     try {
       await navigator.clipboard.writeText(bill.id);
-      toast.success("ID da transacao copiado");
+      toast.success("ID da transação copiado");
     } catch {
-      toast.error("Nao foi possivel copiar o ID");
+      toast.error("Não foi possível copiar o ID");
     }
   };
 
@@ -103,7 +103,7 @@ function ContasPageContent() {
       <PageHeader
         tag="Fluxo futuro"
         title="Contas a pagar"
-        description="Monitore boletos, antecipacoes e despesas recorrentes. Integracao com IA garante leitura precisa dos vencimentos."
+        description="Monitore boletos, antecipações e despesas recorrentes. Integração com IA garante leitura precisa dos vencimentos."
       />
 
       <SummaryCardsGrid>
@@ -111,7 +111,7 @@ function ContasPageContent() {
           icon={Calendar}
           title="Total pendente"
           value={formatCurrency(summary.total)}
-          helper="Inclui todos os lancamentos aguardando pagamento"
+          helper="Inclui todos os lançamentos aguardando pagamento"
         />
         <SummaryCard
           icon={AlertTriangle}
@@ -129,9 +129,9 @@ function ContasPageContent() {
         />
         <SummaryCard
           icon={CheckCircle2}
-          title="Proximos 3 dias"
+          title="Próximos 3 dias"
           value={`${summary.upcomingCount}`}
-          helper="Organize o caixa com antecedencia"
+          helper="Organize o caixa com antecedência"
           variant="success"
         />
       </SummaryCardsGrid>
@@ -168,7 +168,7 @@ function ContasPageContent() {
                   <TableHead>Valor</TableHead>
                   <TableHead>Vencimento</TableHead>
                   <TableHead>Dias restantes</TableHead>
-                  <TableHead className="text-right">Acoes</TableHead>
+                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -191,7 +191,7 @@ function ContasPageContent() {
                               type="button"
                               onClick={() => copyTransactionId(bill)}
                               className="block w-full truncate font-semibold text-left hover:underline decoration-dotted"
-                              title="Clique para copiar o ID da transacao"
+                              title="Clique para copiar o ID da transação"
                             >
                               {bill.description}
                             </button>
@@ -268,7 +268,7 @@ function ContasPageContent() {
                             type="button"
                             onClick={() => copyTransactionId(bill)}
                             className="font-semibold text-left hover:underline decoration-dotted"
-                            title="Clique para copiar o ID da transacao"
+                            title="Clique para copiar o ID da transação"
                           >
                             {bill.description}
                           </button>
@@ -329,7 +329,7 @@ function ContasPageContent() {
           <SheetHeader>
             <SheetTitle>Confirmar pagamento</SheetTitle>
             <SheetDescription>
-              Esta acao ira marcar a conta como paga.
+              Esta ação irá marcar a conta como paga.
             </SheetDescription>
           </SheetHeader>
 
@@ -359,7 +359,7 @@ function ContasPageContent() {
           <form id="edit-bill-form" onSubmit={handleEditSubmit} className="flex flex-1 flex-col">
             <SheetBody className="space-y-4">
               <div className="space-y-2">
-                <Label>Descricao</Label>
+                <Label>Descrição</Label>
                 <Input value={descriptionInput} onChange={(event) => setDescriptionInput(event.target.value)} required />
               </div>
               <div className="space-y-2">
@@ -417,7 +417,7 @@ function getStatusMeta(bill: Transaction) {
     return { label: "VENCE HOJE", className: "bg-amber-200 text-amber-900" };
   }
   if (diff < 3) {
-    return { label: "PROXIMO", className: "bg-yellow-200 text-yellow-900" };
+    return { label: "PRÓXIMO", className: "bg-yellow-200 text-yellow-900" };
   }
   return { label: "EM ABERTO", className: "bg-emerald-200 text-emerald-900" };
 }

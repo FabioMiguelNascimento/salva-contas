@@ -222,22 +222,22 @@ function DashboardContent() {
 
   const rangeLabel = hasDateRange && selectedRange.from && selectedRange.to
     ? `${format(selectedRange.from, "dd/MM/yyyy")} - ${format(selectedRange.to, "dd/MM/yyyy")}`
-    : "Ultimos 7 dias";
+    : "Últimos 7 dias";
 
   const spendingTitle = hasDateRange
-    ? `Gastos no periodo (${rangeDays} dias)`
-    : "Gastos dos ultimos 7 dias";
+    ? `Gastos no período (${rangeDays} dias)`
+    : "Gastos dos últimos 7 dias";
 
   const spendingInfo = hasDateRange
-    ? `Este grafico mostra os gastos do periodo selecionado (${rangeDays} dias), incluindo apenas despesas pagas.`
-    : "Este grafico mostra os gastos dos ultimos 7 dias, incluindo apenas despesas pagas.";
+    ? `Este gráfico mostra os gastos do período selecionado (${rangeDays} dias), incluindo apenas despesas pagas.`
+    : "Este gráfico mostra os gastos dos últimos 7 dias, incluindo apenas despesas pagas.";
 
-  const comparisonLabel = hasDateRange ? "vs periodo anterior" : "vs mes anterior";
+  const comparisonLabel = hasDateRange ? "vs período anterior" : "vs mês anterior";
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8 overflow-x-hidden bg-gray-50 min-h-screen">
       <PageHeader
-        tag="Visao geral"
+        tag="Visão geral"
         title="Dashboard Financeiro"
         description={lastSync ? `Atualizado ${format(new Date(lastSync), "dd 'de' MMMM, HH:mm", { locale: ptBR })}` : "Sincronizando dados..."}
       />
@@ -248,7 +248,7 @@ function DashboardContent() {
             <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
               <div>
                 <label htmlFor="dashboard-filter-range" className="mb-1 block text-xs font-medium text-muted-foreground">
-                  Periodo
+                  Período
                 </label>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
                   <Popover>
@@ -286,11 +286,11 @@ function DashboardContent() {
               <div className="grid grid-cols-2 gap-3 md:grid-cols-2">
                 <div>
                   <label htmlFor="dashboard-filter-month" className="mb-1 block text-xs font-medium text-muted-foreground">
-                    Mes
+                    Mês
                   </label>
                   <Select value={String(filters.month)} onValueChange={handleMonthChange}>
-                    <SelectTrigger id="dashboard-filter-month" aria-label="Filtrar dashboard por mes" className="w-full">
-                      <SelectValue placeholder="Mes" />
+                    <SelectTrigger id="dashboard-filter-month" aria-label="Filtrar dashboard por mês" className="w-full">
+                      <SelectValue placeholder="Mês" />
                     </SelectTrigger>
                     <SelectContent>
                       {monthsShort.map((month) => (
@@ -328,7 +328,7 @@ function DashboardContent() {
           <KpiSparklineCard
             variant="expense"
             icon={ArrowDownRight}
-            title={hasDateRange ? "Total gasto no periodo" : "Total gasto no mes"}
+            title={hasDateRange ? "Total gasto no período" : "Total gasto no mês"}
             value={formatCurrency(metrics?.financials.expenses ?? 0)}
             change={`${(metrics?.financials.expensesChangePercent ?? 0) > 0 ? '+' : ''}${metrics?.financials.expensesChangePercent ?? 0}% ${comparisonLabel}`}
             sparklineData={sparklineExpense}
@@ -337,7 +337,7 @@ function DashboardContent() {
           <KpiSparklineCard
             variant="income"
             icon={ArrowUpRight}
-            title={hasDateRange ? "Receitas no periodo" : "Receitas no mes"}
+            title={hasDateRange ? "Receitas no período" : "Receitas no mês"}
             value={formatCurrency(metrics?.financials.income ?? 0)}
             change={`${(metrics?.financials.incomeChangePercent ?? 0) > 0 ? '+' : ''}${metrics?.financials.incomeChangePercent ?? 0}% ${comparisonLabel}`}
             sparklineData={sparklineIncome}
@@ -346,7 +346,7 @@ function DashboardContent() {
           <KpiSparklineCard
             variant="balance"
             icon={Wallet2}
-            title={hasDateRange ? "Saldo disponivel no periodo" : "Saldo disponivel"}
+            title={hasDateRange ? "Saldo disponível no período" : "Saldo disponível"}
             value={formatCurrency(metrics?.financials.availableBalance ?? metrics?.financials.balance ?? 0)}
             change={`${(metrics?.financials.balanceChangePercent ?? 0) > 0 ? '+' : ''}${metrics?.financials.balanceChangePercent ?? 0}% ${comparisonLabel}`}
             sparklineData={sparklineBalance}

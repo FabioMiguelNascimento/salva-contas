@@ -27,7 +27,7 @@ export default function InvitePage() {
         setOwnerName(data.ownerName || 'Conta principal');
       } catch (error: any) {
         const { toast } = await import('sonner');
-        toast.error(error?.message || 'Convite invalido ou expirado.');
+        toast.error(error?.message || 'Convite inválido ou expirado.');
       } finally {
         setIsLoading(false);
       }
@@ -51,7 +51,7 @@ export default function InvitePage() {
       router.push('/');
     } catch (error: any) {
       const { toast } = await import('sonner');
-      toast.error(error?.message || 'Nao foi possivel aceitar o convite.');
+      toast.error(error?.message || 'Não foi possível aceitar o convite.');
     } finally {
       setIsAccepting(false);
     }
@@ -72,14 +72,14 @@ export default function InvitePage() {
           ) : (
             <>
               <p className="text-sm text-muted-foreground">
-                Foi convidado a partilhar a gestao financeira com{' '}
+                Foi convidado a partilhar a gestão financeira com{' '}
                 <span className="font-semibold text-foreground">{ownerName || 'Conta principal'}</span>.
               </p>
 
               <div className="rounded-lg border bg-muted/30 p-3 text-sm">
                 <p className="flex items-center gap-2 text-emerald-700">
                   <CheckCircle2 className="h-4 w-4" />
-                  Ao aceitar, voce passa a visualizar e operar na conta principal compartilhada.
+                  Ao aceitar, você passa a visualizar e operar na conta principal compartilhada.
                 </p>
               </div>
 

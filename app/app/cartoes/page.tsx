@@ -67,18 +67,18 @@ function CartoesPageContent() {
       </TopbarAction>
 
       <PageHeader
-        tag="Financas"
-        title="Cartoes de credito"
-        description="Gerencie seus cartoes, limites e acompanhe os gastos de cada um."
+        tag="Finanças"
+        title="Cartões de crédito"
+        description="Gerencie seus cartões, limites e acompanhe os gastos de cada um."
       />
 
       <CreditCardsSummaryGrid stats={stats} />
 
       <Card>
         <CardHeader>
-          <CardTitle>Seus cartoes</CardTitle>
+          <CardTitle>Seus cartões</CardTitle>
           <CardDescription>
-            Visualize e gerencie todos os seus cartoes de credito cadastrados.
+            Visualize e gerencie todos os seus cartões de crédito cadastrados.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -90,7 +90,7 @@ function CartoesPageContent() {
             </div>
           ) : creditCards.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">
-              Nenhum cartao cadastrado ainda. Clique em "Novo Cartao" para adicionar o primeiro.
+              Nenhum cartão cadastrado ainda. Clique em "Novo Cartão" para adicionar o primeiro.
             </div>
           ) : (
             <div className="space-y-4">
@@ -118,9 +118,9 @@ function CartoesPageContent() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Seus cartoes de debito</CardTitle>
+          <CardTitle>Seus cartões de débito</CardTitle>
           <CardDescription>
-            Visualize e gerencie seus cartoes de debito cadastrados.
+            Visualize e gerencie seus cartões de débito cadastrados.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -132,7 +132,7 @@ function CartoesPageContent() {
             </div>
           ) : debitCards.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">
-              Nenhum cartao de debito cadastrado ainda. Clique em "Novo Debito" para adicionar o primeiro.
+              Nenhum cartão de débito cadastrado ainda. Clique em "Novo Débito" para adicionar o primeiro.
             </div>
           ) : (
             <div className="space-y-4">

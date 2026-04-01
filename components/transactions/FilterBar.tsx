@@ -84,11 +84,11 @@ export function FilterBar({
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-[120px_120px_minmax(220px,1fr)_minmax(160px,1fr)_minmax(160px,1fr)]">
         <div className="min-w-0">
           <label htmlFor="transactions-filter-month" className="mb-1 block text-xs font-medium text-slate-600">
-            Mes
+            Mês
           </label>
           <Select value={String(month)} onValueChange={(v) => onMonthChange(Number(v))}>
-            <SelectTrigger id="transactions-filter-month" aria-label="Filtrar por mes" className="w-full">
-              <SelectValue placeholder="Mes" />
+            <SelectTrigger id="transactions-filter-month" aria-label="Filtrar por mês" className="w-full">
+              <SelectValue placeholder="Mês" />
             </SelectTrigger>
             <SelectContent>
               {monthsShort.map((m) => (

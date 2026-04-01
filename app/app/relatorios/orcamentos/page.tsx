@@ -6,9 +6,9 @@ export default function RelatorioOrcamentosPage() {
   return (
     <ReportFeaturePage
       feature="orcamentos"
-      tag="Relatorios"
-      title="Relatorio de orcamentos"
-      description="Monitore metas de gastos por categoria e identifique extrapolacoes rapidamente."
+      tag="Relatórios"
+      title="Relatório de orçamentos"
+      description="Monitore metas de gastos por categoria e identifique extrapolações rapidamente."
       sourceRoute="/app/orcamentos"
     />
   );

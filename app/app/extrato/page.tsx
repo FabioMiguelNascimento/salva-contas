@@ -85,13 +85,13 @@ function ExtratoPageContent() {
   return (
     <div className="space-y-8">
       <TopbarAction>
-        <NewTransactionDialog trigger={<Button>Nova Transacao</Button>} />
+        <NewTransactionDialog trigger={<Button>Nova Transação</Button>} />
       </TopbarAction>
 
       <PageHeader
-        tag="Historico"
-        title="Extrato e transacoes"
-        description="Consulte todas as movimentacoes processadas pela IA. Filtre por periodo, categoria e status para investigacoes detalhadas."
+        tag="Histórico"
+        title="Extrato e transações"
+        description="Consulte todas as movimentações processadas pela IA. Filtre por período, categoria e status para investigações detalhadas."
       />
 
       <Card>
@@ -147,7 +147,7 @@ function ExtratoPageContent() {
               ))
             ) : ( 
               <div className="rounded-2xl border border-dashed border-border/60 p-6 text-center text-sm text-muted-foreground">
-                Nenhuma transacao encontrada.
+                Nenhuma transação encontrada.
               </div>
             )}
           </div>

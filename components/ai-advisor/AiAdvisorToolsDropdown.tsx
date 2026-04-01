@@ -13,21 +13,21 @@ import { Button } from '../ui/button';
 const TOOL_PROMPT_OPTIONS = [
   {
     id: 'get_monthly_summary',
-    label: 'Resumo do mes',
+    label: 'Resumo do mês',
     icon: 'scale',
-    prompt: 'Mostre meu resumo financeiro deste mes (receitas, despesas e saldo).',
+    prompt: 'Mostre meu resumo financeiro deste mês (receitas, despesas e saldo).',
   },
   {
     id: 'get_expenses_by_category',
     label: 'Despesas por categoria',
     icon: 'pie-chart',
-    prompt: 'Mostre minhas despesas por categoria neste mes.',
+    prompt: 'Mostre minhas despesas por categoria neste mês.',
   },
   {
     id: 'get_spending_trend',
-    label: 'Tendencia de gastos',
+    label: 'Tendência de gastos',
     icon: 'chart-line',
-    prompt: 'Mostre a tendencia dos meus gastos dos ultimos 30 dias.',
+    prompt: 'Mostre a tendência dos meus gastos dos últimos 30 dias.',
   },
   {
     id: 'get_transaction_details',
@@ -45,7 +45,7 @@ const TOOL_PROMPT_OPTIONS = [
     id: 'create_transaction',
     label: 'Criar transação por texto',
     icon: 'plus-circle',
-    prompt: 'Registre está transação: ',
+    prompt: 'Registre esta transação: ',
   },
 ] as const;
 

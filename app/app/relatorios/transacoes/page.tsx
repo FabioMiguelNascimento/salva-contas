@@ -6,9 +6,9 @@ export default function RelatorioTransacoesPage() {
   return (
     <ReportFeaturePage
       feature="transacoes"
-      tag="Relatorios"
-      title="Relatorio de transacoes"
-      description="Analise entradas e saidas por categoria, status e janela temporal selecionada."
+      tag="Relatórios"
+      title="Relatório de transações"
+      description="Analise entradas e saídas por categoria, status e janela temporal selecionada."
       sourceRoute="/app/extrato"
     />
   );
