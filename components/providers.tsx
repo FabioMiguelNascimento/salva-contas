@@ -1,5 +1,6 @@
 "use client";
 
+import { GlobalClientErrorHandler } from "@/components/global-client-error-handler";
 import { FamilyInviteProvider } from "@/context/family-invite-context";
 import { FinancePeriodProvider } from "@/context/finance-period-context";
 import { UsageProvider } from "@/context/usage-context";
@@ -25,6 +26,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <GlobalClientErrorHandler />
       <AuthProvider>
         <UsageProvider>
           <NotificationsProvider>

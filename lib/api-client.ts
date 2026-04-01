@@ -1,5 +1,11 @@
 import axios from "axios";
 
+export type ApiClientError = Error & {
+  code?: string;
+  status?: number;
+  isExpectedNetworkError?: boolean;
+};
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:3000";
 
 export const apiClient = axios.create({
@@ -11,7 +17,24 @@ export const apiClient = axios.create({
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
-    let message = error?.response?.data?.message ?? error.message ?? "Erro inesperado";
+    const hasResponse = Boolean(error?.response);
+    const rawMessage = String(error?.message ?? "");
+    const isTimeout =
+      error?.code === "ECONNABORTED" ||
+      error?.code === "ETIMEDOUT" ||
+      /timeout/i.test(rawMessage);
+    const isNetworkError = !hasResponse && (error?.code === "ERR_NETWORK" || /network error/i.test(rawMessage));
+
+    let message = error?.response?.data?.message ?? rawMessage ?? "Erro inesperado";
+
+    if (!hasResponse) {
+      if (isTimeout) {
+        message = "O servidor demorou muito para responder. Tente novamente em instantes.";
+      } else if (isNetworkError) {
+        message = "Não conseguimos conectar ao servidor. Verifique sua conexão com a internet.";
+      }
+    }
+
     const code = error?.response?.data?.code ?? error?.response?.data?.error?.code;
     const status = error?.response?.status;
     const details = error?.response?.data?.error?.details;
@@ -28,9 +51,10 @@ apiClient.interceptors.response.use(
         message += ` (${detailMsgs.join(', ')})`;
       }
     }
-    const normalizedError = new Error(message) as Error & { code?: string; status?: number };
+    const normalizedError = new Error(message) as ApiClientError;
     if (code) normalizedError.code = code;
     if (typeof status === 'number') normalizedError.status = status;
+    normalizedError.isExpectedNetworkError = !hasResponse && (isTimeout || isNetworkError);
     return Promise.reject(normalizedError);
   }
 );
