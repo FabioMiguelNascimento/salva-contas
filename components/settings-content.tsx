@@ -7,12 +7,16 @@ import NotificationsCard from "@/components/settings/notifications-card";
 import ProfileCard from "@/components/settings/profile-card";
 import SecurityCard from "@/components/settings/security-card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useFamilyInvite } from "@/context/family-invite-context";
 import { useAuth } from "@/hooks/use-auth";
+import { useUsage } from "@/hooks/use-usage";
 import { useEffect, useState } from "react";
 
 
 export default function SettingsContent({ view = 'page', selectedTab, onTabChange }: { view?: 'page' | 'tabs'; selectedTab?: string; onTabChange?: (tab: string) => void }) {
   const { user, updateUser } = useAuth();
+  const { refreshUsage } = useUsage();
+  const { refresh: refreshFamily } = useFamilyInvite();
   const [notifications, setNotifications] = useState({ vencimentos: true, insights: true, propostas: false });
   const [theme, setTheme] = useState<"auto" | "light" | "dark">("auto");
   const [density, setDensity] = useState<"compact" | "comfortable">("compact");
@@ -34,6 +38,20 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
   useEffect(() => {
     onTabChange?.(activeTab);
   }, [activeTab, onTabChange]);
+
+  // Lazy load usage data when billing tab is accessed
+  useEffect(() => {
+    if (activeTab === 'billing') {
+      void refreshUsage();
+    }
+  }, [activeTab, refreshUsage]);
+
+  // Lazy load family data when family tab is accessed
+  useEffect(() => {
+    if (activeTab === 'family') {
+      void refreshFamily();
+    }
+  }, [activeTab, refreshFamily]);
 
   async function saveProfile() {
     try {

@@ -137,10 +137,6 @@ export function FamilyInviteProvider({ children }: { children: ReactNode }) {
     setIsFamilyPlan(user?.planTier === "FAMILY");
   }, [user]);
 
-  useEffect(() => {
-    void refresh();
-  }, [refresh]);
-
   const value = useMemo<FamilyInviteContextValue>(
     () => ({
       family,

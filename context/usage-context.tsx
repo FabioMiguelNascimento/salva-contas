@@ -6,7 +6,6 @@ import {
     createContext,
     useCallback,
     useContext,
-    useEffect,
     useState,
     type ReactNode
 } from "react";
@@ -36,10 +35,6 @@ export function UsageProvider({ children }: { children: ReactNode }) {
       setIsLoading(false);
     }
   }, [isAuthenticated]);
-
-  useEffect(() => {
-    fetchUsage();
-  }, [fetchUsage]);
 
   return (
     <UsageContext.Provider

@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import UserInitials from '@/components/ui/user-initials';
 import { useFamilyInvite } from '@/context/family-invite-context';
 import { Link2, Lock, RefreshCw, Sparkles, Trash2, Users } from 'lucide-react';
-import { useEffect } from 'react';
 
 
 export default function FamilyShareCard() {
@@ -25,13 +24,6 @@ export default function FamilyShareCard() {
     clearInviteUrl,
     removeFamilyMember,
   } = useFamilyInvite();
-
-  useEffect(() => {
-    if (!isFamilyPlan) return;
-
-    void refresh();
-  }, [isFamilyPlan, refresh]);
-
 
   const handleGenerateInvite = async () => {
     const result = await generateInvite();
