@@ -44,7 +44,7 @@ function VaultsPageContent() {
 
   const handleDelete = async (vault: Vault) => {
     const confirmed = window.confirm(
-      `Excluir o cofrinho \"${vault.name}\"? Esta acao nao pode ser desfeita.`,
+      `Excluir o cofrinho \"${vault.name}\"? Esta ação não pode ser desfeita.`,
     );
 
     if (!confirmed) return;
@@ -76,12 +76,12 @@ function VaultsPageContent() {
     ? {
         deposit: {
           title: `Guardar em ${actionState.vault.name}`,
-          description: "Este valor sera movido do saldo disponivel para o cofrinho.",
+          description: "Este valor será movido do saldo disponível para o cofrinho.",
           submitLabel: "Guardar",
         },
         withdraw: {
           title: `Resgatar de ${actionState.vault.name}`,
-          description: "Este valor saira do cofrinho e voltara ao saldo disponivel.",
+          description: "Este valor sairá do cofrinho e voltará ao saldo disponível.",
           submitLabel: "Resgatar",
         },
         yield: {
@@ -104,7 +104,7 @@ function VaultsPageContent() {
       <PageHeader
         tag="Objetivos"
         title="Meus Cofrinhos"
-        description="Separe dinheiro para metas, registre depositos, resgates e rendimentos manuais."
+        description="Separe dinheiro para metas, registre depósitos, resgates e rendimentos manuais."
       />
 
       <SummaryCardsGrid className="sm:grid-cols-3!">
@@ -123,7 +123,7 @@ function VaultsPageContent() {
         />
         <SummaryCard
           icon={Wallet2}
-          title="Saldo disponivel"
+          title="Saldo disponível"
           value={formatCurrency(stats.availableBalance)}
           helper="Saldo fora dos cofrinhos"
         />
@@ -133,7 +133,7 @@ function VaultsPageContent() {
         <CardHeader>
           <CardTitle>Progresso dos cofrinhos</CardTitle>
           <CardDescription>
-            Acompanhe saldo, metas e movimentacoes de cada cofrinho.
+            Acompanhe saldo, metas e movimentações de cada cofrinho.
           </CardDescription>
         </CardHeader>
         <CardContent>

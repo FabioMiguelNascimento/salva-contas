@@ -171,7 +171,7 @@ export function NotificationsDropdown() {
           <div className="flex flex-col items-center justify-center py-8 text-center">
             <Bell className="h-10 w-10 text-muted-foreground/40" />
             <p className="mt-2 text-sm text-muted-foreground">
-              Nenhuma notificacao
+              Nenhuma notificação
             </p>
           </div>
         ) : (

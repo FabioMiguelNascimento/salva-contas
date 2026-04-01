@@ -6,9 +6,9 @@ export default function RelatorioCofrinhosPage() {
   return (
     <ReportFeaturePage
       feature="cofrinhos"
-      tag="Relatorios"
-      title="Relatorio de cofrinhos"
-      description="Visualize progresso de objetivos, aportes e estimativas de conclusao por cofrinho."
+      tag="Relatórios"
+      title="Relatório de cofrinhos"
+      description="Visualize progresso de objetivos, aportes e estimativas de conclusão por cofrinho."
       sourceRoute="/app/cofrinhos"
     />
   );

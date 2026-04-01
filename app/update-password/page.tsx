@@ -30,12 +30,12 @@ export default function UpdatePasswordPage() {
     setError("");
 
     if (password.length < 6) {
-      setError("A senha deve ter no minimo 6 caracteres");
+      setError("A senha deve ter no mínimo 6 caracteres");
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("As senhas nao coincidem");
+      setError("As senhas não coincidem");
       return;
     }
 
@@ -71,7 +71,7 @@ export default function UpdatePasswordPage() {
           </CardHeader>
           <CardContent className="text-center">
             <p className="text-sm text-muted-foreground">
-              Redirecionando para a pagina inicial...
+              Redirecionando para a página inicial...
             </p>
           </CardContent>
         </Card>
@@ -106,7 +106,7 @@ export default function UpdatePasswordPage() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Minimo 6 caracteres"
+                placeholder="Mínimo 6 caracteres"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={isLoading}

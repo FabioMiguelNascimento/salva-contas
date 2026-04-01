@@ -67,7 +67,7 @@ const parseMoneyValue = (value: string | number) => {
 const formatHeaderLabel = (header: string) => {
   const normalized = normalizeHeader(header);
   const mapped: Record<string, string> = {
-    descricao: "Descricao",
+    descricao: "Descrição",
     categoria: "Categoria",
     tipo: "Tipo",
     status: "Status",
@@ -79,14 +79,14 @@ const formatHeaderLabel = (header: string) => {
     criadoem: "Criado em",
     nome: "Nome",
     bandeira: "Bandeira",
-    ultimos4digitos: "Ultimos 4 digitos",
+    ultimos4digitos: "Últimos 4 dígitos",
     limitetotal: "Limite total",
-    limitedisponivel: "Limite disponivel",
+    limitedisponivel: "Limite disponível",
     diadefechamento: "Dia de fechamento",
     diadevencimento: "Dia de vencimento",
-    frequencia: "Frequencia",
-    valororcado: "Valor orcado",
-    mes: "Mes",
+    frequencia: "Frequência",
+    valororcado: "Valor orçado",
+    mes: "Mês",
     ano: "Ano",
     valoratual: "Valor atual",
     meta: "Meta",

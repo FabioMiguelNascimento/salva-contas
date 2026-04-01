@@ -22,7 +22,7 @@ export default function ProfileCard({ name, onNameChange, userEmail, onReset, on
     <Card id="profile">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base"><User className="h-4 w-4" /> Perfil</CardTitle>
-        <CardDescription>Nome e preferencias do seu usuario.</CardDescription>
+        <CardDescription>Nome e preferências do seu usuário.</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 md:grid-cols-2">
         <div className="grid gap-2">

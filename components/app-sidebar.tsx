@@ -127,14 +127,14 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton size="lg" tooltip={user?.name ?? "Usuario"}>
+                <SidebarMenuButton size="lg" tooltip={user?.name ?? "Usuário"}>
                   <UserInitials
                     name={user?.name}
                     email={user?.email}
                     className="size-8 -group-data-[collapsible=icon]:translate-x-1"
                   />
                   <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
-                    <span className="truncate font-medium">{user?.name ?? "Usuario"}</span>
+                    <span className="truncate font-medium">{user?.name ?? "Usuário"}</span>
                     <span className="truncate text-xs text-primary font-semibold uppercase tracking-wider">
                       Plano {getPlanLabel(user?.planTier)}
                     </span>

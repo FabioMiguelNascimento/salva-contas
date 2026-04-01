@@ -110,10 +110,10 @@ export function ReportFeaturePage({ feature, tag, title, description, sourceRout
     try {
       await handleExport(formatType);
       const { toast } = await import("sonner");
-      toast.success(`Relatorio ${formatType.toUpperCase()} baixado com sucesso.`);
+      toast.success(`Relatório ${formatType.toUpperCase()} baixado com sucesso.`);
     } catch (error: any) {
       const { toast } = await import("sonner");
-      toast.error(error?.message ?? `Nao foi possivel exportar ${formatType.toUpperCase()}.`);
+      toast.error(error?.message ?? `Não foi possível exportar ${formatType.toUpperCase()}.`);
     }
   };
 
@@ -127,7 +127,7 @@ export function ReportFeaturePage({ feature, tag, title, description, sourceRout
             icon={Wallet2}
             title="Registros"
             value={summary.records}
-            helper="na visualizacao atual"
+            helper="na visualização atual"
             variant="default"
             isLoading={isPreviewLoading}
           />
@@ -135,7 +135,7 @@ export function ReportFeaturePage({ feature, tag, title, description, sourceRout
             icon={DollarSign}
             title="Total"
             value={formatMoney(summary.total)}
-            helper="soma do periodo"
+            helper="soma do período"
             variant="default"
             isLoading={isPreviewLoading}
           />
@@ -164,7 +164,7 @@ export function ReportFeaturePage({ feature, tag, title, description, sourceRout
               Filtros
             </CardTitle>
             <CardDescription>
-              Ajuste os filtros e clique em Buscar para atualizar a visualizacao.
+              Ajuste os filtros e clique em Buscar para atualizar a visualização.
             </CardDescription>
           </CardHeader>
          <CardContent className="space-y-4">
@@ -301,11 +301,11 @@ export function ReportFeaturePage({ feature, tag, title, description, sourceRout
         <Card>
           <CardContent>
             {isPreviewLoading ? (
-              <p className="text-sm text-muted-foreground">Carregando previa...</p>
+              <p className="text-sm text-muted-foreground">Carregando prévia...</p>
             ) : previewError ? (
               <p className="text-sm text-destructive">{previewError}</p>
             ) : !preview || preview.rows.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Nenhum dado encontrado para este relatorio.</p>
+              <p className="text-sm text-muted-foreground">Nenhum dado encontrado para este relatório.</p>
             ) : (
               <Table>
                 <TableHeader>

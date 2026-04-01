@@ -9,37 +9,37 @@ import Link from "next/link";
 const reportCards = [
   {
     title: "Contas a pagar",
-    description: "Relatorios de vencimentos, atrasos e recorrencia de pagamentos.",
+    description: "Relatórios de vencimentos, atrasos e recorrência de pagamentos.",
     href: "/app/relatorios/contas",
     icon: CalendarClock,
   },
   {
-    title: "Cartoes",
-    description: "Uso de limite, gastos por cartao e tendencias de fatura.",
+    title: "Cartões",
+    description: "Uso de limite, gastos por cartão e tendências de fatura.",
     href: "/app/relatorios/cartoes",
     icon: CreditCard,
   },
   {
-    title: "Transacoes",
-    description: "Movimentacoes por periodo, categoria, status e tipo.",
+    title: "Transações",
+    description: "Movimentações por período, categoria, status e tipo.",
     href: "/app/relatorios/transacoes",
     icon: ReceiptText,
   },
   {
     title: "Assinaturas",
-    description: "Custos recorrentes, renovacoes e peso no fluxo mensal.",
+    description: "Custos recorrentes, renovações e peso no fluxo mensal.",
     href: "/app/relatorios/assinaturas",
     icon: Repeat,
   },
   {
-    title: "Orcamentos",
+    title: "Orçamentos",
     description: "Acompanhamento de metas, consumo e desvios por categoria.",
     href: "/app/relatorios/orcamentos",
     icon: HandCoins,
   },
   {
     title: "Cofrinhos",
-    description: "Aportes, evolucao de saldo e progresso por objetivo.",
+    description: "Aportes, evolução de saldo e progresso por objetivo.",
     href: "/app/relatorios/cofrinhos",
     icon: PiggyBank,
   },
@@ -50,9 +50,9 @@ export default function RelatoriosPage() {
     <AppShell>
       <div className="space-y-8">
         <PageHeader
-          tag="Inteligencia"
-          title="Hub de relatorios"
-          description="Acesse relatorios por funcionalidade e exporte em CSV ou PDF conforme seu plano."
+          tag="Inteligência"
+          title="Hub de relatórios"
+          description="Acesse relatórios por funcionalidade e exporte em CSV ou PDF conforme seu plano."
         />
 
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -69,7 +69,7 @@ export default function RelatoriosPage() {
                     <CardDescription>{report.description}</CardDescription>
                   </CardHeader>
                   <CardContent className="flex items-center justify-between text-xs text-muted-foreground">
-                    <span>Abrir relatorio</span>
+                    <span>Abrir relatório</span>
                     <BarChart3 className="h-4 w-4" />
                   </CardContent>
                 </Card>

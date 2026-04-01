@@ -6,9 +6,9 @@ export default function RelatorioContasPage() {
   return (
     <ReportFeaturePage
       feature="contas"
-      tag="Relatorios"
-      title="Relatorio de contas a pagar"
-      description="Visualize previsoes de vencimento, pendencias e indicadores de pagamento por periodo."
+      tag="Relatórios"
+      title="Relatório de contas a pagar"
+      description="Visualize previsões de vencimento, pendências e indicadores de pagamento por período."
       sourceRoute="/app/contas"
     />
   );

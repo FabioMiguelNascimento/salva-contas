@@ -41,14 +41,14 @@ function BudgetsPageContent() {
 
       <PageHeader
         tag="Planejamento"
-        title="Orcamentos por categoria"
-        description="Defina limites de gastos por categoria e acompanhe o progresso durante o mes."
+        title="Orçamentos por categoria"
+        description="Defina limites de gastos por categoria e acompanhe o progresso durante o mês."
       />
 
       <SummaryCardsGrid>
         <SummaryCard
           icon={PiggyBank}
-          title="Orcamentos ativos"
+          title="Orçamentos ativos"
           value={stats.totalBudgets}
           helper={`Total de ${formatCurrency(stats.totalBudgeted)} planejado`}
         />
@@ -56,14 +56,14 @@ function BudgetsPageContent() {
           icon={TrendingDown}
           title="Total gasto"
           value={formatCurrency(stats.totalSpent)}
-          helper={`${stats.averagePercentage.toFixed(0)}% do orcamento total`}
+          helper={`${stats.averagePercentage.toFixed(0)}% do orçamento total`}
           variant={stats.averagePercentage > 100 ? "danger" : "default"}
         />
         <SummaryCard
           icon={CheckCircle2}
           title="No limite"
           value={stats.onTrackCount}
-          helper="Categorias dentro do orcamento"
+          helper="Categorias dentro do orçamento"
           variant="success"
         />
         <SummaryCard
@@ -77,9 +77,9 @@ function BudgetsPageContent() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Progresso dos orcamentos</CardTitle>
+          <CardTitle>Progresso dos orçamentos</CardTitle>
           <CardDescription>
-            Acompanhe quanto ja foi gasto em cada categoria no periodo de {filters.month}/{filters.year}.
+            Acompanhe quanto já foi gasto em cada categoria no período de {filters.month}/{filters.year}.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -91,7 +91,7 @@ function BudgetsPageContent() {
             </div>
           ) : budgetProgress.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">
-              Nenhum orcamento cadastrado para este periodo. Clique em "Novo Orcamento" para definir limites.
+              Nenhum orçamento cadastrado para este período. Clique em "Novo Orçamento" para definir limites.
             </div>
           ) : (
             <div className="space-y-4">
