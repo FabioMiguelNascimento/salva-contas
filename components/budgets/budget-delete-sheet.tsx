@@ -14,7 +14,7 @@ import type { BudgetEditorHook } from "@/hooks/use-budget-editor";
 import { formatCurrency } from "@/lib/currency-utils";
 import { AlertTriangle, Loader2 } from "lucide-react";
 
-interface BudgetDeleteSheetProps 
+interface BudgetDeleteSheetProps {
   editor: BudgetEditorHook;
 }
 
