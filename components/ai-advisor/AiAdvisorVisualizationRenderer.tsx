@@ -1,16 +1,17 @@
 "use client";
 
 import type { AiVisualization } from "@/types/ai-advisor";
+import { ReactNode } from "react";
 import ConfirmationListVisualization from "./visualizations/ConfirmationListVisualization";
 import DonutChartVisualization from "./visualizations/DonutChartVisualization";
 import LineChartVisualization from "./visualizations/LineChartVisualization";
 import SingleTransactionSummaryVisualization from "./visualizations/SingleTransactionSummaryVisualization";
 import SummaryVisualization from "./visualizations/SummaryVisualization";
 import TransactionDetailsVisualization from "./visualizations/TransactionDetailsVisualization";
+import TransactionDiffVisualization from "./visualizations/TransactionDiffVisualization";
 import TransactionVisualization from "./visualizations/TransactionVisualization";
 import { VisualizationStatus } from "./visualizations/types";
 import VaultActionSummaryVisualization from "./visualizations/VaultActionSummaryVisualization";
-import { ReactNode } from "react";
 
 
 interface AiAdvisorVisualizationRendererProps {
@@ -57,6 +58,15 @@ export default function AiAdvisorVisualizationRenderer({
         visualization={visualization}
         status={status}
         onConfirm={() => onConfirm()}
+        onCancel={onCancel}
+        requiresConfirmation={requiresConfirmation}
+      />
+    ),
+    transaction_diff: (
+      <TransactionDiffVisualization
+        visualization={visualization}
+        status={status}
+        onConfirm={(payload) => onConfirm(payload)}
         onCancel={onCancel}
         requiresConfirmation={requiresConfirmation}
       />

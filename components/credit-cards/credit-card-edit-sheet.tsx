@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
+import { FlagIcon } from "@/components/flag-icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -81,16 +81,16 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Editar cartão de crédito</SheetTitle>
+          <SheetTitle>Editar cart�o de cr�dito</SheetTitle>
           <SheetDescription>
-            Atualize as informações do seu cartão.
+            Atualize as informa��es do seu cart�o.
           </SheetDescription>
         </SheetHeader>
 
         <form id="edit-card-form" onSubmit={handleSubmit} className="flex flex-1 flex-col">
           <SheetBody className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-name">Nome do cartão</Label>
+              <Label htmlFor="edit-name">Nome do cart�o</Label>
               <Input
                 id="edit-name"
                 placeholder="Ex: Nubank, Itau Platinum"
@@ -111,7 +111,7 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
                     {cardFlags.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         <div className="flex items-center gap-2">
-                          <CardFlagIcon flag={option.value} className="h-4 w-auto" />
+                          <FlagIcon flag={option.value} className="h-4 w-auto" />
                           <span>{option.label}</span>
                         </div>
                       </SelectItem>
@@ -132,7 +132,7 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="edit-limit">Limite do cartão</Label>
+              <Label htmlFor="edit-limit">Limite do cart�o</Label>
               <Input
                 id="edit-limit"
                 placeholder="5000.00"
@@ -201,4 +201,5 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
     </Sheet>
   );
 }
+
 

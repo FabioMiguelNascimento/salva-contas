@@ -26,6 +26,7 @@ const UPDATE_TRANSACTION_KEYS: Array<keyof UpdateTransactionPayload> = [
   'status',
   'dueDate',
   'paymentDate',
+  'installments',
   'creditCardId',
   'debitCardId',
   'splits',
@@ -82,6 +83,21 @@ const buildUpdateTransactionPayload = (payload: Record<string, any>) => {
       return [[key, value]];
     }),
   );
+
+  const normalizedSplits = Array.isArray((normalized as any).splits)
+    ? (normalized as any).splits
+    : [];
+
+  if (normalizedSplits.length > 0) {
+    const splitTotal = normalizedSplits.reduce((total: number, split: Record<string, any>) => {
+      const parsedAmount = Number(split?.amount ?? 0);
+      return total + (Number.isFinite(parsedAmount) ? parsedAmount : 0);
+    }, 0);
+
+    if (Number.isFinite(splitTotal) && splitTotal > 0) {
+      (normalized as any).amount = Number(splitTotal.toFixed(2));
+    }
+  }
 
   return normalized as UpdateTransactionPayload;
 };

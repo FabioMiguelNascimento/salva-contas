@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import { CardFlagIcon } from '@/components/credit-cards/card-flag-icon';
+import { FlagIcon } from '@/components/flag-icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -72,19 +72,19 @@ export function DebitCardEditSheet({ card, open, onOpenChange }: DebitCardEditSh
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Editar cartão de débito</SheetTitle>
+          <SheetTitle>Editar cart�o de d�bito</SheetTitle>
           <SheetDescription>
-            Atualize as informações do seu cartão de débito.
+            Atualize as informa��es do seu cart�o de d�bito.
           </SheetDescription>
         </SheetHeader>
 
         <form id="edit-debit-card-form" onSubmit={handleSubmit} className="flex flex-1 flex-col">
           <SheetBody className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-debit-name">Nome do cartão</Label>
+              <Label htmlFor="edit-debit-name">Nome do cart�o</Label>
               <Input
                 id="edit-debit-name"
-                placeholder="Ex: Itau Débito"
+                placeholder="Ex: Itau D�bito"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -102,7 +102,7 @@ export function DebitCardEditSheet({ card, open, onOpenChange }: DebitCardEditSh
                     {cardFlags.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         <div className="flex items-center gap-2">
-                          <CardFlagIcon flag={option.value} className="h-4 w-auto" />
+                          <FlagIcon flag={option.value} className="h-4 w-auto" />
                           <span>{option.label}</span>
                         </div>
                       </SelectItem>

@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import { CardFlagIcon } from '@/components/credit-cards/card-flag-icon';
+import { FlagIcon } from '@/components/flag-icon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -66,24 +66,24 @@ export function DebitCardCreateSheet() {
       <SheetTrigger asChild>
         <Button variant="outline">
           <PlusCircle className="mr-2 h-4 w-4" />
-          Novo Débito
+          Novo D�bito
         </Button>
       </SheetTrigger>
       <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Novo cartão de débito</SheetTitle>
+          <SheetTitle>Novo cart�o de d�bito</SheetTitle>
           <SheetDescription>
-            Adicione seu cartão de débito para organizar melhor seus meios de pagamento.
+            Adicione seu cart�o de d�bito para organizar melhor seus meios de pagamento.
           </SheetDescription>
         </SheetHeader>
 
         <form id="create-debit-card-form" onSubmit={handleSubmit} className="flex flex-1 flex-col">
           <SheetBody className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="debit-name">Nome do cartão</Label>
+              <Label htmlFor="debit-name">Nome do cart�o</Label>
               <Input
                 id="debit-name"
-                placeholder="Ex: Itau Débito, Inter"
+                placeholder="Ex: Itau D�bito, Inter"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -101,7 +101,7 @@ export function DebitCardCreateSheet() {
                     {cardFlags.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         <div className="flex items-center gap-2">
-                          <CardFlagIcon flag={option.value} className="h-4 w-auto" />
+                          <FlagIcon flag={option.value} className="h-4 w-auto" />
                           <span>{option.label}</span>
                         </div>
                       </SelectItem>
@@ -129,7 +129,7 @@ export function DebitCardCreateSheet() {
               Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting} className="flex-1">
-              {isSubmitting ? 'Criando...' : 'Criar cartão'}
+              {isSubmitting ? 'Criando...' : 'Criar cart�o'}
             </Button>
           </SheetFooter>
         </form>
@@ -137,4 +137,5 @@ export function DebitCardCreateSheet() {
     </Sheet>
   );
 }
+
 

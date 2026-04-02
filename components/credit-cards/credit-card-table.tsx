@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
+import { FlagIcon } from "@/components/flag-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,7 +26,7 @@ export function CreditCardTable({ creditCards, onEdit, onDelete }: CreditCardTab
   if (creditCards.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">
-        Nenhum cartão de crédito encontrado.
+        Nenhum cart�o de cr�dito encontrado.
       </div>
     );
   }
@@ -35,10 +35,10 @@ export function CreditCardTable({ creditCards, onEdit, onDelete }: CreditCardTab
     <Table className="min-w-[920px]">
       <TableHeader>
         <TableRow>
-          <TableHead>Cartão</TableHead>
+          <TableHead>Cart�o</TableHead>
           <TableHead>Bandeira</TableHead>
           <TableHead className="text-right">Limite</TableHead>
-          <TableHead className="text-right">Disponível</TableHead>
+          <TableHead className="text-right">Dispon�vel</TableHead>
           <TableHead>Fechamento</TableHead>
           <TableHead>Vencimento</TableHead>
           <TableHead>Status</TableHead>
@@ -60,7 +60,7 @@ export function CreditCardTable({ creditCards, onEdit, onDelete }: CreditCardTab
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
-                  <CardFlagIcon flag={card.flag} className="h-6 w-auto" />
+                  <FlagIcon flag={card.flag} className="h-6 w-auto" />
                   <span className="text-xs text-muted-foreground">{getFlagLabel(card.flag)}</span>
                 </div>
               </TableCell>
@@ -115,5 +115,6 @@ export function CreditCardTable({ creditCards, onEdit, onDelete }: CreditCardTab
     </Table>
   );
 }
+
 
 

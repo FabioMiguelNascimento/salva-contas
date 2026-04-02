@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import { CardFlagIcon } from '@/components/credit-cards/card-flag-icon';
+import { FlagIcon } from '@/components/flag-icon';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -51,7 +51,7 @@ export function DebitCardTable({ debitCards, onEdit, onDelete }: DebitCardTableP
             </TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
-                <CardFlagIcon flag={card.flag} className="h-6 w-auto" />
+                <FlagIcon flag={card.flag} className="h-6 w-auto" />
                 <span className="text-xs text-muted-foreground">{getFlagLabel(card.flag)}</span>
               </div>
             </TableCell>
@@ -97,4 +97,5 @@ export function DebitCardTable({ debitCards, onEdit, onDelete }: DebitCardTableP
     </Table>
   );
 }
+
 

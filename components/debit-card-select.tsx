@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import { CardFlagIcon } from '@/components/credit-cards/card-flag-icon';
+import { FlagIcon } from '@/components/flag-icon';
 import { Button } from '@/components/ui/button';
 import {
     Command,
@@ -32,7 +32,7 @@ interface DebitCardSelectProps {
 export function DebitCardSelect({
   value,
   onValueChange,
-  placeholder = 'Selecione um cartão de débito',
+  placeholder = 'Selecione um cartão',
   disabled = false,
   allowClear = true,
 }: DebitCardSelectProps) {
@@ -54,7 +54,7 @@ export function DebitCardSelect({
         >
           {selectedCard ? (
             <span className="flex items-center gap-2 truncate">
-              <CardFlagIcon
+              <FlagIcon
                 flag={selectedCard.flag}
                 className="h-4 w-auto shrink-0"
               />
@@ -75,7 +75,7 @@ export function DebitCardSelect({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-[var(--radix-popover-trigger-width)] p-0"
+        className="w-(--radix-popover-trigger-width) p-0"
         align="start"
         side="bottom"
         sideOffset={4}
@@ -119,7 +119,7 @@ export function DebitCardSelect({
                   }}
                   className="flex items-center gap-2"
                 >
-                  <CardFlagIcon flag={card.flag} className="h-4 w-auto" />
+                  <FlagIcon flag={card.flag} className="h-4 w-auto" />
                   <span className="flex-1 truncate">{card.name}</span>
                   {card.lastFourDigits && (
                     <span className="text-xs text-muted-foreground">
@@ -141,4 +141,5 @@ export function DebitCardSelect({
     </Popover>
   );
 }
+
 

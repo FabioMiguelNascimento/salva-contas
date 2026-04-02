@@ -1,19 +1,19 @@
-﻿"use client";
+"use client";
 
-import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
+import { FlagIcon } from "@/components/flag-icon";
 import { Button } from "@/components/ui/button";
 import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
 import { useCardsHook } from "@/hooks/use-cards";
 import { formatCardNumber } from "@/lib/card-utils";
@@ -32,7 +32,7 @@ interface CreditCardSelectProps {
 export function CreditCardSelect({
   value,
   onValueChange,
-  placeholder = "Selecione um cartão",
+  placeholder = "Selecione um cart�o",
   disabled = false,
   allowClear = true,
 }: CreditCardSelectProps) {
@@ -55,7 +55,7 @@ export function CreditCardSelect({
         >
           {selectedCard ? (
             <span className="flex items-center gap-2 truncate">
-              <CardFlagIcon
+              <FlagIcon
                 flag={selectedCard.flag}
                 className="h-4 w-auto shrink-0"
               />
@@ -76,7 +76,7 @@ export function CreditCardSelect({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-[var(--radix-popover-trigger-width)] p-0"
+        className="w-(--radix-popover-trigger-width) p-0"
         align="start"
         side="bottom"
         sideOffset={4}
@@ -84,12 +84,12 @@ export function CreditCardSelect({
         onWheel={(e) => e.stopPropagation()}
       >
         <Command>
-          <CommandInput placeholder="Buscar cartão..." />
+          <CommandInput placeholder="Buscar cart�o..." />
           <CommandList
             className="max-h-48 overflow-y-auto"
             onWheel={(e) => e.stopPropagation()}
           >
-            <CommandEmpty>Nenhum cartão encontrado.</CommandEmpty>
+            <CommandEmpty>Nenhum cart�o encontrado.</CommandEmpty>
             <CommandGroup>
               {allowClear && (
                 <CommandItem
@@ -101,7 +101,7 @@ export function CreditCardSelect({
                   className="flex items-center gap-2 text-muted-foreground"
                 >
                   <CreditCard className="h-4 w-4" />
-                  <span className="flex-1">Nenhum (não usar cartão)</span>
+                  <span className="flex-1">Nenhum (n�o usar cart�o)</span>
                   <Check
                     className={cn(
                       "h-4 w-4 shrink-0",
@@ -120,7 +120,7 @@ export function CreditCardSelect({
                   }}
                   className="flex items-center gap-2"
                 >
-                  <CardFlagIcon flag={card.flag} className="h-4 w-auto" />
+                  <FlagIcon flag={card.flag} className="h-4 w-auto" />
                   <span className="flex-1 truncate">{card.name}</span>
                   {card.lastFourDigits && (
                     <span className="text-xs text-muted-foreground">
@@ -142,4 +142,5 @@ export function CreditCardSelect({
     </Popover>
   );
 }
+
 

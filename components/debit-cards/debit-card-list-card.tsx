@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import { CardFlagIcon } from '@/components/credit-cards/card-flag-icon';
+import { FlagIcon } from '@/components/flag-icon';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
@@ -34,7 +34,7 @@ export function DebitCardListCard({ card, onEdit, onDelete }: DebitCardListCardP
     <div className={cn('rounded-2xl p-5 text-white shadow-lg bg-linear-to-br', gradient)}>
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-3">
-          <CardFlagIcon flag={card.flag} className="h-8 w-auto shrink-0 opacity-90" />
+          <FlagIcon flag={card.flag} className="h-8 w-auto shrink-0 opacity-90" />
           <div>
             <p className="font-bold text-white">{card.name}</p>
             <p className="text-xs text-white/60">{formatDebitCardNumber(card.lastFourDigits)}</p>
@@ -64,7 +64,7 @@ export function DebitCardListCard({ card, onEdit, onDelete }: DebitCardListCardP
       </div>
 
       <div className="mt-4 flex items-center justify-between">
-        <span className="text-xs text-white/60">Cartão de débito</span>
+        <span className="text-xs text-white/60">Cart�o de d�bito</span>
         <span className="text-xs font-medium text-white/80 bg-white/10 px-2 py-0.5 rounded-full">
           {getStatusLabel(card.status)}
         </span>
@@ -72,4 +72,5 @@ export function DebitCardListCard({ card, onEdit, onDelete }: DebitCardListCardP
     </div>
   );
 }
+
 

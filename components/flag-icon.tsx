@@ -1,8 +1,8 @@
-import type { CreditCardFlag } from "@/types/finance";
+import type { CreditCardFlag as PaymentFlag, PaymentMethod } from "@/types/finance";
 import type { SVGProps } from "react";
 
-interface CardFlagIconProps extends SVGProps<SVGSVGElement> {
-  flag: CreditCardFlag;
+interface FlagIconProps extends SVGProps<SVGSVGElement> {
+  flag: PaymentFlag | PaymentMethod | "boleto" | "debit_card" | "dinheiro" | "transferencia" | "transferência";
 }
 
 function VisaIcon(props: SVGProps<SVGSVGElement>) {
@@ -97,10 +97,70 @@ function OtherCardIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-export function CardFlagIcon({ flag, ...props }: CardFlagIconProps) {
+
+function PixIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <rect width="48" height="32" rx="4" fill="#10B981" />
+      <path d="M24 8L30 14L24 20L18 14L24 8Z" fill="white" />
+      <path d="M24 12L27.5 15.5L24 19L20.5 15.5L24 12Z" fill="#10B981" />
+      <text x="18" y="29" fill="white" fontSize="7" fontWeight="bold">PIX</text>
+    </svg>
+  );
+}
+
+function BoletoIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <rect width="48" height="32" rx="4" fill="#374151" />
+      <rect x="8" y="6" width="32" height="20" rx="2" fill="#F9FAFB" />
+      <rect x="12" y="10" width="2" height="12" fill="#111827" />
+      <rect x="16" y="10" width="1" height="12" fill="#111827" />
+      <rect x="20" y="10" width="2" height="12" fill="#111827" />
+      <rect x="25" y="10" width="1" height="12" fill="#111827" />
+      <rect x="29" y="10" width="2" height="12" fill="#111827" />
+      <rect x="34" y="10" width="1" height="12" fill="#111827" />
+    </svg>
+  );
+}
+
+function CashIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <rect width="48" height="32" rx="4" fill="#059669" />
+      <rect x="6" y="8" width="36" height="16" rx="3" fill="#34D399" />
+      <circle cx="24" cy="16" r="4" fill="#047857" />
+      <text x="22" y="18.5" fill="white" fontSize="6" fontWeight="bold">$</text>
+    </svg>
+  );
+}
+
+function TransferIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
+      <rect width="48" height="32" rx="4" fill="#0EA5E9" />
+      <path d="M10 11H30" stroke="white" strokeWidth="2" strokeLinecap="round" />
+      <path d="M26 8L30 11L26 14" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M38 21H18" stroke="white" strokeWidth="2" strokeLinecap="round" />
+      <path d="M22 18L18 21L22 24" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function normalizeFlag(flag: FlagIconProps["flag"]): string {
+  const normalized = String(flag).trim().toLowerCase();
+
+  if (normalized === "debit_card") return "debit";
+  if (normalized === "dinheiro") return "cash";
+  if (normalized === "transferencia" || normalized === "transferência") return "transfer";
+
+  return normalized;
+}
+export function FlagIcon({ flag, ...props }: FlagIconProps) {
   const iconProps = { width: 40, height: 28, ...props };
 
-  switch (flag) {
+  const normalizedFlag = normalizeFlag(flag);
+  switch (normalizedFlag) {
     case "visa":
       return <VisaIcon {...iconProps} />;
     case "mastercard":
@@ -111,7 +171,20 @@ export function CardFlagIcon({ flag, ...props }: CardFlagIconProps) {
       return <EloIcon {...iconProps} />;
     case "hipercard":
       return <HipercardIcon {...iconProps} />;
+    case "pix":
+      return <PixIcon {...iconProps} />;
+    case "boleto":
+      return <BoletoIcon {...iconProps} />;
+    case "cash":
+      return <CashIcon {...iconProps} />;
+    case "transfer":
+      return <TransferIcon {...iconProps} />;
+    case "debit":
+      return <OtherCardIcon {...iconProps} />;
+    case "credit_card":
+      return <OtherCardIcon {...iconProps} />;
     default:
       return <OtherCardIcon {...iconProps} />;
   }
 }
+

@@ -1,5 +1,5 @@
-﻿import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { DynamicIcon } from "@/components/dynamic-icon";
+import { FlagIcon } from "@/components/flag-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -27,11 +27,11 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
     <Table className="min-w-[1100px]">
       <TableHeader>
         <TableRow>
-          <TableHead>Descrição</TableHead>
+          <TableHead>Descri��o</TableHead>
           <TableHead>Valor</TableHead>
           <TableHead>Vencimento</TableHead>
           <TableHead>Categoria</TableHead>
-          <TableHead>Cartão</TableHead>
+          <TableHead>Cart�o</TableHead>
           <TableHead>Frequencia</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="w-12" />
@@ -44,7 +44,7 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
               <div className="min-w-0">
                 <p className="truncate font-semibold">{subscription.description}</p>
                 <p className="truncate text-xs text-muted-foreground">
-                  {subscription.createdAt ? `Criado em ${dateFormatter.format(new Date(subscription.createdAt))}` : "—"}
+                  {subscription.createdAt ? `Criado em ${dateFormatter.format(new Date(subscription.createdAt))}` : "�"}
                 </p>
               </div>
             </TableCell>
@@ -60,17 +60,17 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
                   <span className="truncate">{subscription.category.name}</span>
                 </div>
               ) : (
-                <span className="text-xs text-muted-foreground">—</span>
+                <span className="text-xs text-muted-foreground">�</span>
               )}
             </TableCell>
             <TableCell>
               {subscription.creditCard ? (
                 <div className="flex items-center gap-2">
-                  <CardFlagIcon flag={subscription.creditCard.flag} className="h-5 w-auto" />
+                  <FlagIcon flag={subscription.creditCard.flag} className="h-5 w-auto" />
                   <span className="text-xs text-muted-foreground">{subscription.creditCard.name}</span>
                 </div>
               ) : (
-                <span className="text-xs text-muted-foreground">—</span>
+                <span className="text-xs text-muted-foreground">�</span>
               )}
             </TableCell>
             <TableCell>
@@ -112,5 +112,6 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
     </Table>
   );
 }
+
 
 

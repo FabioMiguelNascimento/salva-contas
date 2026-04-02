@@ -1,6 +1,6 @@
-﻿"use client";
+"use client";
 
-import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
+import { FlagIcon } from "@/components/flag-icon";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -75,21 +75,21 @@ export function CreditCardCreateSheet() {
       <SheetTrigger asChild>
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" />
-          Novo Cartão
+          Novo Cart�o
         </Button>
       </SheetTrigger>
       <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Novo cartão de crédito</SheetTitle>
+          <SheetTitle>Novo cart�o de cr�dito</SheetTitle>
           <SheetDescription>
-            Adicione um novo cartão para acompanhar seus gastos e limites.
+            Adicione um novo cart�o para acompanhar seus gastos e limites.
           </SheetDescription>
         </SheetHeader>
 
         <form id="create-card-form" onSubmit={handleSubmit} className="flex flex-1 flex-col">
           <SheetBody className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nome do cartão</Label>
+              <Label htmlFor="name">Nome do cart�o</Label>
               <Input
                 id="name"
                 placeholder="Ex: Nubank, Itau Platinum"
@@ -110,7 +110,7 @@ export function CreditCardCreateSheet() {
                     {cardFlags.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         <div className="flex items-center gap-2">
-                          <CardFlagIcon flag={option.value} className="h-4 w-auto" />
+                          <FlagIcon flag={option.value} className="h-4 w-auto" />
                           <span>{option.label}</span>
                         </div>
                       </SelectItem>
@@ -132,7 +132,7 @@ export function CreditCardCreateSheet() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="limit">Limite do cartão</Label>
+              <Label htmlFor="limit">Limite do cart�o</Label>
               <Input
                 id="limit"
                 placeholder="5000.00"
@@ -177,7 +177,7 @@ export function CreditCardCreateSheet() {
               Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting} className="flex-1">
-              {isSubmitting ? "Criando..." : "Criar cartão"}
+              {isSubmitting ? "Criando..." : "Criar cart�o"}
             </Button>
           </SheetFooter>
         </form>
@@ -185,4 +185,5 @@ export function CreditCardCreateSheet() {
     </Sheet>
   );
 }
+
 

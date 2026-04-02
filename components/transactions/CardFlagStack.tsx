@@ -1,4 +1,4 @@
-import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
+import { FlagIcon } from "@/components/flag-icon";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { CreditCardFlag, Transaction } from "@/types/finance";
 
@@ -51,7 +51,7 @@ export function CardFlagStack({ transaction, maxVisible = 3 }: CardFlagStackProp
               className="absolute top-0"
               style={{ left: `${index * 6}px`, zIndex: 10 - index }}
             >
-              <CardFlagIcon flag={card.flag} className="h-7 w-7" />
+              <FlagIcon flag={card.flag} className="h-7 w-7" />
             </div>
           ))}
           {cards.length > maxVisible ? (
@@ -66,7 +66,7 @@ export function CardFlagStack({ transaction, maxVisible = 3 }: CardFlagStackProp
         <div className="space-y-1">
           {cards.map((card) => (
             <div key={card.id} className="flex items-center gap-2">
-              <CardFlagIcon flag={card.flag} className="h-5 w-5" />
+              <FlagIcon flag={card.flag} className="h-5 w-5" />
               <span className="text-xs font-medium">{card.name}</span>
             </div>
           ))}
@@ -75,3 +75,4 @@ export function CardFlagStack({ transaction, maxVisible = 3 }: CardFlagStackProp
     </Popover>
   );
 }
+

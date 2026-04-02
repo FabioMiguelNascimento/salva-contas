@@ -1,5 +1,5 @@
-import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { DynamicIcon } from "@/components/dynamic-icon";
+import { FlagIcon } from "@/components/flag-icon";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -73,7 +73,7 @@ export function SubscriptionListCard({ subscription, onEdit, onDelete }: Subscri
           <>
             <span>•</span>
             <div className="flex items-center gap-1">
-              <CardFlagIcon flag={subscription.creditCard.flag} className="h-3.5 w-auto" />
+              <FlagIcon flag={subscription.creditCard.flag} className="h-3.5 w-auto" />
               <span>{subscription.creditCard.name}</span>
             </div>
           </>
@@ -82,3 +82,4 @@ export function SubscriptionListCard({ subscription, onEdit, onDelete }: Subscri
     </div>
   );
 }
+

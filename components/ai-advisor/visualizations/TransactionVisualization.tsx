@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
-import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { DynamicIcon } from "@/components/dynamic-icon";
+import { FlagIcon } from "@/components/flag-icon";
 import { formatCurrency } from "@/lib/currency-utils";
 import { formatDate as formatDateUtil } from "@/lib/date-utils";
 import type { AiVisualization } from "@/types/ai-advisor";
@@ -38,7 +38,7 @@ function renderConfirmationActions(
   if (status === "cancelled") {
     return (
       <div className="mt-3 rounded-md border border-rose-200 bg-rose-50 p-2 text-sm text-rose-700">
-        Transação cancelada. A ação não será realizada.
+        Transa��o cancelada. A a��o n�o ser� realizada.
       </div>
     );
   }
@@ -122,10 +122,10 @@ export default function TransactionVisualization({
   const paymentMethods = transaction.paymentMethods ?? [];
   const hasMultipleMethods = paymentMethods.length > 1;
   const isUpdateTransaction = visualization.toolName === "update_transaction";
-  const confirmLabel = isUpdateTransaction ? "Confirmar Alteração" : "Confirmar";
+  const confirmLabel = isUpdateTransaction ? "Confirmar Altera��o" : "Confirmar";
   const confirmedLabel = isUpdateTransaction
-    ? "Alteração confirmada com sucesso."
-    : "Transação confirmada com sucesso.";
+    ? "Altera��o confirmada com sucesso."
+    : "Transa��o confirmada com sucesso.";
 
   return (
     <div className="mt-3 w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -147,7 +147,7 @@ export default function TransactionVisualization({
                 {formatCurrencyFn(transaction.amount)}
               </p>
               <p className="text-sm text-white/80">
-                {transaction.description ?? "Sem descrição"}
+                {transaction.description ?? "Sem descri��o"}
               </p>
             </div>
           </div>
@@ -174,7 +174,7 @@ export default function TransactionVisualization({
             <p className="mb-1 text-[11px] text-slate-400">Data de pagamento</p>
             <div className="flex items-center gap-1.5">
               <span className="text-[13px] font-medium text-slate-800">
-                {formatDate(transaction.paymentDate) ?? "—"}
+                {formatDate(transaction.paymentDate) ?? "�"}
               </span>
             </div>
           </div>
@@ -183,7 +183,7 @@ export default function TransactionVisualization({
             <p className="mb-1 text-[11px] text-slate-400">Criado em</p>
             <div className="flex items-center gap-1.5">
               <span className="text-[13px] font-medium text-slate-800">
-                {formatDate(transaction.createdAt) ?? "—"}
+                {formatDate(transaction.createdAt) ?? "�"}
               </span>
             </div>
           </div>
@@ -223,7 +223,7 @@ export default function TransactionVisualization({
                   >
                     <div className="flex items-center gap-2.5">
                       {showCardIcon ? (
-                        <CardFlagIcon
+                        <FlagIcon
                           flag={resolvedCardFlag as any}
                           className="h-7 w-10 rounded-md border border-slate-200 bg-white"
                         />
@@ -242,7 +242,7 @@ export default function TransactionVisualization({
                         </p>
                         {(method.creditCard?.lastFourDigits || method.debitCard?.lastFourDigits || matchingSplit?.creditCard?.lastFourDigits || matchingSplit?.debitCard?.lastFourDigits) && (
                           <p className="text-[11px] text-slate-400">
-                            {`•••• ${
+                            {`���� ${
                               method.creditCard?.lastFourDigits ||
                               method.debitCard?.lastFourDigits ||
                               matchingSplit?.creditCard?.lastFourDigits ||

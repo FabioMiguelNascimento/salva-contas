@@ -312,6 +312,7 @@ export interface UpdateTransactionPayload {
   status?: TransactionStatus;
   dueDate?: string | null;
   paymentDate?: string | null;
+  installments?: number | null;
   creditCardId?: string | null;
   debitCardId?: string | null;
   splits?: Omit<TransactionSplit, 'id' | 'creditCard' | 'debitCard'>[];

@@ -1,6 +1,6 @@
 export type VisualizationStatus = 'idle' | 'confirming' | 'confirmed' | 'cancelled';
 
-export type AiVisualizationType = 'chart_donut' | 'chart_line' | 'table_summary' | 'transaction';
+export type AiVisualizationType = 'chart_donut' | 'chart_line' | 'table_summary' | 'transaction' | 'transaction_diff';
 
 export interface AiVisualization {
   type: AiVisualizationType;
