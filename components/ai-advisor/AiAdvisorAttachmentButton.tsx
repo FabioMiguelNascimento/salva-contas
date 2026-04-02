@@ -19,7 +19,6 @@ export default function AiAdvisorAttachmentButton({
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
         className="hidden"
         multiple
         onChange={(event) => {
