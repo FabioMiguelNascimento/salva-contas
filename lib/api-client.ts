@@ -12,6 +12,9 @@ export const apiClient = axios.create({
   baseURL: API_BASE_URL,
   timeout: 60000,
   withCredentials: false,
+  headers: {
+    'ngrok-skip-browser-warning': 'true'
+  }
 });
 
 apiClient.interceptors.response.use(
