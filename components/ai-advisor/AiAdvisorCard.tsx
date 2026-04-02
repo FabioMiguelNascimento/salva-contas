@@ -130,6 +130,15 @@ export default function AiAdvisorCard({ month, year }: AiAdvisorCardProps) {
             : msg,
         ),
       );
+
+      const transactionIds = Array.isArray(confirmed) ? confirmed.map(t => t.id) : [confirmed.id];
+      const idsString = transactionIds.join(', ');
+      const systemMessage: ChatMessage = {
+        id: `system-${Date.now()}`,
+        role: 'user',
+        content: `[SISTEMA]: A transação pendente acabou de ser confirmada pelo usuário e salva no banco. O ID oficial gerado é: ${idsString}. Caso o usuário peça detalhes a partir de agora, use este ID.`,
+      };
+      setMessages((prev) => [...prev, systemMessage]);
     } catch (error: any) {
       toast.error(error?.message || 'Falha ao confirmar transação. Tente novamente.');
       setMessages((prev) =>

@@ -33,6 +33,10 @@ export default function AiAdvisorMessageBubble({
   onConfirmVisualization,
   onCancelVisualization,
 }: MessageBubbleProps) {
+  if (message.content.startsWith("[SISTEMA]:")) {
+    return null;
+  }
+
   const isAssistant = message.role === "assistant";
   const { user } = useAuth();
 
