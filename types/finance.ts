@@ -456,23 +456,13 @@ export interface CreateNotificationPayload {
   relatedId?: string;
 }
 
-export type AiVisualizationType = "chart_donut" | "chart_line" | "table_summary" | "transaction";
+export type {
+    AiAdvisorChatHistoryMessage,
+    AiAdvisorChatResponse,
+    AiVisualization,
+    AiVisualizationType,
+    ChatAttachment,
+    ChatMessage,
+    VisualizationStatus
+} from './ai-advisor';
 
-export interface AiVisualization {
-  type: AiVisualizationType;
-  toolName: string;
-  title: string;
-  payload: Record<string, any>;
-}
-
-export interface AiAdvisorChatHistoryMessage {
-  role: "user" | "assistant";
-  content: string;
-}
-
-export interface AiAdvisorChatResponse {
-  message: string;
-  toolCalls: string[];
-  visualization: AiVisualization | null;
-  visualizations: AiVisualization[];
-}

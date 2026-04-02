@@ -2,7 +2,7 @@
 
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { formatCurrency } from "@/lib/currency-utils";
-import { AiVisualization } from "@/types/finance";
+import type { AiVisualization } from "@/types/ai-advisor";
 import { VisualizationStatus } from "./types";
 
 interface VaultActionSummaryVisualizationProps {

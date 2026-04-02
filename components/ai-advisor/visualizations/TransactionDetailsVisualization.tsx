@@ -2,9 +2,9 @@
 
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { formatCurrency, parseNumber } from "@/lib/currency-utils";
-import { formatDate,  formatDate as formatDateUtil, parseDateOnly as parseDateOnlyUtil } from "@/lib/date-utils";
+import { formatDate } from "@/lib/date-utils";
 import { getTransactionStatusLabel } from "@/lib/utils";
-import type { AiVisualization } from "@/types/finance";
+import type { AiVisualization } from "@/types/ai-advisor";
 import type { VisualizationStatus } from "./types";
 
 interface TransactionDetailsVisualizationProps {

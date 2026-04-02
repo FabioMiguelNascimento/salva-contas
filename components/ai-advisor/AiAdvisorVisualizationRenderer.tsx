@@ -1,7 +1,6 @@
 "use client";
 
-import type { AiVisualization } from "@/types/finance";
-import { useState } from "react";
+import type { AiVisualization } from "@/types/ai-advisor";
 import ConfirmationListVisualization from "./visualizations/ConfirmationListVisualization";
 import DonutChartVisualization from "./visualizations/DonutChartVisualization";
 import LineChartVisualization from "./visualizations/LineChartVisualization";
@@ -11,6 +10,7 @@ import TransactionDetailsVisualization from "./visualizations/TransactionDetails
 import TransactionVisualization from "./visualizations/TransactionVisualization";
 import { VisualizationStatus } from "./visualizations/types";
 import VaultActionSummaryVisualization from "./visualizations/VaultActionSummaryVisualization";
+import { ReactNode } from "react";
 
 
 interface AiAdvisorVisualizationRendererProps {
@@ -28,28 +28,22 @@ export default function AiAdvisorVisualizationRenderer({
 }: AiAdvisorVisualizationRendererProps) {
   const payload = visualization.payload || {};
   const requiresConfirmation = Boolean((payload as any).requiresConfirmation);
-  const [deselectedIndices, setDeselectedIndices] = useState<Set<number>>(new Set());
 
-  const confirmData = () => {
-    const proposedTransactions = Array.isArray((payload as any).proposedTransactions)
-      ? (payload as any).proposedTransactions
-      : null;
-
-    if (proposedTransactions) {
-      return proposedTransactions.filter((_: any, idx: number) => !deselectedIndices.has(idx));
-    }
-
-    if (payload && typeof payload === "object") {
-      const { requiresConfirmation: _req, proposedTransactions: _prop, ...rest } = payload as any;
+  const buildConfirmPayload = () => {
+    if (payload && typeof payload === 'object') {
+      const { requiresConfirmation: _requiresConfirmation, proposedTransactions: _proposedTransactions, ...rest } = payload as any;
       return [rest];
     }
 
     return [];
   };
 
-  const onConfirm = async () => {
-    if (!requiresConfirmation || status === "confirming" || status === "confirmed") return;
-    await onConfirmVisualization(confirmData());
+  const onConfirm = async (selectedItems?: any[]) => {
+    if (!requiresConfirmation || status === 'confirming' || status === 'confirmed') {
+      return;
+    }
+
+    await onConfirmVisualization(selectedItems ?? buildConfirmPayload());
   };
 
   const onCancel = () => {
@@ -57,115 +51,91 @@ export default function AiAdvisorVisualizationRenderer({
     onCancelVisualization();
   };
 
-  // Transaction visualization
-  if (visualization.type === "transaction") {
-    return (
+  const renderers: Record<string, ReactNode> = {
+    transaction: (
       <TransactionVisualization
         visualization={visualization}
         status={status}
-        onConfirm={onConfirm}
+        onConfirm={() => onConfirm()}
         onCancel={onCancel}
         requiresConfirmation={requiresConfirmation}
       />
-    );
-  }
-
-  // Line chart visualization
-  if (visualization.type === "chart_line") {
-    return (
+    ),
+    chart_line: (
       <LineChartVisualization
         visualization={visualization}
         status={status}
-        onConfirm={onConfirm}
+        onConfirm={() => onConfirm()}
         onCancel={onCancel}
         requiresConfirmation={requiresConfirmation}
       />
-    );
-  }
-
-  // Donut chart visualization
-  if (visualization.type === "chart_donut") {
-    return (
+    ),
+    chart_donut: (
       <DonutChartVisualization
         visualization={visualization}
         status={status}
-        onConfirm={onConfirm}
+        onConfirm={() => onConfirm()}
         onCancel={onCancel}
         requiresConfirmation={requiresConfirmation}
       />
-    );
-  }
-
-  // Transaction details search results
-  if (
-    visualization.type === "table_summary" &&
-    visualization.toolName === "get_transaction_details" &&
-    Array.isArray((payload as any).items)
-  ) {
-    return (
+    ),
+    transaction_details: (
       <TransactionDetailsVisualization
         visualization={visualization}
         status={status}
-        onConfirm={onConfirm}
+        onConfirm={() => onConfirm()}
         onCancel={onCancel}
         requiresConfirmation={requiresConfirmation}
       />
-    );
-  }
-
-  // Single transaction summary
-  if (
-    visualization.type === "table_summary" &&
-    visualization.payload &&
-    typeof visualization.payload === "object" &&
-    "description" in visualization.payload &&
-    "amount" in visualization.payload
-  ) {
-    return (
+    ),
+    single_transaction_summary: (
       <SingleTransactionSummaryVisualization
         visualization={visualization}
         status={status}
-        onConfirm={onConfirm}
+        onConfirm={() => onConfirm()}
         onCancel={onCancel}
         requiresConfirmation={requiresConfirmation}
       />
-    );
-  }
-
-  // Confirmation list with checkboxes
-  if (requiresConfirmation && Array.isArray(payload.items)) {
-    return (
+    ),
+    confirmation_list: (
       <ConfirmationListVisualization
         visualization={visualization}
         status={status}
-        onConfirm={onConfirm}
+        onConfirm={(selectedItems) => onConfirm(selectedItems)}
         onCancel={onCancel}
         requiresConfirmation={requiresConfirmation}
       />
-    );
-  }
-
-  // Vault action summary (AI tool)
-  if (visualization.type === "table_summary" && visualization.toolName === "vault_ai_action") {
-    return (
+    ),
+    vault_ai_action: (
       <VaultActionSummaryVisualization
         visualization={visualization}
         status={status}
-        onConfirm={onConfirm}
+        onConfirm={() => onConfirm()}
         onCancel={onCancel}
         requiresConfirmation={requiresConfirmation}
       />
-    );
-  }
+    ),
+    summary: (
+      <SummaryVisualization
+        visualization={visualization}
+        status={status}
+        onConfirm={() => onConfirm()}
+        onCancel={onCancel}
+        requiresConfirmation={requiresConfirmation}
+      />
+    ),
+  };
 
-  // Default summary visualization
-  return (
-    <SummaryVisualization
-      visualization={visualization}
-      status={status}
-      onConfirm={onConfirm}
-      onCancel={onCancel}
-      requiresConfirmation={requiresConfirmation}
-    />
-  );
+  const rendererKey =
+    visualization.type === 'table_summary' && visualization.toolName === 'get_transaction_details' && Array.isArray((payload as any).items)
+      ? 'transaction_details'
+      : visualization.type === 'table_summary' && visualization.toolName === 'vault_ai_action'
+        ? 'vault_ai_action'
+        : visualization.type === 'table_summary' && requiresConfirmation && Array.isArray((payload as any).items)
+          ? 'confirmation_list'
+          : visualization.type === 'table_summary' && payload && typeof payload === 'object' && 'description' in visualization.payload && 'amount' in visualization.payload
+            ? 'single_transaction_summary'
+            : visualization.type;
+
+  return renderers[rendererKey] ?? renderers.summary;
 }

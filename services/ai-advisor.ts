@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api-client';
-import type { AiAdvisorChatHistoryMessage, AiAdvisorChatResponse } from '@/types/finance';
+import type { AiAdvisorChatHistoryMessage, AiAdvisorChatResponse } from '@/types/ai-advisor';
 
 type ApiResponse<T> = T | { data: T };
 

@@ -1,27 +1,10 @@
 "use client";
 
 import AiAdvisorVisualizationRenderer from "@/components/ai-advisor/AiAdvisorVisualizationRenderer";
-import { VisualizationStatus } from "@/components/ai-advisor/visualizations/types";
 import UserInitials from "@/components/ui/user-initials";
-import { useAuth } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { AiVisualization } from "@/types/finance";
+import type { ChatMessage } from "@/types/ai-advisor";
 import ReactMarkdown from "react-markdown";
-
-type ChatAttachment = {
-  name: string;
-  url: string;
-  type: string;
-};
-
-type ChatMessage = {
-  id: string;
-  role: "user" | "assistant";
-  content: string;
-  visualizations?: AiVisualization[];
-  visualizationStatuses?: Record<string, VisualizationStatus>;
-  attachments?: ChatAttachment[];
-};
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -39,7 +22,6 @@ export default function AiAdvisorMessageBubble({
   }
 
   const isAssistant = message.role === "assistant";
-  const { user } = useAuth();
   const isMobile = useIsMobile();
 
   return (

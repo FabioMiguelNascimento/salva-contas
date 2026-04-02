@@ -4,7 +4,8 @@ import { CardFlagIcon } from "@/components/credit-cards/card-flag-icon";
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { formatCurrency } from "@/lib/currency-utils";
 import { formatDate as formatDateUtil } from "@/lib/date-utils";
-import type { AiVisualization, CreditCardFlag, PaymentMethod, TransactionDetailsPayload } from "@/types/finance";
+import type { AiVisualization } from "@/types/ai-advisor";
+import type { CreditCardFlag, PaymentMethod, TransactionDetailsPayload } from "@/types/finance";
 import { PAYMENT_METHOD_LABELS } from "@/types/finance";
 import { ArrowDown, ArrowUp } from "lucide-react";
 import type { VisualizationStatus } from "./types";
@@ -23,11 +24,13 @@ function renderConfirmationActions(
   status: VisualizationStatus,
   onConfirm: () => void,
   onCancel: () => void,
+  confirmLabel: string,
+  confirmedLabel: string,
 ) {
   if (status === "confirmed") {
     return (
       <div className="mt-3 rounded-md border border-emerald-200 bg-emerald-50 p-2 text-sm text-emerald-700">
-        Transação confirmada com sucesso.
+        {confirmedLabel}
       </div>
     );
   }
@@ -48,7 +51,7 @@ function renderConfirmationActions(
         disabled={status === "confirming"}
         className="inline-flex items-center justify-center gap-2 rounded-md bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground shadow-sm transition-colors hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
       >
-        {status === "confirming" ? "Confirmando..." : "Confirmar"}
+        {status === "confirming" ? "Confirmando..." : confirmLabel}
       </button>
       <button
         type="button"
@@ -118,6 +121,11 @@ export default function TransactionVisualization({
 
   const paymentMethods = transaction.paymentMethods ?? [];
   const hasMultipleMethods = paymentMethods.length > 1;
+  const isUpdateTransaction = visualization.toolName === "update_transaction";
+  const confirmLabel = isUpdateTransaction ? "Confirmar Alteração" : "Confirmar";
+  const confirmedLabel = isUpdateTransaction
+    ? "Alteração confirmada com sucesso."
+    : "Transação confirmada com sucesso.";
 
   return (
     <div className="mt-3 w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -181,7 +189,7 @@ export default function TransactionVisualization({
           </div>
         </div>
 
-        {(paymentMethods.length > 0 || transaction.splits?.length) && (
+        {(paymentMethods.length > 0 || (transaction.splits?.length ?? 0) > 0) && (
           <>
             <div className="my-4 h-px bg-slate-100" />
 
@@ -268,7 +276,7 @@ export default function TransactionVisualization({
           </span>
         </div>
 
-        {requiresConfirmation && renderConfirmationActions(status, onConfirm, onCancel)}
+        {requiresConfirmation && renderConfirmationActions(status, onConfirm, onCancel, confirmLabel, confirmedLabel)}
       </div>
     </div>
   );

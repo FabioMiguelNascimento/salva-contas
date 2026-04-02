@@ -2,7 +2,7 @@
 
 import { formatCurrency } from "@/lib/currency-utils";
 import { formatDate } from "@/lib/date-utils";
-import type { AiVisualization } from "@/types/finance";
+import type { AiVisualization } from "@/types/ai-advisor";
 import type { VisualizationStatus } from "./types";
 
 interface SingleTransactionSummaryVisualizationProps {

@@ -1,1 +1,1 @@
-export type VisualizationStatus = "idle" | "confirming" | "confirmed" | "cancelled";
+export type { VisualizationStatus } from '@/types/ai-advisor';

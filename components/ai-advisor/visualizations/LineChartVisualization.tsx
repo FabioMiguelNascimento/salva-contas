@@ -1,15 +1,15 @@
 ﻿"use client";
 
 import { formatCurrency, parseAmount } from "@/lib/currency-utils";
-import type { AiVisualization } from "@/types/finance";
+import type { AiVisualization } from "@/types/ai-advisor";
 import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
+    CartesianGrid,
+    Line,
+    LineChart,
+    ResponsiveContainer,
+    Tooltip,
+    XAxis,
+    YAxis,
 } from "recharts";
 import type { VisualizationStatus } from "./types";
 

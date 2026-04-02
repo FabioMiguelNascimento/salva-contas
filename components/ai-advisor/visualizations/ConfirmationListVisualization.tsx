@@ -3,14 +3,14 @@
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { formatCurrency, parseAmount } from "@/lib/currency-utils";
 import { formatDate } from "@/lib/date-utils";
-import type { AiVisualization } from "@/types/finance";
+import type { AiVisualization } from "@/types/ai-advisor";
 import { useState } from "react";
 import type { VisualizationStatus } from "./types";
 
 interface ConfirmationListVisualizationProps {
   visualization: AiVisualization;
   status: VisualizationStatus;
-  onConfirm: () => void;
+  onConfirm: (selectedItems: Array<Record<string, any>>) => void;
   onCancel: () => void;
   requiresConfirmation: boolean;
 }
@@ -19,8 +19,9 @@ interface ConfirmationListVisualizationProps {
 
 function renderConfirmationActions(
   status: VisualizationStatus,
-  onConfirm: () => void,
+  onConfirm: (selectedItems: Array<Record<string, any>>) => void,
   onCancel: () => void,
+  selectedItems: Array<Record<string, any>>,
 ) {
   if (status === "confirmed") {
     return (
@@ -42,7 +43,7 @@ function renderConfirmationActions(
     <div className="mt-3 flex flex-wrap gap-2">
       <button
         type="button"
-        onClick={onConfirm}
+        onClick={() => onConfirm(selectedItems)}
         disabled={status === "confirming"}
         className="inline-flex items-center justify-center gap-2 rounded-md bg-secondary px-3 py-2 text-sm font-medium text-secondary-foreground shadow-sm transition-colors hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
       >
@@ -171,7 +172,7 @@ export default function ConfirmationListVisualization({
         })}
       </div>
 
-      {requiresConfirmation && renderConfirmationActions(status, onConfirm, onCancel)}
+      {requiresConfirmation && renderConfirmationActions(status, onConfirm, onCancel, selectedItems)}
     </div>
   );
 }
