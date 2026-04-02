@@ -4,6 +4,7 @@ import AiAdvisorVisualizationRenderer from "@/components/ai-advisor/AiAdvisorVis
 import { VisualizationStatus } from "@/components/ai-advisor/visualizations/types";
 import UserInitials from "@/components/ui/user-initials";
 import { useAuth } from "@/hooks/use-auth";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { AiVisualization } from "@/types/finance";
 import ReactMarkdown from "react-markdown";
 
@@ -39,15 +40,16 @@ export default function AiAdvisorMessageBubble({
 
   const isAssistant = message.role === "assistant";
   const { user } = useAuth();
+  const isMobile = useIsMobile();
 
   return (
-    <div className={`flex w-full ${isAssistant ? "justify-start" : "justify-end"} items-end gap-2 mb-4`}>
-      {isAssistant && (
+    <div className={`flex w-full ${isAssistant ? "justify-start" : "justify-end"} items-end ${isAssistant && !isMobile ? "gap-2" : "gap-0"} mb-4`}>
+      {isAssistant && !isMobile && (
         <UserInitials name="Boletinho" className="h-8 w-8" />
       )}
       
       <div
-        className={`relative max-w-[85%] sm:max-w-[75%] px-4 py-2.5 shadow-sm ${
+        className={`relative max-w-[95%] sm:max-w-[75%] px-4 py-2.5 shadow-sm ${
           isAssistant
             ? "bg-white border border-emerald-100 text-slate-800 rounded-2xl rounded-bl-none"
             : "bg-emerald-600 text-white rounded-2xl rounded-br-none"
