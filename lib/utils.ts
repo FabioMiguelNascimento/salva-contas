@@ -41,7 +41,11 @@ export function getTransactionStatusLabel(status?: string | null) {
   const labels: Record<string, string> = {
     paid: "Pago",
     pending: "Pendente",
+    overdue: "Atrasado",
+    cancelled: "Cancelado",
+    canceled: "Cancelado",
   };
 
-  return labels[status] ?? status;
+  const normalized = status.toLowerCase();
+  return labels[normalized] ?? status;
 }
