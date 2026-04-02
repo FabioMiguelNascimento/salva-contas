@@ -100,11 +100,9 @@ function OtherCardIcon(props: SVGProps<SVGSVGElement>) {
 
 function PixIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <rect width="48" height="32" rx="4" fill="#10B981" />
-      <path d="M24 8L30 14L24 20L18 14L24 8Z" fill="white" />
-      <path d="M24 12L27.5 15.5L24 19L20.5 15.5L24 12Z" fill="#10B981" />
-      <text x="18" y="29" fill="white" fontSize="7" fontWeight="bold">PIX</text>
+    <svg viewBox="0 0 16 16" fill="#000000" xmlns="http://www.w3.org/2000/svg" data-darkreader-inline-fill="" {...props}>
+        <path d="M11.917 11.71a2.046 2.046 0 0 1-1.454-.602l-2.1-2.1a.4.4 0 0 0-.551 0l-2.108 2.108a2.044 2.044 0 0 1-1.454.602h-.414l2.66 2.66c.83.83 2.177.83 3.007 0l2.667-2.668h-.253zM4.25 4.282c.55 0 1.066.214 1.454.602l2.108 2.108a.39.39 0 0 0 .552 0l2.1-2.1a2.044 2.044 0 0 1 1.453-.602h.253L9.503 1.623a2.127 2.127 0 0 0-3.007 0l-2.66 2.66h.414z" />
+        <path d="m14.377 6.496-1.612-1.612a.307.307 0 0 1-.114.023h-.733c-.379 0-.75.154-1.017.422l-2.1 2.1a1.005 1.005 0 0 1-1.425 0L5.268 5.32a1.448 1.448 0 0 0-1.018-.422h-.9a.306.306 0 0 1-.109-.021L1.623 6.496c-.83.83-.83 2.177 0 3.008l1.618 1.618a.305.305 0 0 1 .108-.022h.901c.38 0 .75-.153 1.018-.421L7.375 8.57a1.034 1.034 0 0 1 1.426 0l2.1 2.1c.267.268.638.421 1.017.421h.733c.04 0 .079.01.114.024l1.612-1.612c.83-.83.83-2.178 0-3.008z" />
     </svg>
   );
 }
@@ -112,14 +110,10 @@ function PixIcon(props: SVGProps<SVGSVGElement>) {
 function BoletoIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <rect width="48" height="32" rx="4" fill="#374151" />
-      <rect x="8" y="6" width="32" height="20" rx="2" fill="#F9FAFB" />
-      <rect x="12" y="10" width="2" height="12" fill="#111827" />
-      <rect x="16" y="10" width="1" height="12" fill="#111827" />
-      <rect x="20" y="10" width="2" height="12" fill="#111827" />
-      <rect x="25" y="10" width="1" height="12" fill="#111827" />
-      <rect x="29" y="10" width="2" height="12" fill="#111827" />
-      <rect x="34" y="10" width="1" height="12" fill="#111827" />
+      <rect width="48" height="32" rx="4" fill="#059669" />
+      <rect x="6" y="8" width="36" height="16" rx="3" fill="#34D399" />
+      <circle cx="24" cy="16" r="4" fill="#047857" />
+      <text x="22" y="18.5" fill="white" fontSize="6" fontWeight="bold">$</text>
     </svg>
   );
 }
