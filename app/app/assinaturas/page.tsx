@@ -11,7 +11,9 @@ import { SummaryCard } from "@/components/summary-card";
 import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { CardsProvider } from "@/context/cards-context";
 import { SubscriptionsProvider } from "@/context/subscriptions-context";
+import { TransactionsProvider } from "@/context/transactions-context";
 import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useSubscriptionEditor } from "@/hooks/use-subscription-editor";
 import { useSubscriptionFilters } from "@/hooks/use-subscription-filters";
@@ -141,9 +143,13 @@ function SubscriptionsPageContent() {
 export default function SubscriptionsPage() {
   return (
     <SubscriptionsProvider>
-      <AppShell>
-        <SubscriptionsPageContent />
-      </AppShell>
+      <TransactionsProvider >
+        <CardsProvider>
+          <AppShell>
+            <SubscriptionsPageContent />
+          </AppShell>
+        </CardsProvider>
+      </TransactionsProvider>
     </SubscriptionsProvider>
   );
 }
