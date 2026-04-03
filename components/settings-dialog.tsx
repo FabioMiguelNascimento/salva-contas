@@ -1,9 +1,12 @@
-﻿"use client";
+"use client";
 
 import SettingsContent from "@/components/settings-content";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import { Bell, Palette, Shield, User, Users, Wallet } from "lucide-react";
+import { Bell, ChevronLeft, Palette, Shield, User, Users, Wallet, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import UserInitials from "./ui/user-initials";
+import { useAuth } from "@/contexts/auth-context";
 
 interface SettingsDialogProps {
   open: boolean;
@@ -12,68 +15,138 @@ interface SettingsDialogProps {
   onTabChange: (tab: string) => void;
 }
 
+const tabs = [
+  { id: "profile", label: "Perfil", icon: User },
+  { id: "appearance", label: "Aparência", icon: Palette },
+  { id: "notifications", label: "Notificações", icon: Bell },
+  { id: "security", label: "Segurança", icon: Shield },
+  { id: "billing", label: "Faturamento", icon: Wallet },
+  { id: "family", label: "Partilha Familiar", icon: Users },
+] as const;
+
 export function SettingsDialog({ open, onOpenChange, selectedTab, onTabChange }: SettingsDialogProps) {
+  const [mobileShowContent, setMobileShowContent] = useState(false);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!open) {
+      setMobileShowContent(false);
+    }
+  }, [open]);
+
+  const handleTabClick = (tab: string) => {
+    onTabChange(tab);
+    setMobileShowContent(true);
+  };
+
+  const handleBack = () => {
+    setMobileShowContent(false);
+  };
+
+  const handleClose = () => {
+    setMobileShowContent(false);
+    onOpenChange(false);
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-7xl w-[95vw] h-[calc(100vh-4rem)] p-0 overflow-hidden sm:max-w-none">
-        <div className="flex h-full bg-background">
-          <nav className="w-64 border-r border-border p-4">
-            <div className="mb-4">
-              <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">Configurações</p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <button
-                className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", selectedTab === 'profile' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")}
-                onClick={() => onTabChange('profile')}
-              >
-                <User className="h-4 w-4" />
-                <span>Perfil</span>
-              </button>
-              <button
-                className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", selectedTab === 'appearance' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")}
-                onClick={() => onTabChange('appearance')}
-              >
-                <Palette className="h-4 w-4" />
-                <span>Aparencia</span>
-              </button>
-              <button
-                className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", selectedTab === 'notifications' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")}
-                onClick={() => onTabChange('notifications')}
-              >
-                <Bell className="h-4 w-4" />
-                <span>Notificações</span>
-              </button>
-              <button
-                className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", selectedTab === 'security' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")}
-                onClick={() => onTabChange('security')}
-              >
-                <Shield className="h-4 w-4" />
-                <span>Seguranca</span>
-              </button>
-              <button
-                className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", selectedTab === 'family' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")}
-                onClick={() => onTabChange('billing')}
-              >
-                <Wallet className="h-4 w-4" />
-                <span>Faturamento</span>
-              </button>
-              <button
-                className={cn("text-left rounded-md px-3 py-2 flex items-center gap-3", selectedTab === 'family' ? "bg-accent/50 font-medium" : "hover:bg-accent/50")}
-                onClick={() => onTabChange('family')}
-              >
-                <Users className="h-4 w-4" />
-                <span>Partilha Familiar</span>
-              </button>
-              <hr className="my-3 border-border/60" />
-            </div>
+      <DialogContent
+        className="flex h-dvh w-screen max-w-none flex-col overflow-hidden border-0 p-0 shadow-2xl sm:h-[85vh] sm:w-[95vw] sm:max-w-5xl sm:flex-row sm:rounded-3xl sm:border sm:border-slate-200 [&>button]:hidden"
+      >
+        <DialogTitle className="sr-only">Configurações</DialogTitle>
+
+        <aside
+          className={cn(
+            "flex-col border-b border-slate-100 bg-slate-50/50 sm:w-72 sm:shrink-0 sm:border-b-0 sm:border-r sm:bg-slate-50/80",
+            mobileShowContent ? "hidden sm:flex" : "flex",
+            "h-full"
+          )}
+        >
+          <div className="flex shrink-0 items-center justify-between px-8 py-6 sm:py-8">
+            <p className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-600/80">
+              Configurações
+            </p>
+            <button
+              onClick={handleClose}
+              className="rounded-full p-2 text-slate-400 hover:bg-slate-200 hover:text-slate-700 sm:hidden"
+              aria-label="Fechar configurações"
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+
+          <nav className="flex-1 space-y-1.5 overflow-y-auto px-4 pb-6">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              const isActive = selectedTab === tab.id;
+
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabClick(tab.id)}
+                  className={cn(
+                    "flex w-full items-center gap-3.5 rounded-xl px-4 py-3 text-left text-sm font-semibold transition-all duration-200",
+                    isActive
+                      ? "bg-white text-emerald-700 shadow-sm ring-1 ring-slate-200/50"
+                      : "text-slate-500 hover:bg-white/50 hover:text-slate-900"
+                  )}
+                >
+                  <Icon className={cn("h-4.5 w-4.5 transition-colors", isActive ? "text-emerald-600" : "text-slate-400")} />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
           </nav>
 
-          <div className="flex-1 overflow-auto p-6">
-            <div className="max-w-full">
+          <footer className="p-6 border-t border-slate-100 mt-auto hidden sm:block">
+            <div className="flex gap-2 mb-2">
+              <UserInitials
+                name={user?.name}
+                email={user?.email}
+                className="size-8 -group-data-[collapsible=icon]:translate-x-1"
+              />
+              <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
+                <span className="truncate font-medium">{user?.name ?? "Usuário"}</span>
+                <span className="truncate text-xs text-primary font-semibold tracking-wider">
+                  {user?.email}
+                </span>
+              </div>
+            </div>
+          </footer>
+        </aside>
+
+        <main
+          className={cn(
+            "relative flex-1 flex-col bg-white",
+            mobileShowContent ? "flex" : "hidden sm:flex",
+            "h-full"
+          )}
+        >
+          <button
+            onClick={handleClose}
+            className="absolute right-6 top-6 hidden rounded-full p-2 text-slate-400 transition-all hover:bg-slate-100 hover:text-slate-700 sm:block z-20"
+            aria-label="Fechar configurações"
+          >
+            <X className="h-5 w-5" />
+          </button>
+
+          <div className="flex shrink-0 items-center border-b border-slate-100 bg-white px-6 py-4 sm:hidden">
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors"
+              aria-label="Voltar para menu de configurações"
+            >
+              <ChevronLeft className="h-5 w-5" />
+              Voltar
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-y-auto pt-6 pb-12 px-6 sm:pt-16 sm:px-16">
+            <div className="mx-auto max-w-3xl">
               <SettingsContent selectedTab={selectedTab} onTabChange={onTabChange} />
             </div>
           </div>
-        </div>
+        </main>
       </DialogContent>
     </Dialog>
   );

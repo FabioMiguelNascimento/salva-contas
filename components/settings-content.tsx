@@ -1,11 +1,13 @@
-﻿"use client";
+"use client";
 
-import AppearanceCard from "@/components/settings/appearance-card";
-import FamilyShareCard from "@/components/settings/family-share-card";
-import { MercadoPagoSettings } from "@/components/settings/mercado-pago-settings";
-import NotificationsCard from "@/components/settings/notifications-card";
-import ProfileCard from "@/components/settings/profile-card";
-import SecurityCard from "@/components/settings/security-card";
+import { 
+  AppearanceSection, 
+  FamilyShareCard, 
+  MercadoPagoSettings, 
+  NotificationsSection, 
+  ProfileSection, 
+  SecuritySection 
+} from "@/components/settings";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useFamilyInvite } from "@/context/family-invite-context";
 import { useAuth } from "@/hooks/use-auth";
@@ -92,21 +94,19 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
     }
   }
 
-  const profileCard = (
-    <ProfileCard
+  const profileSection = (
+    <ProfileSection
       name={name}
       onNameChange={setName}
       userEmail={user?.email ?? ""}
       onReset={() => { setName(user?.name ?? ""); setTheme("auto"); setDensity("compact"); }}
       onSave={saveProfile}
       saving={savingProfile}
-      setTheme={setTheme}
-      setDensity={setDensity}
     />
   );
 
-  const appearanceCard = (
-    <AppearanceCard
+  const appearanceSection = (
+    <AppearanceSection
       theme={theme}
       setTheme={setTheme}
       density={density}
@@ -115,16 +115,16 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
     />
   );
 
-  const notificationsCard = (
-    <NotificationsCard
+  const notificationsSection = (
+    <NotificationsSection
       notifications={notifications}
       setNotifications={setNotifications}
       onSave={saveProfile}
     />
   );
 
-  const securityCard = (
-    <SecurityCard
+  const securitySection = (
+    <SecuritySection
       newPassword={newPassword}
       confirmPassword={confirmPassword}
       setNewPassword={setNewPassword}
@@ -134,65 +134,58 @@ export default function SettingsContent({ view = 'page', selectedTab, onTabChang
     />
   );
 
-  const familyShareCard = <FamilyShareCard />;
+  const familyShareSection = <FamilyShareCard />;
   const mercadoPagoSettings = <MercadoPagoSettings />;
 
   if (selectedTab) {
     return (
-      <div className="space-y-6">
-        {selectedTab === 'profile' && profileCard}
-        {selectedTab === 'appearance' && appearanceCard}
-        {selectedTab === 'notifications' && notificationsCard}
-        {selectedTab === 'security' && securityCard}
+      <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+        {selectedTab === 'profile' && profileSection}
+        {selectedTab === 'appearance' && appearanceSection}
+        {selectedTab === 'notifications' && notificationsSection}
+        {selectedTab === 'security' && securitySection}
         {selectedTab === 'billing' && mercadoPagoSettings}
-        {selectedTab === 'family' && familyShareCard}
+        {selectedTab === 'family' && familyShareSection}
       </div>
     );
   }
 
-  const Cards = (
-    <>
-      {profileCard}
-      {appearanceCard}
-      {notificationsCard}
-      {securityCard}
+  const Sections = (
+    <div className="space-y-12">
+      {profileSection}
+      {appearanceSection}
+      {notificationsSection}
+      {securitySection}
       {mercadoPagoSettings}
-      {familyShareCard}
-    </>
+      {familyShareSection}
+    </div>
   );
 
   if (view === 'tabs') {
     return (
       <div className="flex flex-col h-full">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v)}>
-          <TabsList className="mb-4">
-            <TabsTrigger value="profile">Perfil</TabsTrigger>
-            <TabsTrigger value="appearance">Aparencia</TabsTrigger>
-            <TabsTrigger value="notifications">Notificações</TabsTrigger>
-            <TabsTrigger value="security">Seguranca</TabsTrigger>
-            <TabsTrigger value="billing">Faturamento</TabsTrigger>
-            <TabsTrigger value="family">Partilha Familiar</TabsTrigger>
+          <TabsList className="mb-8 bg-slate-100/50 p-1 rounded-xl">
+            <TabsTrigger value="profile" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Perfil</TabsTrigger>
+            <TabsTrigger value="appearance" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Aparência</TabsTrigger>
+            <TabsTrigger value="notifications" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Notificações</TabsTrigger>
+            <TabsTrigger value="security" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Segurança</TabsTrigger>
+            <TabsTrigger value="billing" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Faturamento</TabsTrigger>
+            <TabsTrigger value="family" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">Partilha</TabsTrigger>
           </TabsList>
 
-          <div className="flex-1 overflow-auto space-y-6">
-            <TabsContent value="profile">{profileCard}</TabsContent>
-            <TabsContent value="appearance">{appearanceCard}</TabsContent>
-            <TabsContent value="notifications">{notificationsCard}</TabsContent>
-            <TabsContent value="security">{securityCard}</TabsContent>
-            <TabsContent value="billing">{mercadoPagoSettings}</TabsContent>
-            <TabsContent value="family">{familyShareCard}</TabsContent>
+          <div className="flex-1 overflow-auto">
+            <TabsContent value="profile" className="animate-in fade-in duration-300">{profileSection}</TabsContent>
+            <TabsContent value="appearance" className="animate-in fade-in duration-300">{appearanceSection}</TabsContent>
+            <TabsContent value="notifications" className="animate-in fade-in duration-300">{notificationsSection}</TabsContent>
+            <TabsContent value="security" className="animate-in fade-in duration-300">{securitySection}</TabsContent>
+            <TabsContent value="billing" className="animate-in fade-in duration-300">{mercadoPagoSettings}</TabsContent>
+            <TabsContent value="family" className="animate-in fade-in duration-300">{familyShareSection}</TabsContent>
           </div>
         </Tabs>
       </div>
     );
   }
 
-  return (
-    <>
-      {Cards}
-      
-    </>
-  );
+  return Sections;
 }
-
-

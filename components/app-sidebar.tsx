@@ -142,13 +142,26 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent align="start" className="w-56">
-                <DropdownMenuLabel className="truncate">{user?.name}</DropdownMenuLabel>
-                <DropdownMenuItem onClick={() => router.push("/perfil")}>
+              <DropdownMenuContent align="start" className="w-56 py-4">
+                <div className="flex gap-2 mb-2">
+                  <UserInitials
+                    name={user?.name}
+                    email={user?.email}
+                    className="size-8 -group-data-[collapsible=icon]:translate-x-1"
+                  />
+                  <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
+                    <span className="truncate font-medium">{user?.name ?? "Usuário"}</span>
+                      <span className="truncate text-xs text-primary font-semibold tracking-wider">
+                        {user?.email}
+                    </span>
+                  </div>
+                </div>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => onOpenSettings("profile")}>
                   <User className="mr-2" />
                   Perfil
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onOpenSettings("profile")}>
+                <DropdownMenuItem onClick={() => onOpenSettings("appearance")}>
                   <Settings className="mr-2" />
                   Configurações
                 </DropdownMenuItem>
