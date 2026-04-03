@@ -1,18 +1,19 @@
 "use client";
 
+import { toDateOnlyString } from "@/lib/date-utils";
 import { fetchCategories } from "@/services/categories";
 import {
-  deleteTransaction,
-  fetchInstallmentTransactions,
-  fetchTransactions,
-  processTransaction,
-  updateTransaction,
+    deleteTransaction,
+    fetchInstallmentTransactions,
+    fetchTransactions,
+    processTransaction,
+    updateTransaction,
 } from "@/services/transactions";
 import type {
-  ProcessTransactionClientPayload,
-  Transaction,
-  TransactionCategory,
-  UpdateTransactionPayload,
+    ProcessTransactionClientPayload,
+    Transaction,
+    TransactionCategory,
+    UpdateTransactionPayload,
 } from "@/types/finance";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
@@ -144,10 +145,9 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
   }, []);
 
   const markAsPaid = useCallback(async (id: string) => {
-    const now = new Date().toISOString();
     const payload: UpdateTransactionPayload = {
       status: "paid",
-      paymentDate: now,
+      paymentDate: toDateOnlyString(new Date()),
     };
     const transaction = await updateTransaction(id, payload);
     triggerRefresh();

@@ -1,5 +1,6 @@
 import type { SplitRow } from "@/components/new-transaction/split-payment-builder";
 import { useTransactions } from "@/context/transactions-context";
+import { parseDateOnly, toDateOnlyString } from "@/lib/date-utils";
 import type { PaymentMethod, Transaction } from "@/types/finance";
 import { useCallback, useEffect, useState } from "react";
 
@@ -31,7 +32,7 @@ export function useTransactionEditor() {
     setEditCategoryId(tx.categoryId ?? null);
     setEditType(tx.type);
     setEditStatus(tx.status);
-    setEditDate(tx.paymentDate ? new Date(tx.paymentDate) : undefined);
+    setEditDate(parseDateOnly(tx.paymentDate) ?? undefined);
 
     // Init payment method / splits
     if (tx.splits && tx.splits.length > 0) {
@@ -89,7 +90,7 @@ export function useTransactionEditor() {
           amount: parsedAmount,
           type: editType as Transaction["type"],
           status: editStatus as Transaction["status"],
-          paymentDate: editDate ? editDate.toISOString() : null,
+          paymentDate: toDateOnlyString(editDate),
           categoryId: editCategoryId,
         };
 

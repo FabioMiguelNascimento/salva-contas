@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api-client";
+import { toDateOnlyString } from "@/lib/date-utils";
 
 export type ReportFeature =
   | "contas"
@@ -61,7 +62,8 @@ export async function exportReport({ feature, format, filters }: ExportReportOpt
 
   const contentDisposition = response.headers["content-disposition"] as string | undefined;
   const extension = format === "csv" ? "csv" : "pdf";
-  const fallbackName = `${feature}-report-${new Date().toISOString().slice(0, 10)}.${extension}`;
+  const fallbackDate = toDateOnlyString(new Date()) ?? "report";
+  const fallbackName = `${feature}-report-${fallbackDate}.${extension}`;
   const fileName = getFileNameFromDisposition(contentDisposition) ?? fallbackName;
 
   triggerDownload(response.data, fileName);

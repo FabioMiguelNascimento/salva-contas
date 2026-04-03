@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatDate } from "@/lib/date-utils";
 import { cn, getTransactionStatusLabel } from "@/lib/utils";
 import { PAYMENT_METHOD_LABELS, PaymentMethod, Transaction } from "@/types/finance";
 import { SplitSquareHorizontal } from "lucide-react";
@@ -237,7 +238,7 @@ export function EditTransactionSheet({
                         <tr key={installment.id} className="border-t border-border">
                           <td className="px-2 py-2">{installment.installmentCurrent}</td>
                           <td className="px-2 py-2">{installment.amount.toLocaleString("pt-BR", { style: "currency", currency: "BRL" })}</td>
-                          <td className="px-2 py-2">{installment.dueDate ? new Date(installment.dueDate).toLocaleDateString("pt-BR") : "—"}</td>
+                          <td className="px-2 py-2">{installment.dueDate ? formatDate(installment.dueDate) : "—"}</td>
                           <td className="px-2 py-2"><Badge
                             className={cn(
                               "text-xs",

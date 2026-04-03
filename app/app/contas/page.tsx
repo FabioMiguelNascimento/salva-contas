@@ -20,7 +20,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { TransactionsProvider, useTransactions } from "@/context/transactions-context";
 import { usePendingBills } from "@/hooks/use-pending-bills";
 import { formatCurrency } from "@/lib/currency-utils";
-import { cn, getTransactionCategoryLabel, parseDateOnly } from "@/lib/utils";
+import { cn, getTransactionCategoryLabel, parseDateOnly, toDateOnlyString } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { differenceInCalendarDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -81,7 +81,7 @@ function ContasPageContent() {
       await updateExistingTransaction(editSheet.bill.id, {
         description: descriptionInput,
         amount: parsedAmount,
-        dueDate: editDate ? editDate.toISOString() : null,
+        dueDate: toDateOnlyString(editDate),
       });
       setEditSheet({ open: false });
     } finally {

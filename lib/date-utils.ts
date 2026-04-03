@@ -8,12 +8,32 @@ export function parseDate(value?: string | Date | null): Date | undefined {
 
 export function parseDateOnly(value: string | Date | null | undefined): Date | null {
   if (!value) return null;
-  const str = typeof value === "string" ? value : value.toISOString();
-  const match = str.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (value instanceof Date) {
+    return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+  }
+
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (match) {
     return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
   }
-  return new Date(str);
+
+  return new Date(value);
+}
+
+export function toDateOnlyString(value: Date | string | null | undefined): string | null {
+  if (!value) return null;
+
+  const parsed =
+    value instanceof Date
+      ? value
+      : parseDateOnly(value);
+
+  if (!parsed) return null;
+
+  const year = parsed.getFullYear();
+  const month = String(parsed.getMonth() + 1).padStart(2, "0");
+  const day = String(parsed.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 export function formatDate(value?: string | Date | null, defaultValue = "—"): string {

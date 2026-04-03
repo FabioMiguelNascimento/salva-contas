@@ -1,5 +1,5 @@
 import { formatCurrency as formatCurrencyLib } from "@/lib/currency-utils";
-import { parseDateOnly as parseDateOnlyLib } from "@/lib/date-utils";
+import { parseDateOnly as parseDateOnlyLib, toDateOnlyString as toDateOnlyStringLib } from "@/lib/date-utils";
 import { getInitials as getInitialsLib } from "@/lib/text-utils";
 import type { Transaction } from "@/types/finance";
 import { clsx, type ClassValue } from "clsx";
@@ -11,6 +11,7 @@ export function cn(...inputs: ClassValue[]) {
 
 export const formatCurrency = formatCurrencyLib;
 export const parseDateOnly = parseDateOnlyLib;
+export const toDateOnlyString = toDateOnlyStringLib;
 export const getInitials = getInitialsLib;
 
 export function removeAccents(str: string) {
