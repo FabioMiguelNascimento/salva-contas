@@ -1,5 +1,6 @@
 export type TransactionType = "expense" | "income";
 export type TransactionStatus = "paid" | "pending";
+export type PendingBillsFilter = "all" | "overdue" | "today" | "upcoming";
 export type SubscriptionFrequency = "weekly" | "monthly" | "yearly";
 export type CreditCardFlag = "visa" | "mastercard" | "american_express" | "elo" | "hipercard" | "other";
 export type CreditCardStatus = "active" | "blocked" | "expired" | "cancelled";
@@ -304,6 +305,33 @@ export interface TransactionFilters {
   page?: number;
 }
 
+export interface PendingBillsSummary {
+  total: number;
+  overdueAmount: number;
+  overdueCount: number;
+  todayCount: number;
+  upcomingCount: number;
+}
+
+export interface PendingBillsResponse {
+  data: Transaction[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+  summary: PendingBillsSummary;
+}
+
+export interface PendingBillsFilters {
+  page?: number;
+  limit?: number;
+  filter?: PendingBillsFilter;
+  query?: string;
+  categoryId?: string;
+}
+
 export interface UpdateTransactionPayload {
   amount?: number;
   description?: string;
@@ -458,12 +486,12 @@ export interface CreateNotificationPayload {
 }
 
 export type {
-    AiAdvisorChatHistoryMessage,
-    AiAdvisorChatResponse,
-    AiVisualization,
-    AiVisualizationType,
-    ChatAttachment,
-    ChatMessage,
-    VisualizationStatus
+  AiAdvisorChatHistoryMessage,
+  AiAdvisorChatResponse,
+  AiVisualization,
+  AiVisualizationType,
+  ChatAttachment,
+  ChatMessage,
+  VisualizationStatus
 } from './ai-advisor';
 

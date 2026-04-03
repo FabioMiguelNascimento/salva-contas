@@ -1,6 +1,8 @@
 import { apiClient } from "@/lib/api-client";
 import type {
     PaymentMethod,
+    PendingBillsFilters,
+    PendingBillsResponse,
     ProcessTransactionClientPayload,
     Transaction,
     TransactionFilters,
@@ -83,6 +85,14 @@ export type TransactionsResponse = {
   };
 };
 
+const defaultPendingBillsSummary = {
+  total: 0,
+  overdueAmount: 0,
+  overdueCount: 0,
+  todayCount: 0,
+  upcomingCount: 0,
+};
+
 export async function fetchTransactions(filters: TransactionFilters): Promise<TransactionsResponse> {
   const response = await apiClient.get<ApiResponse<{ data: ApiTransaction[]; meta: { total: number; page: number; limit: number; totalPages: number } }>>("/transactions", {
     params: filters,
@@ -112,6 +122,36 @@ export async function fetchTransactions(filters: TransactionFilters): Promise<Tr
   return {
     data: (data ?? []).map(normalizeTransaction),
     meta,
+  };
+}
+
+export async function fetchPendingBills(filters: PendingBillsFilters = {}): Promise<PendingBillsResponse> {
+  const response = await apiClient.get<ApiResponse<any>>("/transactions/pending-bills", {
+    params: filters,
+  });
+
+  const raw = response.data as any;
+  const payload = raw?.data?.data && raw?.data?.meta ? raw.data : raw;
+
+  const dataRaw = Array.isArray(payload?.data) ? payload.data : [];
+  const meta = payload?.meta ?? {
+    total: dataRaw.length,
+    page: filters.page ?? 1,
+    limit: filters.limit ?? 15,
+    totalPages: Math.max(Math.ceil(dataRaw.length / (filters.limit ?? 15)), 1),
+  };
+  const summary = payload?.summary ?? defaultPendingBillsSummary;
+
+  return {
+    data: dataRaw.map(normalizeTransaction),
+    meta,
+    summary: {
+      total: toNumber(summary.total ?? 0),
+      overdueAmount: toNumber(summary.overdueAmount ?? 0),
+      overdueCount: Number(summary.overdueCount ?? 0),
+      todayCount: Number(summary.todayCount ?? 0),
+      upcomingCount: Number(summary.upcomingCount ?? 0),
+    },
   };
 }
 

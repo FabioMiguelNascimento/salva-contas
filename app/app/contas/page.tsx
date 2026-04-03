@@ -17,11 +17,11 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { TransactionsProvider, useTransactions } from "@/context/transactions-context";
-import { usePendingBills } from "@/hooks/use-pending-bills";
 import { formatCurrency } from "@/lib/currency-utils";
 import { cn, getTransactionCategoryLabel, parseDateOnly, toDateOnlyString } from "@/lib/utils";
-import type { Transaction } from "@/types/finance";
+import { fetchPendingBills, updateTransaction } from "@/services/transactions";
+import type { PendingBillsFilter, Transaction } from "@/types/finance";
+import { useQuery } from "@tanstack/react-query";
 import { differenceInCalendarDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { AlertTriangle, Calendar, CheckCircle2, FileText, MoreHorizontal, PencilLine, ShieldCheck } from "lucide-react";
@@ -37,8 +37,7 @@ const filterTabs = [
 ] as const;
 
 function ContasPageContent() {
-  const { pendingBills, markAsPaid, updateExistingTransaction, isLoading } = useTransactions();
-  const [activeFilter, setActiveFilter] = useState<(typeof filterTabs)[number]["value"]>("all");
+  const [activeFilter, setActiveFilter] = useState<PendingBillsFilter>("all");
   const [payDialog, setPayDialog] = useState<{ open: boolean; bill?: Transaction }>({ open: false });
   const [editSheet, setEditSheet] = useState<{ open: boolean; bill?: Transaction }>({ open: false });
   const [attachmentViewer, setAttachmentViewer] = useState<{ open: boolean; bill?: Transaction }>({ open: false });
@@ -47,7 +46,28 @@ function ContasPageContent() {
   const [amountInput, setAmountInput] = useState("");
   const [descriptionInput, setDescriptionInput] = useState("");
 
-  const { summary, filteredBills } = usePendingBills(pendingBills, activeFilter);
+  const {
+    data: pendingBillsData,
+    isLoading,
+    refetch: refetchPendingBills,
+  } = useQuery({
+    queryKey: ["pending-bills", activeFilter],
+    queryFn: () =>
+      fetchPendingBills({
+        filter: activeFilter,
+        page: 1,
+        limit: 1000,
+      }),
+  });
+
+  const summary = pendingBillsData?.summary ?? {
+    total: 0,
+    overdueAmount: 0,
+    overdueCount: 0,
+    todayCount: 0,
+    upcomingCount: 0,
+  };
+  const filteredBills = pendingBillsData?.data ?? [];
 
   const openEditSheet = (bill: Transaction) => {
     setEditSheet({ open: true, bill });
@@ -60,7 +80,11 @@ function ContasPageContent() {
     if (!payDialog.bill) return;
     try {
       setIsProcessing(true);
-      await markAsPaid(payDialog.bill.id);
+      await updateTransaction(payDialog.bill.id, {
+        status: "paid",
+        paymentDate: toDateOnlyString(new Date()),
+      });
+      await refetchPendingBills();
       setPayDialog({ open: false });
     } finally {
       setIsProcessing(false);
@@ -78,11 +102,12 @@ function ContasPageContent() {
 
     setIsProcessing(true);
     try {
-      await updateExistingTransaction(editSheet.bill.id, {
+      await updateTransaction(editSheet.bill.id, {
         description: descriptionInput,
         amount: parsedAmount,
         dueDate: toDateOnlyString(editDate),
       });
+      await refetchPendingBills();
       setEditSheet({ open: false });
     } finally {
       setIsProcessing(false);
@@ -431,10 +456,8 @@ function formatDaysRemaining(bill: Transaction) {
 
 export default function ContasPage() {
   return (
-    <TransactionsProvider>
-      <AppShell>
-        <ContasPageContent />
-      </AppShell>
-    </TransactionsProvider>
+    <AppShell>
+      <ContasPageContent />
+    </AppShell>
   );
 }
