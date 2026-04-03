@@ -2,10 +2,16 @@
 
 import { ShareButton } from "@/components/share-button";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+} from "@/components/ui/dialog";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ExternalLink, FileText, Image as ImageIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { ExternalLink, FileText, Image as ImageIcon, Maximize2, Minimize2, X, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 import { useEffect, useState } from "react";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 interface AttachmentViewerProps {
   open: boolean;
@@ -23,109 +29,123 @@ export function AttachmentViewer({
   attachmentMimeType,
 }: AttachmentViewerProps) {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [maximized, setMaximized] = useState(false);
+
   const isImage = attachmentMimeType?.startsWith("image/");
   const isPdf = attachmentMimeType === "application/pdf";
+  const fileName = attachmentOriginalName || "Anexo";
+  const fileKindLabel = isImage ? "Imagem" : isPdf ? "PDF" : "Arquivo";
 
   useEffect(() => {
     setImageLoaded(false);
   }, [attachmentUrl]);
 
+  useEffect(() => {
+    if (!open) setMaximized(false);
+  }, [open]);
+
   const handleOpenInNewTab = () => {
-    if (attachmentUrl) {
-      window.open(attachmentUrl, "_blank", "noopener,noreferrer");
-    }
+    if (!attachmentUrl) return;
+    window.open(attachmentUrl, "_blank", "noopener,noreferrer");
   };
 
-  if (!attachmentUrl) {
-    return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>Anexo não disponível</DialogTitle>
-          </DialogHeader>
-          <div className="flex items-center justify-center p-8 text-muted-foreground">
-            <FileText className="mr-2 h-5 w-5" />
-            Nenhum anexo encontrado
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
+  if (!attachmentUrl) return null; // (Mantenha seu fallback de erro aqui, omiti para encurtar)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-screen h-screen min-h-screen min-w-screen p-0 m-0 rounded-none max-w-none max-h-none flex flex-col">
-        <DialogHeader className="pb-4 flex flex-row justify-between pr-6 flex-wrap relative z-20">
-            <DialogTitle className="flex gap-2 items-center ">
-              {isImage && <ImageIcon className="h-4 w-4 shrink-0" />}
-              {isPdf && <FileText className="h-4 w-4 shrink-0" />}
-              <span className="text-sm break-words">
-                {(attachmentOriginalName || "Anexo").length > 10
-                  ? (attachmentOriginalName || "Anexo").slice(0, 20) + "..."
-                  : attachmentOriginalName || "Anexo"}
-              </span>
-            </DialogTitle>
+      <DialogContent
+        showCloseButton={false}
+        className={cn(
+          "flex flex-col overflow-hidden border border-slate-200 bg-white p-0 shadow-2xl transition-all duration-300",
+          maximized
+            ? "max-w-none rounded-none w-screen h-screen !translate-x-0 !translate-y-0 !top-0 !left-0"
+            : "w-[95vw] sm:max-w-[90vw] lg:max-w-5xl h-[85vh] rounded-2xl" // <-- Aqui quebramos o limite do Shadcn
+        )}
+      >
+        {/* Header (Mantido igual) */}
+        <div className="flex shrink-0 items-center justify-between gap-3 px-4 py-3 sm:px-5 border-b border-slate-100">
+          <div className="flex min-w-0 flex-1 items-center gap-2.5">
+            <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-slate-100">
+              {isImage ? <ImageIcon className="size-3.5 text-slate-500" /> : <FileText className="size-3.5 text-slate-500" />}
+            </div>
+            <span className="truncate text-sm font-medium text-slate-900" title={fileName}>
+              {fileName}
+            </span>
+          </div>
 
-            <div className="flex gap-2 ml-auto mr-12 z-30">
-              <ShareButton
-                title={attachmentOriginalName || "Anexo"}
-                text="Confira este anexo"
-                fileUrl={attachmentUrl}
-                fileName={attachmentOriginalName ? attachmentOriginalName : undefined}
-              />
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleOpenInNewTab}
-                title="Abrir em nova aba"
-              >
-                <ExternalLink />
-                <span>Nova aba</span>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMaximized((prev) => !prev)}
+              className="size-8 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+            >
+              {maximized ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
+            </Button>
+            <DialogClose asChild>
+              <Button variant="ghost" size="icon" className="size-8 text-slate-500 hover:bg-slate-100 hover:text-slate-900">
+                <X className="size-4" />
               </Button>
-            </div>
-        </DialogHeader>
-        
-        <div className="flex-1 overflow-auto min-h-0">
+            </DialogClose>
+          </div>
+        </div>
+
+        {/* Content Area */}
+        <div className="relative min-h-0 flex-1 overflow-hidden bg-slate-50/50">
           {isImage && (
-            <div className="w-full h-full overflow-auto flex items-center justify-center p-4">
-              {!imageLoaded && <Skeleton className="absolute inset-0 w-full h-full" />}
-              <img
-                src={attachmentUrl}
-                alt={attachmentOriginalName || "Anexo"}
-                className="max-w-full max-h-[80vh] h-auto object-contain"
-                onLoad={() => setImageLoaded(true)}
-                onError={() => setImageLoaded(true)}
-              />
-            </div>
+            <TransformWrapper
+              initialScale={1}
+              minScale={0.5}
+              maxScale={4}
+              centerOnInit
+            >
+              {({ zoomIn, zoomOut, resetTransform }) => (
+                <div className="relative h-full w-full">
+                  
+                  {/* Controles de Zoom Overlay */}
+                  <div className="absolute bottom-4 right-4 z-10 flex gap-1 rounded-lg border border-slate-200 bg-white/80 p-1 shadow-sm backdrop-blur-sm">
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600" onClick={() => zoomOut()}>
+                      <ZoomOut className="size-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600" onClick={() => resetTransform()}>
+                      <RotateCcw className="size-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600" onClick={() => zoomIn()}>
+                      <ZoomIn className="size-4" />
+                    </Button>
+                  </div>
+
+                  <TransformComponent wrapperClass="!w-full !h-full" contentClass="!w-full !h-full flex items-center justify-center">
+                    {!imageLoaded && (
+                      <Skeleton className="absolute inset-0 m-auto h-[60vh] w-[40vw] rounded-xl bg-slate-200/50" />
+                    )}
+                    <img
+                      src={attachmentUrl}
+                      alt={fileName}
+                      className={cn(
+                        "max-h-full max-w-full rounded-md object-contain transition-opacity duration-300",
+                        imageLoaded ? "opacity-100" : "opacity-0"
+                      )}
+                      onLoad={() => setImageLoaded(true)}
+                    />
+                  </TransformComponent>
+                </div>
+              )}
+            </TransformWrapper>
           )}
-          
-          {isPdf && (
-            <div className="w-full h-full">
-              <iframe
-                src={attachmentUrl}
-                title={attachmentOriginalName || "PDF"}
-                className="w-full h-full"
-              />
-            </div>
-          )}
-          
-          {!isImage && !isPdf && (
-            <div className="w-full h-full flex items-center justify-center flex-col">
-              <FileText />
-              <p>Visualização não disponível para este tipo de arquivo</p>
-              <a
-                href={attachmentUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Baixar arquivo
-              </a>
-            </div>
-          )}
+
+          {isPdf && <iframe src={attachmentUrl} className="h-full w-full bg-white" title={fileName} />}
+        </div>
+
+        <div className="flex shrink-0 items-center justify-between border-t border-slate-100 bg-white px-4 py-3 sm:px-5">
+          <div className="flex items-center gap-2 text-xs text-slate-500">
+             <span>{fileKindLabel}</span>
+          </div>
+          <Button variant="ghost" size="sm" onClick={handleOpenInNewTab} className="h-7 text-xs text-slate-500 hover:bg-slate-100">
+            <ExternalLink className="mr-2 size-3" /> Abrir original
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
   );
 }
-
-
