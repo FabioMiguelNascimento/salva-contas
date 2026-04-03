@@ -49,20 +49,19 @@ export function AttachmentViewer({
     window.open(attachmentUrl, "_blank", "noopener,noreferrer");
   };
 
-  if (!attachmentUrl) return null; // (Mantenha seu fallback de erro aqui, omiti para encurtar)
+  if (!attachmentUrl) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
         showCloseButton={false}
         className={cn(
-          "flex flex-col overflow-hidden border border-slate-200 bg-white p-0 shadow-2xl transition-all duration-300",
+          "flex flex-col overflow-hidden bg-white p-0 shadow-2xl transition-all duration-200",
           maximized
-            ? "max-w-none rounded-none w-screen h-screen !translate-x-0 !translate-y-0 !top-0 !left-0"
-            : "w-[95vw] sm:max-w-[90vw] lg:max-w-5xl h-[85vh] rounded-2xl" // <-- Aqui quebramos o limite do Shadcn
+            ? "w-[100vw] h-[100dvh] !max-w-[100vw] rounded-none border-0" 
+            : "w-[95vw] sm:!max-w-[90vw] lg:!max-w-5xl h-[85vh] rounded-2xl border border-slate-200"
         )}
       >
-        {/* Header (Mantido igual) */}
         <div className="flex shrink-0 items-center justify-between gap-3 px-4 py-3 sm:px-5 border-b border-slate-100">
           <div className="flex min-w-0 flex-1 items-center gap-2.5">
             <div className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-slate-100">
@@ -90,7 +89,6 @@ export function AttachmentViewer({
           </div>
         </div>
 
-        {/* Content Area */}
         <div className="relative min-h-0 flex-1 overflow-hidden bg-slate-50/50">
           {isImage && (
             <TransformWrapper
@@ -102,7 +100,6 @@ export function AttachmentViewer({
               {({ zoomIn, zoomOut, resetTransform }) => (
                 <div className="relative h-full w-full">
                   
-                  {/* Controles de Zoom Overlay */}
                   <div className="absolute bottom-4 right-4 z-10 flex gap-1 rounded-lg border border-slate-200 bg-white/80 p-1 shadow-sm backdrop-blur-sm">
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-600" onClick={() => zoomOut()}>
                       <ZoomOut className="size-4" />
@@ -138,9 +135,6 @@ export function AttachmentViewer({
         </div>
 
         <div className="flex shrink-0 items-center justify-between border-t border-slate-100 bg-white px-4 py-3 sm:px-5">
-          <div className="flex items-center gap-2 text-xs text-slate-500">
-             <span>{fileKindLabel}</span>
-          </div>
           <Button variant="ghost" size="sm" onClick={handleOpenInNewTab} className="h-7 text-xs text-slate-500 hover:bg-slate-100">
             <ExternalLink className="mr-2 size-3" /> Abrir original
           </Button>
