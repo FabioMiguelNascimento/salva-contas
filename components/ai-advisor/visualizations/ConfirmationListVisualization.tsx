@@ -74,10 +74,17 @@ export default function ConfirmationListVisualization({
     category?: string;
     createdByName?: string | null;
   }>;
+  const proposedTransactions = Array.isArray(payload.proposedTransactions)
+    ? (payload.proposedTransactions as Array<Record<string, any>>)
+    : [];
 
   const [deselectedIndices, setDeselectedIndices] = useState<Set<number>>(new Set());
 
   const selectedItems = allItems.filter((_, idx) => !deselectedIndices.has(idx));
+  const selectedTransactions =
+    proposedTransactions.length === allItems.length
+      ? proposedTransactions.filter((_, idx) => !deselectedIndices.has(idx))
+      : selectedItems;
   const total = selectedItems.reduce((sum, item) => sum + parseAmount(item.amount), 0);
 
   return (
@@ -172,7 +179,13 @@ export default function ConfirmationListVisualization({
         })}
       </div>
 
-      {requiresConfirmation && renderConfirmationActions(status, onConfirm, onCancel, selectedItems)}
+      {requiresConfirmation &&
+        renderConfirmationActions(
+          status,
+          onConfirm,
+          onCancel,
+          selectedTransactions,
+        )}
     </div>
   );
 }

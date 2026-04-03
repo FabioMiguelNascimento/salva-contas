@@ -31,6 +31,10 @@ export default function AiAdvisorVisualizationRenderer({
   const requiresConfirmation = Boolean((payload as any).requiresConfirmation);
 
   const buildConfirmPayload = () => {
+    if (payload && typeof payload === 'object' && Array.isArray((payload as any).proposedTransactions)) {
+      return (payload as any).proposedTransactions;
+    }
+
     if (payload && typeof payload === 'object') {
       const { requiresConfirmation: _requiresConfirmation, proposedTransactions: _proposedTransactions, ...rest } = payload as any;
       return [rest];
