@@ -20,6 +20,14 @@ export function formatDate(value?: string | Date | null, defaultValue = "—"): 
   if (!value) return defaultValue;
 
   try {
+    if (typeof value === "string") {
+      const datePrefixMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})(?:$|T)/);
+      if (datePrefixMatch) {
+        const [, year, month, day] = datePrefixMatch;
+        return `${day}/${month}/${year}`;
+      }
+    }
+
     let date: Date;
     if (typeof value === "string") {
       const parsed = parseISO(value);
