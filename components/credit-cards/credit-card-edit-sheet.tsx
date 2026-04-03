@@ -81,16 +81,16 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Editar cart�o de cr�dito</SheetTitle>
+          <SheetTitle>Editar cartão de crédito</SheetTitle>
           <SheetDescription>
-            Atualize as informa��es do seu cart�o.
+            Atualize as informações do seu cartão.
           </SheetDescription>
         </SheetHeader>
 
         <form id="edit-card-form" onSubmit={handleSubmit} className="flex flex-1 flex-col">
           <SheetBody className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-name">Nome do cart�o</Label>
+              <Label htmlFor="edit-name">Nome do cartão</Label>
               <Input
                 id="edit-name"
                 placeholder="Ex: Nubank, Itau Platinum"
@@ -120,7 +120,7 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="edit-lastFourDigits">Ultimos 4 digitos</Label>
+                <Label htmlFor="edit-lastFourDigits">Últimos 4 dígitos</Label>
                 <Input
                   id="edit-lastFourDigits"
                   placeholder="1234"
@@ -129,10 +129,10 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
                   onChange={(e) => setLastFourDigits(e.target.value.replace(/\D/g, ""))}
                 />
               </div>
-            </div>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="edit-limit">Limite do cart�o</Label>
+              <div className="space-y-2">
+              <Label htmlFor="edit-limit">Limite do cartão</Label>
               <Input
                 id="edit-limit"
                 placeholder="5000.00"
@@ -140,7 +140,7 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
                 onChange={(e) => setLimit(e.target.value)}
                 required
               />
-            </div>
+              </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
@@ -193,7 +193,7 @@ export function CreditCardEditSheet({ card, open, onOpenChange }: CreditCardEdit
               Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting} className="flex-1">
-              {isSubmitting ? "Salvando..." : "Salvar alteracoes"}
+              {isSubmitting ? "Salvando..." : "Salvar alterações"}
             </Button>
           </SheetFooter>
         </form>

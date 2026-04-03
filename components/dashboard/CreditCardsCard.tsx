@@ -24,8 +24,8 @@ export default function CreditCardsCard({ activeCards, totalCreditLimit, totalCr
     <Card>
       <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          <CardTitle className="text-base">Cart�es de Cr�dito</CardTitle>
-          <InfoPopover content="Aqui voc� pode ver o resumo dos seus cart�es de cr�dito ativos, incluindo o limite total dispon�vel, quanto j� foi utilizado e o percentual de uso. Cada cart�o mostra seu limite individual e bandeira." />
+          <CardTitle className="text-base">Cartões de Crédito</CardTitle>
+          <InfoPopover content="Aqui você pode ver o resumo dos seus cartões de crédito ativos, incluindo o limite total disponível, quanto já foi utilizado e o percentual de uso. Cada cartão mostra seu limite individual e bandeira." />
         </div>
         <Button variant="ghost" size="sm" className="self-start sm:self-auto" asChild>
           <Link href="/app/cartoes">Ver todos</Link>
@@ -36,7 +36,7 @@ export default function CreditCardsCard({ activeCards, totalCreditLimit, totalCr
           <Skeleton className="h-32 w-full" />
         ) : activeCards.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-6 text-center">
-            <p className="text-sm text-muted-foreground">Nenhum cart�o cadastrado</p>
+            <p className="text-sm text-muted-foreground">Nenhum cartão cadastrado</p>
           </div>
         ) : (
           <div className="space-y-4 p-4 sm:p-6">

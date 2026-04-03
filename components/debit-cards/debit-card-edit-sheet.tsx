@@ -72,19 +72,19 @@ export function DebitCardEditSheet({ card, open, onOpenChange }: DebitCardEditSh
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Editar cart�o de d�bito</SheetTitle>
+          <SheetTitle>Editar cartão de débito</SheetTitle>
           <SheetDescription>
-            Atualize as informa��es do seu cart�o de d�bito.
+            Atualize as informações do seu cartão de débito.
           </SheetDescription>
         </SheetHeader>
 
         <form id="edit-debit-card-form" onSubmit={handleSubmit} className="flex flex-1 flex-col">
           <SheetBody className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-debit-name">Nome do cart�o</Label>
+              <Label htmlFor="edit-debit-name">Nome do cartão</Label>
               <Input
                 id="edit-debit-name"
-                placeholder="Ex: Itau D�bito"
+                placeholder="Ex: Itaú Débito"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -112,7 +112,7 @@ export function DebitCardEditSheet({ card, open, onOpenChange }: DebitCardEditSh
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="edit-debit-lastFourDigits">Ultimos 4 digitos</Label>
+                <Label htmlFor="edit-debit-lastFourDigits">Últimos 4 dígitos</Label>
                 <Input
                   id="edit-debit-lastFourDigits"
                   placeholder="1234"
@@ -145,7 +145,7 @@ export function DebitCardEditSheet({ card, open, onOpenChange }: DebitCardEditSh
               Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting} className="flex-1">
-              {isSubmitting ? 'Salvando...' : 'Salvar alteracoes'}
+              {isSubmitting ? 'Salvando...' : 'Salvar alterações'}
             </Button>
           </SheetFooter>
         </form>

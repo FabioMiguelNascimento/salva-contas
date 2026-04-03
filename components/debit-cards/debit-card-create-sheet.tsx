@@ -66,24 +66,24 @@ export function DebitCardCreateSheet() {
       <SheetTrigger asChild>
         <Button variant="outline">
           <PlusCircle className="mr-2 h-4 w-4" />
-          Novo D�bito
+          Novo Débito
         </Button>
-      </SheetTrigger>
-      <SheetContent className="flex flex-col overflow-y-auto">
+        </SheetTrigger>
+        <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Novo cart�o de d�bito</SheetTitle>
+          <SheetTitle>Novo cartão de débito</SheetTitle>
           <SheetDescription>
-            Adicione seu cart�o de d�bito para organizar melhor seus meios de pagamento.
+            Adicione seu cartão de débito para organizar melhor seus meios de pagamento.
           </SheetDescription>
         </SheetHeader>
 
         <form id="create-debit-card-form" onSubmit={handleSubmit} className="flex flex-1 flex-col">
           <SheetBody className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="debit-name">Nome do cart�o</Label>
+              <Label htmlFor="debit-name">Nome do cartão</Label>
               <Input
                 id="debit-name"
-                placeholder="Ex: Itau D�bito, Inter"
+                placeholder="Ex: Itaú Débito, Inter"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -111,7 +111,7 @@ export function DebitCardCreateSheet() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="debit-lastFourDigits">Ultimos 4 digitos</Label>
+                <Label htmlFor="debit-lastFourDigits">Últimos 4 dígitos</Label>
                 <Input
                   id="debit-lastFourDigits"
                   placeholder="1234"
@@ -129,7 +129,7 @@ export function DebitCardCreateSheet() {
               Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting} className="flex-1">
-              {isSubmitting ? 'Criando...' : 'Criar cart�o'}
+              {isSubmitting ? 'Criando...' : 'Criar cartão'}
             </Button>
           </SheetFooter>
         </form>

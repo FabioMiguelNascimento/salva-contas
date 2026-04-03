@@ -27,11 +27,11 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
     <Table className="min-w-[1100px]">
       <TableHeader>
         <TableRow>
-          <TableHead>Descri��o</TableHead>
+          <TableHead>Descrição</TableHead>
           <TableHead>Valor</TableHead>
           <TableHead>Vencimento</TableHead>
           <TableHead>Categoria</TableHead>
-          <TableHead>Cart�o</TableHead>
+          <TableHead>Cartão</TableHead>
           <TableHead>Frequencia</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="w-12" />
@@ -44,14 +44,14 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
               <div className="min-w-0">
                 <p className="truncate font-semibold">{subscription.description}</p>
                 <p className="truncate text-xs text-muted-foreground">
-                  {subscription.createdAt ? `Criado em ${dateFormatter.format(new Date(subscription.createdAt))}` : "�"}
+                  {subscription.createdAt ? `Criado em ${dateFormatter.format(new Date(subscription.createdAt))}` : "—"}
                 </p>
-              </div>
-            </TableCell>
-            <TableCell>{formatCurrency(subscription.amount)}</TableCell>
-            <TableCell className="text-muted-foreground">{getScheduleLabel(subscription)}</TableCell>
-            <TableCell>
-              {subscription.category ? (
+                </div>
+                </TableCell>
+                <TableCell>{formatCurrency(subscription.amount)}</TableCell>
+                <TableCell className="text-muted-foreground">{getScheduleLabel(subscription)}</TableCell>
+                <TableCell>
+                {subscription.category ? (
                 <div className="flex items-center gap-2 min-w-0">
                   <DynamicIcon
                     name={subscription.category.icon ?? "tag"}
@@ -59,20 +59,20 @@ export function SubscriptionTable({ subscriptions, onEdit, onDelete }: Subscript
                   />
                   <span className="truncate">{subscription.category.name}</span>
                 </div>
-              ) : (
-                <span className="text-xs text-muted-foreground">�</span>
-              )}
-            </TableCell>
-            <TableCell>
-              {subscription.creditCard ? (
+                ) : (
+                <span className="text-xs text-muted-foreground">—</span>
+                )}
+                </TableCell>
+                <TableCell>
+                {subscription.creditCard ? (
                 <div className="flex items-center gap-2">
                   <FlagIcon flag={subscription.creditCard.flag} className="h-5 w-auto" />
                   <span className="text-xs text-muted-foreground">{subscription.creditCard.name}</span>
                 </div>
-              ) : (
-                <span className="text-xs text-muted-foreground">�</span>
-              )}
-            </TableCell>
+                ) : (
+                <span className="text-xs text-muted-foreground">—</span>
+                )}
+                </TableCell>
             <TableCell>
               <Badge variant="outline" className="text-xs">
                 {getFrequencyLabel(subscription.frequency)}

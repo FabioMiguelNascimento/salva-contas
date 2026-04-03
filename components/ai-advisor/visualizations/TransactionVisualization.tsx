@@ -38,7 +38,7 @@ function renderConfirmationActions(
   if (status === "cancelled") {
     return (
       <div className="mt-3 rounded-md border border-rose-200 bg-rose-50 p-2 text-sm text-rose-700">
-        Transa��o cancelada. A a��o n�o ser� realizada.
+        Transação cancelada. A ação não será realizada.
       </div>
     );
   }
@@ -122,10 +122,10 @@ export default function TransactionVisualization({
   const paymentMethods = transaction.paymentMethods ?? [];
   const hasMultipleMethods = paymentMethods.length > 1;
   const isUpdateTransaction = visualization.toolName === "update_transaction";
-  const confirmLabel = isUpdateTransaction ? "Confirmar Altera��o" : "Confirmar";
+  const confirmLabel = isUpdateTransaction ? "Confirmar Alteração" : "Confirmar";
   const confirmedLabel = isUpdateTransaction
-    ? "Altera��o confirmada com sucesso."
-    : "Transa��o confirmada com sucesso.";
+    ? "Alteração confirmada com sucesso."
+    : "Transação confirmada com sucesso.";
 
   return (
     <div className="mt-3 w-full min-w-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -147,23 +147,23 @@ export default function TransactionVisualization({
                 {formatCurrencyFn(transaction.amount)}
               </p>
               <p className="text-sm text-white/80">
-                {transaction.description ?? "Sem descri��o"}
+                {transaction.description ?? "Sem descrição"}
               </p>
-            </div>
-          </div>
+              </div>
+              </div>
 
-          <div className="flex flex-col items-end gap-1">
-            <span className="shrink-0 rounded-full border border-white/30 bg-white/20 px-3 py-1 text-xs font-semibold text-white">
+              <div className="flex flex-col items-end gap-1">
+              <span className="shrink-0 rounded-full border border-white/30 bg-white/20 px-3 py-1 text-xs font-semibold text-white">
               {formatStatusLabel(transaction.status)}
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-xs text-white">
+              </span>
+              <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-xs text-white">
               {transaction.type === "expense" ? (
                 <ArrowDown className="h-4 w-4" />
               ) : (
                 <ArrowUp className="h-4 w-4" />
               )}
-              {transaction.type === "expense" ? "Saida" : "Entrada"}
-            </span>
+              {transaction.type === "expense" ? "Saída" : "Entrada"}
+              </span>
           </div>
         </div>
       </div>
@@ -174,7 +174,7 @@ export default function TransactionVisualization({
             <p className="mb-1 text-[11px] text-slate-400">Data de pagamento</p>
             <div className="flex items-center gap-1.5">
               <span className="text-[13px] font-medium text-slate-800">
-                {formatDate(transaction.paymentDate) ?? "�"}
+                {formatDate(transaction.paymentDate) ?? "—"}
               </span>
             </div>
           </div>
@@ -183,7 +183,7 @@ export default function TransactionVisualization({
             <p className="mb-1 text-[11px] text-slate-400">Criado em</p>
             <div className="flex items-center gap-1.5">
               <span className="text-[13px] font-medium text-slate-800">
-                {formatDate(transaction.createdAt) ?? "�"}
+                {formatDate(transaction.createdAt) ?? "—"}
               </span>
             </div>
           </div>
@@ -242,7 +242,7 @@ export default function TransactionVisualization({
                         </p>
                         {(method.creditCard?.lastFourDigits || method.debitCard?.lastFourDigits || matchingSplit?.creditCard?.lastFourDigits || matchingSplit?.debitCard?.lastFourDigits) && (
                           <p className="text-[11px] text-slate-400">
-                            {`���� ${
+                            {`**** ${
                               method.creditCard?.lastFourDigits ||
                               method.debitCard?.lastFourDigits ||
                               matchingSplit?.creditCard?.lastFourDigits ||

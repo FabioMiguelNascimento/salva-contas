@@ -32,7 +32,7 @@ interface CreditCardSelectProps {
 export function CreditCardSelect({
   value,
   onValueChange,
-  placeholder = "Selecione um cart�o",
+  placeholder = "Selecione um cartão",
   disabled = false,
   allowClear = true,
 }: CreditCardSelectProps) {
@@ -84,12 +84,12 @@ export function CreditCardSelect({
         onWheel={(e) => e.stopPropagation()}
       >
         <Command>
-          <CommandInput placeholder="Buscar cart�o..." />
+          <CommandInput placeholder="Buscar cartão..." />
           <CommandList
             className="max-h-48 overflow-y-auto"
             onWheel={(e) => e.stopPropagation()}
           >
-            <CommandEmpty>Nenhum cart�o encontrado.</CommandEmpty>
+            <CommandEmpty>Nenhum cartão encontrado.</CommandEmpty>
             <CommandGroup>
               {allowClear && (
                 <CommandItem
@@ -101,7 +101,7 @@ export function CreditCardSelect({
                   className="flex items-center gap-2 text-muted-foreground"
                 >
                   <CreditCard className="h-4 w-4" />
-                  <span className="flex-1">Nenhum (n�o usar cart�o)</span>
+                  <span className="flex-1">Nenhum (não usar cartão)</span>
                   <Check
                     className={cn(
                       "h-4 w-4 shrink-0",

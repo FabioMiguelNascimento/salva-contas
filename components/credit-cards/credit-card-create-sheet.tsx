@@ -75,21 +75,21 @@ export function CreditCardCreateSheet() {
       <SheetTrigger asChild>
         <Button>
           <PlusCircle className="mr-2 h-4 w-4" />
-          Novo Cart�o
+          Novo Cartão
         </Button>
       </SheetTrigger>
       <SheetContent className="flex flex-col overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>Novo cart�o de cr�dito</SheetTitle>
+          <SheetTitle>Novo cartão de crédito</SheetTitle>
           <SheetDescription>
-            Adicione um novo cart�o para acompanhar seus gastos e limites.
+            Adicione um novo cartão para acompanhar seus gastos e limites.
           </SheetDescription>
         </SheetHeader>
 
         <form id="create-card-form" onSubmit={handleSubmit} className="flex flex-1 flex-col">
           <SheetBody className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Nome do cart�o</Label>
+              <Label htmlFor="name">Nome do cartão</Label>
               <Input
                 id="name"
                 placeholder="Ex: Nubank, Itau Platinum"
@@ -119,7 +119,7 @@ export function CreditCardCreateSheet() {
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="lastFourDigits">Ultimos 4 digitos</Label>
+                <Label htmlFor="lastFourDigits">Últimos 4 dígitos</Label>
                 <Input
                   id="lastFourDigits"
                   placeholder="1234"
@@ -129,10 +129,10 @@ export function CreditCardCreateSheet() {
                   onChange={(e) => setLastFourDigits(e.target.value.replace(/\D/g, ""))}
                 />
               </div>
-            </div>
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="limit">Limite do cart�o</Label>
+              <div className="space-y-2">
+              <Label htmlFor="limit">Limite do cartão</Label>
               <Input
                 id="limit"
                 placeholder="5000.00"
@@ -140,7 +140,7 @@ export function CreditCardCreateSheet() {
                 onChange={(e) => setLimit(e.target.value)}
                 required
               />
-            </div>
+              </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
@@ -177,7 +177,7 @@ export function CreditCardCreateSheet() {
               Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting} className="flex-1">
-              {isSubmitting ? "Criando..." : "Criar cart�o"}
+              {isSubmitting ? "Criando..." : "Criar cartão"}
             </Button>
           </SheetFooter>
         </form>

@@ -86,11 +86,11 @@ export function CreditCardListCard({ card, onEdit, onDelete }: CreditCardListCar
       <div className="mt-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-xs text-white/60">Fecha dia {card.closingDay}</span>
-          <span className="text-xs text-white/40">�</span>
+          <span className="text-xs text-white/40">•</span>
           <span className="text-xs text-white/60">Vence dia {card.dueDay}</span>
         </div>
         <span className="text-xs font-medium text-white/80 bg-white/10 px-2 py-0.5 rounded-full">
-          {usedPercentage > 80 ? "Alta utiliza��o" : usedPercentage > 50 ? "Moderado" : "Dispon�vel"}
+          {usedPercentage > 80 ? "Alta utilização" : usedPercentage > 50 ? "Moderado" : "Disponível"}
         </span>
       </div>
     </div>

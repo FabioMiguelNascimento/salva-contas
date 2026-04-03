@@ -26,7 +26,7 @@ export function CreditCardTable({ creditCards, onEdit, onDelete }: CreditCardTab
   if (creditCards.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">
-        Nenhum cart�o de cr�dito encontrado.
+        Nenhum cartão de crédito encontrado.
       </div>
     );
   }
@@ -35,10 +35,10 @@ export function CreditCardTable({ creditCards, onEdit, onDelete }: CreditCardTab
     <Table className="min-w-[920px]">
       <TableHeader>
         <TableRow>
-          <TableHead>Cart�o</TableHead>
+          <TableHead>Cartão</TableHead>
           <TableHead>Bandeira</TableHead>
           <TableHead className="text-right">Limite</TableHead>
-          <TableHead className="text-right">Dispon�vel</TableHead>
+          <TableHead className="text-right">Disponível</TableHead>
           <TableHead>Fechamento</TableHead>
           <TableHead>Vencimento</TableHead>
           <TableHead>Status</TableHead>
