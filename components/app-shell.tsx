@@ -2,13 +2,14 @@
 
 import { useAuth } from "@/contexts/auth-context";
 import { TopbarActionProvider, useTopbarAction } from "@/contexts/topbar-action-context";
+import { TopbarRefreshProvider, useTopbarRefresh } from "@/contexts/topbar-refresh-context";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import {
-    SidebarProvider,
-    SidebarTrigger,
-    useSidebar
+  SidebarProvider,
+  SidebarTrigger,
+  useSidebar
 } from "@/components/ui/sidebar";
 
 import { useFinancePeriod } from "@/context/finance-period-context";
@@ -31,9 +32,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <SidebarProvider>
       <TopbarActionProvider>
-        <AppShellContent>
-          {children}
-        </AppShellContent>
+        <TopbarRefreshProvider>
+          <AppShellContent>
+            {children}
+          </AppShellContent>
+        </TopbarRefreshProvider>
       </TopbarActionProvider>
     </SidebarProvider>
   );
@@ -41,10 +44,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
 function AppShellContent({ children }: { children: React.ReactNode }) {
   const { actionNode } = useTopbarAction();
+  const { refresh: refreshOverride } = useTopbarRefresh();
   const { toggleSidebar } = useSidebar();
   const { user, logout } = useAuth();
   
   const { pendingBillsCount, isSyncing, refresh } = useFinancePeriod();
+  const topbarRefresh = refreshOverride ?? refresh;
   
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [settingsSelectedTab, setSettingsSelectedTab] = useState<string>('profile');
@@ -61,7 +66,7 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
       <Topbar
         userName={user?.name}
         pendingBillsCount={pendingBillsCount}
-        refresh={refresh}
+        refresh={topbarRefresh}
         isSyncing={isSyncing}
         actionNode={actionNode}
         showNewTransaction={false}

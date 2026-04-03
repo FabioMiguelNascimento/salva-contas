@@ -1,35 +1,34 @@
 "use client";
 
 import { Filter } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { AppShell } from "@/components/app-shell";
 import { AttachmentViewer } from "@/components/attachment-viewer";
 import { NewTransactionDialog } from "@/components/new-transaction-sheet";
 import { PageHeader } from "@/components/page-header";
-import { useFinancePeriod } from "@/context/finance-period-context";
-import { TransactionsProvider, useTransactions } from "@/context/transactions-context";
-import { TopbarAction } from "@/contexts/topbar-action-context";
-
 import { DeleteTransactionDialog } from "@/components/transactions/DeleteTransactionDialog";
 import { EditTransactionSheet } from "@/components/transactions/EditTransactionSheet";
 import { FilterBar } from "@/components/transactions/FilterBar";
 import { PaginationControls } from "@/components/transactions/PaginationControls";
 import { TransactionCard } from "@/components/transactions/TransactionCard";
 import { TransactionTable } from "@/components/transactions/TransactionTable";
-
-import { useTransactionEditor } from "@/hooks/use-transaction-editor";
-import { useTransactionFilters } from "@/hooks/use-transaction-filters";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-
-
 import { CardsProvider } from "@/context/cards-context";
+import { useFinancePeriod } from "@/context/finance-period-context";
+import { TransactionsProvider, useTransactions } from "@/context/transactions-context";
+import { TopbarAction } from "@/contexts/topbar-action-context";
+import { TopbarRefresh } from "@/contexts/topbar-refresh-context";
+import { useTransactionEditor } from "@/hooks/use-transaction-editor";
+import { useTransactionFilters } from "@/hooks/use-transaction-filters";
 import type { Transaction } from "@/types/finance";
+import { useQueryClient } from "@tanstack/react-query";
 
 function ExtratoPageContent() {
+  const queryClient = useQueryClient();
+
   const {
     transactions: serverTransactions,
     isLoading,
@@ -42,7 +41,6 @@ function ExtratoPageContent() {
   } = useTransactions();
 
   const { filters, setFilters } = useFinancePeriod();
-
   const {
     filters: urlFilters,
     setType,
@@ -57,7 +55,7 @@ function ExtratoPageContent() {
   const [attachmentViewer, setAttachmentViewer] = useState<{ open: boolean; transaction?: Transaction }>({ open: false });
   const [isProcessing, setIsProcessing] = useState(false);
 
-  useEffect(() => {
+  const syncTransactionsQuery = useCallback(() => {
     void refresh(urlFilters.page, {
       query: urlFilters.search || undefined,
       type: urlFilters.type !== "all" ? (urlFilters.type as "expense" | "income") : undefined,
@@ -68,8 +66,15 @@ function ExtratoPageContent() {
       startDate: undefined,
       endDate: undefined,
     });
-  }, [refresh, urlFilters.page, urlFilters.search, urlFilters.type, urlFilters.status, urlFilters.categoryId, filters.month, filters.year]);
+  }, [filters.month, filters.year, refresh, urlFilters.categoryId, urlFilters.page, urlFilters.search, urlFilters.status, urlFilters.type]);
 
+  const refreshTransactions = useCallback(() => {
+    void queryClient.invalidateQueries({ queryKey: ["transactions"] });
+  }, [queryClient]);
+
+  useEffect(() => {
+    syncTransactionsQuery();
+  }, [syncTransactionsQuery]);
 
   const handleDelete = async () => {
     if (!deleteDialog.transaction) return;
@@ -87,6 +92,8 @@ function ExtratoPageContent() {
       <TopbarAction>
         <NewTransactionDialog trigger={<Button>Nova Transação</Button>} />
       </TopbarAction>
+
+      <TopbarRefresh refresh={refreshTransactions} />
 
       <PageHeader
         tag="Histórico"
@@ -109,8 +116,8 @@ function ExtratoPageContent() {
             categories={categories}
             isSearching={isSyncing}
             onSearchChange={setSearch}
-            onMonthChange={(v) => setFilters({ ...filters, month: v })}
-            onYearChange={(v) => setFilters({ ...filters, year: v })}
+            onMonthChange={(value) => setFilters({ ...filters, month: value })}
+            onYearChange={(value) => setFilters({ ...filters, year: value })}
             onCategoryChange={setCategory}
             onTypeChange={setType}
             onStatusChange={setStatus}
@@ -122,30 +129,32 @@ function ExtratoPageContent() {
               transactions={serverTransactions}
               isLoading={isLoading}
               onEdit={editor.openEditor}
-              onDelete={(tx) => setDeleteDialog({ open: true, transaction: tx })}
-              onViewAttachment={(tx) => setAttachmentViewer({ open: true, transaction: tx })}
+              onDelete={(transaction) => setDeleteDialog({ open: true, transaction })}
+              onViewAttachment={(transaction) => setAttachmentViewer({ open: true, transaction })}
             />
           </div>
 
           <div className="flex flex-col gap-3 md:hidden">
             {isLoading ? (
-              Array.from({ length: 4 }).map((_, idx) => (
-                <Skeleton key={idx} className="h-28 w-full rounded-2xl" />
+              Array.from({ length: 4 }).map((_, index) => (
+                <Skeleton key={index} className="h-28 w-full rounded-2xl" />
               ))
             ) : serverTransactions.length ? (
-              serverTransactions.map((tx) => (
+              serverTransactions.map((transaction) => (
                 <TransactionCard
-                  key={tx.id}
-                  transaction={tx}
+                  key={transaction.id}
+                  transaction={transaction}
                   onEdit={editor.openEditor}
-                  onDelete={() => setDeleteDialog({ open: true, transaction: tx })}
+                  onDelete={() => setDeleteDialog({ open: true, transaction })}
                   onViewAttachment={
-                    tx.attachmentUrl ? () => setAttachmentViewer({ open: true, transaction: tx }) : undefined
+                    transaction.attachmentUrl
+                      ? () => setAttachmentViewer({ open: true, transaction })
+                      : undefined
                   }
                   isLoading={false}
                 />
               ))
-            ) : ( 
+            ) : (
               <div className="rounded-2xl border border-dashed border-border/60 p-6 text-center text-sm text-muted-foreground">
                 Nenhuma transação encontrada.
               </div>
@@ -216,7 +225,7 @@ function ExtratoPageContent() {
 export default function ExtratoPage() {
   return (
     <TransactionsProvider>
-      <CardsProvider >
+      <CardsProvider>
         <AppShell>
           <ExtratoPageContent />
         </AppShell>
