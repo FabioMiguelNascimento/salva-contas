@@ -13,6 +13,7 @@ import { cn, getTransactionCategoryLabel } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
 import { FileText, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { DynamicIcon } from "../dynamic-icon";
 
 interface Props {
     transaction: Transaction;
@@ -100,7 +101,9 @@ export function TransactionCard({
         </DropdownMenu>
       </div>
       <div className="mt-3 flex items-center justify-between text-sm">
-        <Badge variant="outline">{getTransactionCategoryLabel(transaction)}</Badge>
+        <Badge variant="outline">
+          <DynamicIcon name={transaction.categoryRel?.icon!} className="mr-1 h-3 w-3" />
+          {getTransactionCategoryLabel(transaction)}</Badge>
         <div className="flex items-center gap-2">
           <Badge
             className={cn(
