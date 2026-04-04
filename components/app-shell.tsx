@@ -92,8 +92,8 @@ function AppShellContent({ children }: { children: React.ReactNode }) {
           onOpenChange={setAiAdvisorOpen}
         />
 
-        <div className="flex-1 min-w-0 lg:pt-16 w-full">
-          <header className="flex items-center gap-3 border-b bg-card px-4 py-3 shadow-sm lg:hidden">
+        <div className="flex-1 min-w-0 w-full pt-14 lg:pt-16">
+          <header className="fixed right-0 left-0 top-0 z-40 flex h-14 items-center gap-3 border-b bg-card px-4 shadow-sm lg:hidden">
             <SidebarTrigger />
             <div className="ml-auto flex items-center gap-2">
               <NotificationsDropdown />
