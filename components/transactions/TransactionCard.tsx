@@ -1,19 +1,9 @@
 ﻿import { CardFlagStack } from "@/components/transactions/CardFlagStack";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { formatCurrency } from "@/lib/currency-utils";
-import { formatDate } from "@/lib/date-utils";
+import { formatDateWithoutYear } from "@/lib/date-utils";
 import { cn, getTransactionCategoryLabel } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
-import { FileText, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { DynamicIcon } from "../dynamic-icon";
 
 interface Props {
     transaction: Transaction;
@@ -26,8 +16,6 @@ interface Props {
 export function TransactionCard({
   transaction,
   onEdit,
-  onDelete,
-  onViewAttachment,
   isLoading,
 }: Props) {
   const copyTransactionId = async () => {
@@ -44,87 +32,57 @@ export function TransactionCard({
   }
 
   const displayDate = transaction.paymentDate
-    ? formatDate(transaction.paymentDate)
+    ? formatDateWithoutYear(transaction.paymentDate)
     : transaction.dueDate
-    ? `${formatDate(transaction.dueDate)}`
+    ? formatDateWithoutYear(transaction.dueDate)
     : "—";
 
+  const handleOpenEdit = () => {
+    onEdit(transaction);
+  };
+
   return (
-    <div className="rounded-2xl border border-border/60 p-4">
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex-1">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={handleOpenEdit}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          handleOpenEdit();
+        }
+      }}
+      className="border-b border-border/40 px-0 py-3.5 text-left transition-colors last:border-b-0 hover:bg-muted/20 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+    >
+      <div className="flex items-start justify-between gap-4">
+        <div className="min-w-0 flex-1">
           <button
             type="button"
-            onClick={copyTransactionId}
-            className="font-semibold text-left hover:underline decoration-dotted"
+            onClick={(event) => {
+              event.stopPropagation();
+              copyTransactionId();
+            }}
+            className="block w-full truncate text-left text-[15px] font-medium leading-6 hover:underline decoration-dotted"
             title="Clique para copiar o ID da transação"
           >
             {transaction.description}
           </button>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span>{displayDate}</span>
-            {transaction.createdByName ? (
-              <>
-                <span>•</span>
-                <span>Criado por {transaction.createdByName}</span>
-              </>
-            ) : null}
-            <span>•</span>
-            <CardFlagStack transaction={transaction} />          </div>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Abrir menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            {transaction.attachmentUrl && onViewAttachment && (
-              <DropdownMenuItem onClick={() => onViewAttachment(transaction)}>
-                <FileText className="mr-2 h-4 w-4" />
-                Ver anexo
-              </DropdownMenuItem>
-            )}
-            <DropdownMenuItem onClick={() => onEdit(transaction)}>
-              <Pencil className="mr-2 h-4 w-4" />
-              Editar
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => onDelete(transaction)}
-              className="text-destructive focus:text-destructive"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Excluir
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <span
+          className={cn(
+            "shrink-0 text-right text-[15px] font-semibold tracking-tight",
+            transaction.type === "income" ? "text-emerald-500" : "text-slate-900"
+          )}
+        >
+          {transaction.type === "income" ? "+" : "-"}
+          {formatCurrency(transaction.amount)}
+        </span>
       </div>
-      <div className="mt-3 flex items-center justify-between text-sm">
-        <Badge variant="outline">
-          <DynamicIcon name={transaction.categoryRel?.icon!} className="mr-1 h-3 w-3" />
-          {getTransactionCategoryLabel(transaction)}</Badge>
-        <div className="flex items-center gap-2">
-          <Badge
-            className={cn(
-              "text-xs",
-              transaction.type === "income"
-                ? "bg-emerald-100 text-emerald-900"
-                : "bg-destructive/15 text-destructive"
-            )}
-          >
-            {transaction.type === "income" ? "Receita" : "Despesa"}
-          </Badge>
-          <span
-            className={cn(
-              "font-semibold",
-              transaction.type === "income" ? "text-emerald-600" : "text-destructive"
-            )}
-          >
-            {transaction.type === "income" ? "+" : "-"}
-            {formatCurrency(transaction.amount)}
-          </span>
-        </div>
+
+      <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-slate-500">
+        <span>{displayDate}</span>
+        <span className="min-w-0 truncate">{getTransactionCategoryLabel(transaction)}</span>
+        <CardFlagStack transaction={transaction} />
       </div>
     </div>
   );

@@ -38,7 +38,7 @@ export function CardFlagStack({ transaction, maxVisible = 3 }: CardFlagStackProp
   const cards = getTransactionCardFlags(transaction);
 
   if (cards.length === 0) {
-    return <span className="text-xs text-muted-foreground">—</span>;
+    return null;
   }
 
   return (

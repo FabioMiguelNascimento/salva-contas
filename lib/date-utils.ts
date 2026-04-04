@@ -66,3 +66,34 @@ export function formatDate(value?: string | Date | null, defaultValue = "—"): 
     return String(value);
   }
 }
+
+export function formatDateWithoutYear(value?: string | Date | null, defaultValue = "—"): string {
+  if (!value) return defaultValue;
+
+  try {
+    if (typeof value === "string") {
+      const datePrefixMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})(?:$|T)/);
+      if (datePrefixMatch) {
+        const [, , month, day] = datePrefixMatch;
+        return `${day}/${month}`;
+      }
+    }
+
+    let date: Date;
+    if (typeof value === "string") {
+      const parsed = parseISO(value);
+      if (Number.isNaN(parsed.getTime())) return String(value);
+      date = parsed;
+    } else {
+      date = value;
+    }
+
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+      return String(value);
+    }
+
+    return format(date, "dd/MM", { locale: ptBR });
+  } catch {
+    return String(value);
+  }
+}

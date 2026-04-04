@@ -134,10 +134,10 @@ function ExtratoPageContent() {
             />
           </div>
 
-          <div className="flex flex-col gap-3 md:hidden">
+          <div className="flex flex-col divide-y divide-border/40 md:hidden">
             {isLoading ? (
               Array.from({ length: 4 }).map((_, index) => (
-                <Skeleton key={index} className="h-28 w-full rounded-2xl" />
+                <Skeleton key={index} className="h-19 w-full rounded-none" />
               ))
             ) : serverTransactions.length ? (
               serverTransactions.map((transaction) => (
