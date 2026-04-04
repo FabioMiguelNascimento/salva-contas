@@ -81,7 +81,7 @@ export function FilterBar({
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 gap-2 sm:grid-cols-[120px_120px_minmax(220px,1fr)_minmax(160px,1fr)_minmax(160px,1fr)]">
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-[120px_120px_minmax(220px,1fr)_minmax(160px,1fr)_minmax(160px,1fr)]">
         <div className="min-w-0">
           <label htmlFor="transactions-filter-month" className="mb-1 block text-xs font-medium text-slate-600">
             Mês

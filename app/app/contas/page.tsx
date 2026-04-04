@@ -161,7 +161,7 @@ function ContasPageContent() {
         />
       </SummaryCardsGrid>
 
-      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3" role="group" aria-label="Filtros de contas">
+      <div className="flex flex-wrap gap-2 sm:gap-3" role="group" aria-label="Filtros de contas">
         {filterTabs.map((filter) => (
           <Button
             key={filter.value}
@@ -174,7 +174,7 @@ function ContasPageContent() {
             {filter.label}
           </Button>
         ))}
-        <Button variant="ghost" className="col-span-2 w-full text-sm sm:ml-auto sm:w-auto" asChild>
+        <Button variant="ghost" className="w-full text-sm sm:ml-auto sm:w-auto" asChild>
           <Link href="/app/extrato">Ver extrato</Link>
         </Button>
       </div>

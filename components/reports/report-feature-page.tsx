@@ -10,12 +10,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
 } from "@/components/ui/table";
 import { useReportExport } from "@/hooks/reports/use-report-export";
 import { useReportFilters } from "@/hooks/reports/use-report-filters";
@@ -168,134 +168,128 @@ export function ReportFeaturePage({ feature, tag, title, description, sourceRout
             </CardDescription>
           </CardHeader>
          <CardContent className="space-y-4">
-  <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-    
-    <div className="flex flex-wrap items-end gap-3 lg:flex-nowrap">
-      
-      <div className="w-full sm:w-[120px]">
-        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Mês</label>
-        <Select
-          value={String(form.month)}
-          onValueChange={(v) => setForm((prev) => ({ ...prev, month: Number(v) }))}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Mês" />
-          </SelectTrigger>
-          <SelectContent>
-            {monthsShort.map((m) => (
-              <SelectItem key={m.value} value={String(m.value)}>
-                {m.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-[120px_100px_130px_minmax(220px,1fr)]">
+              <div className="min-w-0">
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Mês</label>
+                <Select
+                  value={String(form.month)}
+                  onValueChange={(v) => setForm((prev) => ({ ...prev, month: Number(v) }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Mês" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {monthsShort.map((m) => (
+                      <SelectItem key={m.value} value={String(m.value)}>
+                        {m.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-      <div className="w-full sm:w-[100px]">
-        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Ano</label>
-        <Select
-          value={String(form.year)}
-          onValueChange={(v) => setForm((prev) => ({ ...prev, year: Number(v) }))}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Ano" />
-          </SelectTrigger>
-          <SelectContent>
-            {years.map((y) => (
-              <SelectItem key={y} value={String(y)}>
-                {y}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+              <div className="min-w-0">
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Ano</label>
+                <Select
+                  value={String(form.year)}
+                  onValueChange={(v) => setForm((prev) => ({ ...prev, year: Number(v) }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Ano" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {years.map((y) => (
+                      <SelectItem key={y} value={String(y)}>
+                        {y}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-      <div className="w-full sm:w-[130px]">
-        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Status</label>
-        <Select
-          value={form.status}
-          onValueChange={(v) => setForm((prev) => ({ ...prev, status: v }))}
-        >
-          <SelectTrigger>
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="paid">Pago</SelectItem>
-            <SelectItem value="pending">Pendente</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+              <div className="min-w-0">
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Status</label>
+                <Select
+                  value={form.status}
+                  onValueChange={(v) => setForm((prev) => ({ ...prev, status: v }))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="paid">Pago</SelectItem>
+                    <SelectItem value="pending">Pendente</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-      <div className="w-full sm:w-[260px]">
-        <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Período</label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              id="dashboard-filter-range"
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !hasDateRange && "text-muted-foreground"
-              )}
-            >
-              <CalendarIcon data-icon="inline-start" className="mr-2 size-4" />
-              <span className="truncate">{rangeLabel}</span>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <Calendar
-              mode="range"
-              selected={selectedRange}
-              onSelect={handleRangeChange}
-              locale={ptBR}
-              numberOfMonths={isMobile ? 1 : 2}
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
+              <div className="min-w-0">
+                <label className="mb-1.5 block text-xs font-medium text-muted-foreground">Período</label>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      id="dashboard-filter-range"
+                      variant="outline"
+                      className={cn(
+                        "w-full justify-start text-left font-normal",
+                        !hasDateRange && "text-muted-foreground",
+                      )}
+                    >
+                      <CalendarIcon data-icon="inline-start" className="mr-2 size-4" />
+                      <span className="truncate">{rangeLabel}</span>
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="range"
+                      selected={selectedRange}
+                      onSelect={handleRangeChange}
+                      locale={ptBR}
+                      numberOfMonths={isMobile ? 1 : 2}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+            </div>
 
-      <div className="flex items-center gap-2">
-        <Button size="sm" onClick={handleSearch} disabled={isSubmitting}>
-          Buscar
-        </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={clearPeriod}
-          disabled={!form.startDate && !form.endDate}
-          className="px-2 text-muted-foreground hover:text-foreground"
-        >
-          Limpar
-        </Button>
-      </div>
-    </div>
-
-    <div className="flex w-full sm:w-auto items-center gap-2 pt-2 lg:pt-0">
-      <div className="hidden h-8 w-px bg-border lg:block mx-2" />
-      <Button
-        size="sm"
-        variant="outline"
-        disabled={!canExport || isExporting}
-        onClick={() => void onExport("csv")}
-      >
-        <FileSpreadsheet data-icon="inline-start" className="mr-2 size-4" />
-        {exportingFormat === "csv" ? "Exportando..." : "CSV"}
-        {!canExport ? <Lock data-icon="inline-end" className="ml-2 size-3 text-muted-foreground" /> : null}
-      </Button>
-      <Button
-        size="sm"
-        variant="outline"
-        disabled={!canExport || isExporting}
-        onClick={() => void onExport("pdf")}
-      >
-        <FileText data-icon="inline-start" className="mr-2 size-4" />
-        {exportingFormat === "pdf" ? "Exportando..." : "PDF"}
-        {!canExport ? <Lock data-icon="inline-end" className="ml-2 size-3 text-muted-foreground" /> : null}
-      </Button>
-    </div>
-  </div>
-</CardContent>
+            <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap xl:justify-end">
+              <Button size="sm" onClick={handleSearch} disabled={isSubmitting}>
+                Buscar
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={clearPeriod}
+                disabled={!form.startDate && !form.endDate}
+                className="px-2 text-muted-foreground hover:text-foreground"
+              >
+                Limpar
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={!canExport || isExporting}
+                onClick={() => void onExport("csv")}
+              >
+                <FileSpreadsheet data-icon="inline-start" className="mr-2 size-4" />
+                {exportingFormat === "csv" ? "Exportando..." : "CSV"}
+                {!canExport ? <Lock data-icon="inline-end" className="ml-2 size-3 text-muted-foreground" /> : null}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={!canExport || isExporting}
+                onClick={() => void onExport("pdf")}
+              >
+                <FileText data-icon="inline-start" className="mr-2 size-4" />
+                {exportingFormat === "pdf" ? "Exportando..." : "PDF"}
+                {!canExport ? <Lock data-icon="inline-end" className="ml-2 size-3 text-muted-foreground" /> : null}
+              </Button>
+            </div>
+          </div>
+        </CardContent>
         </Card>
 
         <Card>

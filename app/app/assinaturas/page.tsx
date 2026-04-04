@@ -71,10 +71,6 @@ function SubscriptionsPageContent() {
 
       <Card>
         <CardHeader className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div>
-            <CardTitle>Assinaturas configuradas</CardTitle>
-            <CardDescription>Gerencie e acompanhe todas as recorrências automatizadas.</CardDescription>
-          </div>
           <div className="flex flex-wrap gap-2" role="group" aria-label="Filtros de assinaturas">
             <Button
               variant={activeFilter === "all" ? "default" : "outline"}
