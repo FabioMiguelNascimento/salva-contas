@@ -388,6 +388,20 @@ export interface Budget {
   updatedAt?: string;
 }
 
+export interface BudgetHistoryEntry {
+  id: string;
+  budgetId: string;
+  categoryId: string;
+  budgetAmount: number;
+  spentAmount: number;
+  remainingAmount: number;
+  spentPercentage: number;
+  month: number;
+  year: number;
+  message: string;
+  createdAt: string;
+}
+
 export interface BudgetProgress {
   budget: Budget;
   spent: number;

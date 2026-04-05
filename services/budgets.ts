@@ -2,6 +2,7 @@ import { apiClient } from "@/lib/api-client";
 import type {
     Budget,
     BudgetFilters,
+    BudgetHistoryEntry,
     BudgetMetrics,
     BudgetProgress,
     CreateBudgetPayload,
@@ -71,4 +72,12 @@ export async function fetchBudgetMetrics(month: number, year: number): Promise<B
     params: { month, year },
   });
   return response.data?.data ?? response.data;
+}
+
+export async function fetchBudgetHistory(id: string, limit = 12): Promise<BudgetHistoryEntry[]> {
+  const response = await apiClient.get<ApiResponse<BudgetHistoryEntry[]>>(`/budgets/${id}/history`, {
+    params: { limit },
+  });
+
+  return unwrapData(response.data) ?? [];
 }
