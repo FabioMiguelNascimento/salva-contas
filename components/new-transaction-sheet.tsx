@@ -7,16 +7,17 @@ import { TransactionDetails } from "@/components/new-transaction/transaction-det
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
-    Sheet,
-    SheetBody,
-    SheetContent,
-    SheetDescription,
-    SheetFooter,
-    SheetHeader,
-    SheetTitle,
-    SheetTrigger,
+  Sheet,
+  SheetBody,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
 } from "@/components/ui/sheet";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useCategories } from "@/context/category-context";
 import { useTransactions } from "@/context/transactions-context";
 import { createManualTransaction } from "@/services/transactions";
 import type { TransactionStatus, TransactionType } from "@/types/finance";
@@ -29,7 +30,8 @@ interface NewTransactionSheetProps {
 }
 
 export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
-  const { processUnstructuredTransaction, categories, refresh } = useTransactions();
+  const { processUnstructuredTransaction, refresh } = useTransactions();
+  const { categories } = useCategories();
   const [mode, setMode] = useState<"ai" | "manual">("ai");
   const [open, setOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);

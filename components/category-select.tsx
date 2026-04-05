@@ -3,19 +3,19 @@
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { Button } from "@/components/ui/button";
 import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
 } from "@/components/ui/command";
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
-import { useTransactions } from "@/context/transactions-context";
+import { useCategories } from "@/context/category-context";
 import { cn } from "@/lib/utils";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useState } from "react";
@@ -34,7 +34,7 @@ export function CategorySelect({
   disabled = false,
 }: CategorySelectProps) {
   const [open, setOpen] = useState(false);
-  const { categories } = useTransactions();
+  const { categories } = useCategories();
 
   const selectedCategory = categories.find((cat) => cat.id === value);
 

@@ -1,19 +1,17 @@
 "use client";
 
 import { toDateOnlyString } from "@/lib/date-utils";
-import { fetchCategories } from "@/services/categories";
 import {
-    deleteTransaction,
-    fetchInstallmentTransactions,
-    fetchTransactions,
-    processTransaction,
-    updateTransaction,
+  deleteTransaction,
+  fetchInstallmentTransactions,
+  fetchTransactions,
+  processTransaction,
+  updateTransaction,
 } from "@/services/transactions";
 import type {
-    ProcessTransactionClientPayload,
-    Transaction,
-    TransactionCategory,
-    UpdateTransactionPayload,
+  ProcessTransactionClientPayload,
+  Transaction,
+  UpdateTransactionPayload,
 } from "@/types/finance";
 import { keepPreviousData, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
@@ -39,7 +37,6 @@ interface TransactionsContextValue {
   lastSync: string | null;
   transactions: Transaction[];
   pendingBills: Transaction[];
-  categories: TransactionCategory[];
   totalPages: number;
   currentPage: number;
   refresh: (page?: number, filters?: TransactionQueryParams) => Promise<void>;
@@ -77,12 +74,6 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
     }));
   }, [filters.month, filters.year, filters.startDate, filters.endDate, filters.categoryId]);
 
-  const categoriesQuery = useQuery({
-    queryKey: ["transaction-categories"],
-    queryFn: fetchCategories,
-    staleTime: 10 * 60_000,
-  });
-
   const transactionsQuery = useQuery({
     queryKey: ["transactions", queryParams, refreshTicket],
     queryFn: () =>
@@ -106,17 +97,11 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
   }, []);
 
   const transactions = transactionsQuery.data?.data ?? [];
-  const categories = categoriesQuery.data ?? [];
   const totalPages = transactionsQuery.data?.meta.totalPages ?? 1;
   const currentPage = transactionsQuery.data?.meta.page ?? queryParams.page ?? 1;
   const isLoading = transactionsQuery.isLoading;
-  const isSyncing = transactionsQuery.isFetching || categoriesQuery.isFetching;
-  const error =
-    (transactionsQuery.error instanceof Error
-      ? transactionsQuery.error.message
-      : categoriesQuery.error instanceof Error
-        ? categoriesQuery.error.message
-        : null) ?? null;
+  const isSyncing = transactionsQuery.isFetching;
+  const error = transactionsQuery.error instanceof Error ? transactionsQuery.error.message : null;
   const lastSync = transactionsQuery.dataUpdatedAt
     ? new Date(transactionsQuery.dataUpdatedAt).toISOString()
     : null;
@@ -170,7 +155,6 @@ export function TransactionsProvider({ children }: { children: React.ReactNode }
         lastSync,
         transactions,
         pendingBills,
-        categories,
         totalPages,
         currentPage,
         refresh,

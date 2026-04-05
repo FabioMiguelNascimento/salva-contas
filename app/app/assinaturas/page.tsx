@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CardsProvider } from "@/context/cards-context";
 import { SubscriptionsProvider } from "@/context/subscriptions-context";
-import { TransactionsProvider } from "@/context/transactions-context";
 import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useSubscriptionEditor } from "@/hooks/use-subscription-editor";
 import { useSubscriptionFilters } from "@/hooks/use-subscription-filters";
@@ -137,13 +136,11 @@ function SubscriptionsPageContent() {
 export default function SubscriptionsPage() {
   return (
     <SubscriptionsProvider>
-      <TransactionsProvider >
-        <CardsProvider>
-          <AppShell>
-            <SubscriptionsPageContent />
-          </AppShell>
-        </CardsProvider>
-      </TransactionsProvider>
+      <CardsProvider>
+        <AppShell>
+          <SubscriptionsPageContent />
+        </AppShell>
+      </CardsProvider>
     </SubscriptionsProvider>
   );
 }

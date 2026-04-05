@@ -1,6 +1,7 @@
 "use client";
 
 import { GlobalClientErrorHandler } from "@/components/global-client-error-handler";
+import { CategoryProvider } from "@/context/category-context";
 import { FamilyInviteProvider } from "@/context/family-invite-context";
 import { FinancePeriodProvider } from "@/context/finance-period-context";
 import { UsageProvider } from "@/context/usage-context";
@@ -31,7 +32,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
         <UsageProvider>
           <NotificationsProvider>
             <FinancePeriodProvider>
-              <FamilyInviteProvider>{children}</FamilyInviteProvider>
+              <CategoryProvider>
+                <FamilyInviteProvider>{children}</FamilyInviteProvider>
+              </CategoryProvider>
             </FinancePeriodProvider>
           </NotificationsProvider>
         </UsageProvider>

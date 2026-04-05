@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CardsProvider } from "@/context/cards-context";
+import { useCategories } from "@/context/category-context";
 import { useFinancePeriod } from "@/context/finance-period-context";
 import { TransactionsProvider, useTransactions } from "@/context/transactions-context";
 import { TopbarAction } from "@/contexts/topbar-action-context";
@@ -33,12 +34,12 @@ function ExtratoPageContent() {
     transactions: serverTransactions,
     isLoading,
     isSyncing,
-    categories,
     removeTransaction,
     totalPages,
     currentPage,
     refresh,
   } = useTransactions();
+  const { categories } = useCategories();
 
   const { filters, setFilters } = useFinancePeriod();
   const {
