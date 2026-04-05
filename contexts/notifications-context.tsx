@@ -10,16 +10,20 @@ import {
   markNotificationAsRead,
 } from "@/services/notifications";
 import type { Notification } from "@/types/finance";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
+
+const NOTIFICATIONS_QUERY_KEY = ["notifications"] as const;
+const UNREAD_COUNT_QUERY_KEY = ["notifications", "unread-count"] as const;
+const POLLING_INTERVAL = 60_000; // 1 minute
 
 interface NotificationsContextValue {
   notifications: Notification[];
@@ -34,125 +38,76 @@ interface NotificationsContextValue {
 
 const NotificationsContext = createContext<NotificationsContextValue | null>(null);
 
-const POLLING_INTERVAL = 60000; // 1 minute
-
 export function NotificationsProvider({ children }: { children: ReactNode }) {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-
   const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
 
-  const loadNotifications = useCallback(async () => {
-    if (!isAuthenticated) return; // don't call API when unauthenticated
-    try {
-      const [notifs, count] = await Promise.all([
-        fetchNotifications(),
-        fetchUnreadCount(),
-      ]);
-      setNotifications(notifs);
-      setUnreadCount(count);
-    } catch (error) {
-      console.error("Failed to load notifications:", error);
-    }
-  }, [isAuthenticated]);
+  const notificationsQuery = useQuery({
+    queryKey: NOTIFICATIONS_QUERY_KEY,
+    queryFn: () => fetchNotifications(),
+    enabled: isAuthenticated,
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+  });
+
+  const unreadCountQuery = useQuery({
+    queryKey: UNREAD_COUNT_QUERY_KEY,
+    queryFn: fetchUnreadCount,
+    enabled: isAuthenticated,
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+    refetchInterval: POLLING_INTERVAL,
+    refetchIntervalInBackground: false,
+  });
+
+  const notifications = useMemo(
+    () => notificationsQuery.data ?? [],
+    [notificationsQuery.data],
+  );
+
+  const unreadCount = unreadCountQuery.data ?? 0;
+  const isLoading = notificationsQuery.isLoading;
 
   const refresh = useCallback(async () => {
-    setIsLoading(true);
-    await loadNotifications();
-    setIsLoading(false);
-  }, [loadNotifications]);
-
-  const lastRefreshAuth = useRef<{ refresh: any; isAuthenticated: boolean } | null>(null);
-
-  // Initial load — refresh when auth becomes available
-  useEffect(() => {
-    if (
-      lastRefreshAuth.current?.refresh === refresh &&
-      lastRefreshAuth.current?.isAuthenticated === isAuthenticated
-    ) {
-      return;
-    }
-    lastRefreshAuth.current = { refresh, isAuthenticated };
-
-    if (isAuthenticated) {
-      refresh();
-    } else {
-      // clear notifications when logged out
-      setNotifications([]);
-      setUnreadCount(0);
-      setIsLoading(false);
-    }
-  }, [refresh, isAuthenticated]);
-
-  // Polling for unread count — keep dependency array stable to avoid hook-size warnings.
-  // Use a ref to read the current `isAuthenticated` inside the interval handler.
-  const isAuthenticatedRef = useRef(isAuthenticated);
-  useEffect(() => { isAuthenticatedRef.current = isAuthenticated; }, [isAuthenticated]);
-
-  useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        if (!isAuthenticatedRef.current) return; // skip when unauthenticated
-        const count = await fetchUnreadCount();
-        setUnreadCount(count);
-      } catch (error) {
-        console.error("Failed to fetch unread count:", error);
-      }
-    }, POLLING_INTERVAL);
-
-    return () => clearInterval(interval);
-  }, []);
+    await queryClient.invalidateQueries({ queryKey: NOTIFICATIONS_QUERY_KEY });
+    await queryClient.invalidateQueries({ queryKey: UNREAD_COUNT_QUERY_KEY });
+  }, [queryClient]);
 
   const markAsRead = useCallback(async (id: string) => {
-    try {
-      const updated = await markNotificationAsRead(id);
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? updated : n))
-      );
-      setUnreadCount((prev) => Math.max(0, prev - 1));
-    } catch (error) {
-      console.error("Failed to mark notification as read:", error);
-      throw error;
-    }
-  }, []);
+    const updated = await markNotificationAsRead(id);
+    queryClient.setQueryData(NOTIFICATIONS_QUERY_KEY, (prev: Notification[] | undefined) =>
+      prev?.map((n) => (n.id === id ? updated : n)) ?? [],
+    );
+    queryClient.invalidateQueries({ queryKey: UNREAD_COUNT_QUERY_KEY });
+  }, [queryClient]);
 
   const markAllAsRead = useCallback(async () => {
-    try {
-      await markAllNotificationsAsRead();
-      setNotifications((prev) =>
-        prev.map((n) => ({ ...n, status: "read" as const, readAt: new Date().toISOString() }))
-      );
-      setUnreadCount(0);
-    } catch (error) {
-      console.error("Failed to mark all as read:", error);
-      throw error;
-    }
-  }, []);
+    await markAllNotificationsAsRead();
+    queryClient.setQueryData(NOTIFICATIONS_QUERY_KEY, (prev: Notification[] | undefined) =>
+      prev?.map((n) => ({ ...n, status: "read" as const, readAt: new Date().toISOString() })) ?? [],
+    );
+    queryClient.setQueryData(UNREAD_COUNT_QUERY_KEY, 0);
+  }, [queryClient]);
 
   const remove = useCallback(async (id: string) => {
-    try {
-      const notification = notifications.find((n) => n.id === id);
-      await deleteNotification(id);
-      setNotifications((prev) => prev.filter((n) => n.id !== id));
-      if (notification?.status === "unread") {
-        setUnreadCount((prev) => Math.max(0, prev - 1));
-      }
-    } catch (error) {
-      console.error("Failed to delete notification:", error);
-      throw error;
-    }
-  }, [notifications]);
+    await deleteNotification(id);
+    queryClient.setQueryData(NOTIFICATIONS_QUERY_KEY, (prev: Notification[] | undefined) =>
+      prev?.filter((n) => n.id !== id) ?? [],
+    );
+    queryClient.invalidateQueries({ queryKey: UNREAD_COUNT_QUERY_KEY });
+  }, [queryClient]);
 
   const generate = useCallback(async () => {
-    try {
-      await generateNotifications();
-      await loadNotifications();
-    } catch (error) {
-      console.error("Failed to generate notifications:", error);
-      throw error;
+    await generateNotifications();
+    await refresh();
+  }, [refresh]);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      queryClient.setQueryData(NOTIFICATIONS_QUERY_KEY, []);
+      queryClient.setQueryData(UNREAD_COUNT_QUERY_KEY, 0);
     }
-  }, [loadNotifications]);
+  }, [isAuthenticated, queryClient]);
 
   const value = useMemo<NotificationsContextValue>(
     () => ({
@@ -165,7 +120,7 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
       remove,
       generate,
     }),
-    [notifications, unreadCount, isLoading, refresh, markAsRead, markAllAsRead, remove, generate]
+    [notifications, unreadCount, isLoading, refresh, markAsRead, markAllAsRead, remove, generate],
   );
 
   return (
