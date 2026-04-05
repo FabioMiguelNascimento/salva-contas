@@ -87,6 +87,15 @@ function ExtratoPageContent() {
     }
   };
 
+  const handleDeleteFromEditSheet = (transaction: Transaction) => {
+    editor.closeEditor();
+    setDeleteDialog({ open: true, transaction });
+  };
+
+  const handleOpenAttachmentFromEditSheet = (transaction: Transaction) => {
+    setAttachmentViewer({ open: true, transaction });
+  };
+
   return (
     <div className="space-y-8">
       <TopbarAction>
@@ -129,8 +138,6 @@ function ExtratoPageContent() {
               transactions={serverTransactions}
               isLoading={isLoading}
               onEdit={editor.openEditor}
-              onDelete={(transaction) => setDeleteDialog({ open: true, transaction })}
-              onViewAttachment={(transaction) => setAttachmentViewer({ open: true, transaction })}
             />
           </div>
 
@@ -145,12 +152,6 @@ function ExtratoPageContent() {
                   key={transaction.id}
                   transaction={transaction}
                   onEdit={editor.openEditor}
-                  onDelete={() => setDeleteDialog({ open: true, transaction })}
-                  onViewAttachment={
-                    transaction.attachmentUrl
-                      ? () => setAttachmentViewer({ open: true, transaction })
-                      : undefined
-                  }
                   isLoading={false}
                 />
               ))
@@ -208,6 +209,8 @@ function ExtratoPageContent() {
         setEditIsSplitMode={editor.setEditIsSplitMode}
         setEditSplits={editor.setEditSplits}
         onClose={editor.closeEditor}
+        onDeleteTransaction={handleDeleteFromEditSheet}
+        onViewAttachment={handleOpenAttachmentFromEditSheet}
         onSubmit={editor.handleSubmit}
       />
 

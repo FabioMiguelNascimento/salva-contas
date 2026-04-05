@@ -18,8 +18,8 @@ import { CardsProvider } from "@/context/cards-context";
 import { TopbarAction } from "@/contexts/topbar-action-context";
 import { useCardsHook } from "@/hooks/use-cards";
 import type {
-  CreditCard,
-  DebitCard,
+    CreditCard,
+    DebitCard,
 } from "@/types/finance";
 import { useState } from "react";
 
@@ -98,7 +98,6 @@ function CartoesPageContent() {
                 <CreditCardTable
                   creditCards={creditCards}
                   onEdit={openEdit}
-                  onDelete={openDelete}
                 />
               </div>
               <div className="grid gap-3 md:hidden">
@@ -107,7 +106,6 @@ function CartoesPageContent() {
                     key={card.id}
                     card={card}
                     onEdit={openEdit}
-                    onDelete={openDelete}
                   />
                 ))}
               </div>
@@ -140,7 +138,6 @@ function CartoesPageContent() {
                 <DebitCardTable
                   debitCards={debitCards}
                   onEdit={openEditDebit}
-                  onDelete={openDeleteDebit}
                 />
               </div>
               <div className="grid gap-3 md:hidden">
@@ -149,7 +146,6 @@ function CartoesPageContent() {
                     key={card.id}
                     card={card}
                     onEdit={openEditDebit}
-                    onDelete={openDeleteDebit}
                   />
                 ))}
               </div>
@@ -162,6 +158,7 @@ function CartoesPageContent() {
         card={editSheet.card}
         open={editSheet.open}
         onOpenChange={(open) => setEditSheet({ open, card: open ? editSheet.card : null })}
+        onRequestDelete={openDelete}
       />
       <CreditCardDeleteSheet
         card={deleteSheet.card}
@@ -173,6 +170,7 @@ function CartoesPageContent() {
         card={editDebitSheet.card}
         open={editDebitSheet.open}
         onOpenChange={(open) => setEditDebitSheet({ open, card: open ? editDebitSheet.card : null })}
+        onRequestDelete={openDeleteDebit}
       />
 
       <DebitCardDeleteSheet

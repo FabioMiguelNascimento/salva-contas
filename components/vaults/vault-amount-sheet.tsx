@@ -6,17 +6,21 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
+    Sheet,
+    SheetBody,
+    SheetClose,
+    SheetContent,
+    SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
 } from "@/components/ui/sheet";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { CheckCircle2, X } from "lucide-react";
 
 const amountSchema = z.object({
   amount: z.coerce.number().refine((value) => Number.isFinite(value), {
@@ -70,10 +74,38 @@ export function VaultAmountSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex flex-col overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>{title}</SheetTitle>
-          <SheetDescription>{description}</SheetDescription>
+      <SheetContent className="flex flex-col overflow-y-auto" showCloseButton={false}>
+        <SheetHeader className="gap-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <SheetTitle>{title}</SheetTitle>
+              <SheetDescription>{description}</SheetDescription>
+            </div>
+
+            <TooltipProvider>
+              <ButtonGroup aria-label="Ações de valor do cofrinho">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button type="button" variant="outline" size="icon-sm" aria-label="Ação de valor do cofrinho" disabled>
+                      <CheckCircle2 />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Confirmar</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <SheetClose asChild>
+                      <Button type="button" variant="outline" size="icon-sm" aria-label="Fechar">
+                        <X />
+                      </Button>
+                    </SheetClose>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Fechar</TooltipContent>
+                </Tooltip>
+              </ButtonGroup>
+            </TooltipProvider>
+          </div>
         </SheetHeader>
 
         <form onSubmit={submit} className="flex h-full flex-col">

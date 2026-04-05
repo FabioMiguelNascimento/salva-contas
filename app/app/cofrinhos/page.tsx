@@ -72,6 +72,16 @@ function VaultsPageContent() {
     toast.success("Rendimento registrado com sucesso");
   };
 
+  const handleVaultDeleteFromEdit = async (vault: Vault) => {
+    await handleDelete(vault);
+    setEditingVault(null);
+  };
+
+  const handleVaultAmountFromEdit = (type: VaultActionType, vault: Vault) => {
+    setEditingVault(null);
+    setActionState({ type, vault });
+  };
+
   const actionConfig = actionState
     ? {
         deposit: {
@@ -152,11 +162,7 @@ function VaultsPageContent() {
               <div className="hidden md:block overflow-x-auto">
                 <VaultTable
                   vaults={vaults}
-                  onDeposit={(vault) => setActionState({ type: "deposit", vault })}
-                  onWithdraw={(vault) => setActionState({ type: "withdraw", vault })}
-                  onYield={(vault) => setActionState({ type: "yield", vault })}
                   onEdit={setEditingVault}
-                  onDelete={handleDelete}
                 />
               </div>
               <div className="grid gap-3 md:hidden">
@@ -164,11 +170,7 @@ function VaultsPageContent() {
                   <VaultCard
                     key={vault.id}
                     vault={vault}
-                    onDeposit={() => setActionState({ type: "deposit", vault })}
-                    onWithdraw={() => setActionState({ type: "withdraw", vault })}
-                    onYield={() => setActionState({ type: "yield", vault })}
                     onEdit={() => setEditingVault(vault)}
-                    onDelete={() => handleDelete(vault)}
                   />
                 ))}
               </div>
@@ -199,6 +201,8 @@ function VaultsPageContent() {
           toast.success("Cofrinho atualizado com sucesso");
           setEditingVault(null);
         }}
+        onRequestDelete={handleVaultDeleteFromEdit}
+        onOpenAmountAction={handleVaultAmountFromEdit}
       />
 
       <VaultAmountSheet

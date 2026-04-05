@@ -7,35 +7,39 @@ import { z } from "zod";
 
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
 import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
+    InputGroup,
+    InputGroupAddon,
+    InputGroupButton,
+    InputGroupInput,
 } from "@/components/ui/input-group";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
+    Sheet,
+    SheetBody,
+    SheetClose,
+    SheetContent,
+    SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
 } from "@/components/ui/sheet";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn, formatCurrency } from "@/lib/utils";
 import { fetchVaultHistory } from "@/services/vaults";
 import type {
-  CreateVaultPayload,
-  UpdateVaultPayload,
-  Vault,
-  VaultHistoryEvent,
-  VaultHistoryGroup,
-  VaultHistoryResponse,
+    CreateVaultPayload,
+    UpdateVaultPayload,
+    Vault,
+    VaultHistoryEvent,
+    VaultHistoryGroup,
+    VaultHistoryResponse,
 } from "@/types/finance";
+import { HandCoins, Landmark, Pencil, Trash2, TrendingUp, X } from "lucide-react";
 
 const DEFAULT_COLOR = "#10b981";
 
@@ -117,6 +121,8 @@ interface VaultFormSheetProps {
   vault?: Vault | null;
   onCreate: (payload: CreateVaultPayload) => Promise<void>;
   onUpdate: (id: string, payload: UpdateVaultPayload) => Promise<void>;
+  onRequestDelete?: (vault: Vault) => void | Promise<void>;
+  onOpenAmountAction?: (type: "deposit" | "withdraw" | "yield", vault: Vault) => void;
 }
 
 function mergeHistoryGroups(
@@ -206,6 +212,8 @@ export function VaultFormSheet({
   vault,
   onCreate,
   onUpdate,
+  onRequestDelete,
+  onOpenAmountAction,
 }: VaultFormSheetProps) {
   const [history, setHistory] = useState<VaultHistoryResponse | null>(null);
   const [isHistoryLoading, setIsHistoryLoading] = useState(false);
@@ -353,14 +361,104 @@ export function VaultFormSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex flex-col overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>{vault ? "Editar cofrinho" : "Novo cofrinho"}</SheetTitle>
-          <SheetDescription>
-            {vault
-              ? "Atualize nome, meta e visual do objetivo."
-              : "Crie um objetivo financeiro para separar dinheiro do saldo principal."}
-          </SheetDescription>
+      <SheetContent className="flex flex-col overflow-y-auto" showCloseButton={!vault}>
+        <SheetHeader className="gap-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <SheetTitle>{vault ? "Editar cofrinho" : "Novo cofrinho"}</SheetTitle>
+              <SheetDescription>
+                {vault
+                  ? "Atualize nome, meta e visual do objetivo."
+                  : "Crie um objetivo financeiro para separar dinheiro do saldo principal."}
+              </SheetDescription>
+            </div>
+
+            {vault ? (
+              <TooltipProvider>
+                <ButtonGroup aria-label="Ações do cofrinho">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button type="button" variant="outline" size="icon-sm" aria-label="Editando cofrinho atual" disabled>
+                        <Pencil />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Editando</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon-sm"
+                        aria-label="Guardar valor"
+                        onClick={() => onOpenAmountAction?.("deposit", vault)}
+                      >
+                        <Landmark />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Guardar</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon-sm"
+                        aria-label="Resgatar valor"
+                        onClick={() => onOpenAmountAction?.("withdraw", vault)}
+                      >
+                        <HandCoins />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Resgatar</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon-sm"
+                        aria-label="Adicionar rendimento"
+                        onClick={() => onOpenAmountAction?.("yield", vault)}
+                      >
+                        <TrendingUp />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Rendimento</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon-sm"
+                        aria-label="Excluir cofrinho"
+                        onClick={() => void onRequestDelete?.(vault)}
+                      >
+                        <Trash2 />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Excluir</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SheetClose asChild>
+                        <Button type="button" variant="outline" size="icon-sm" aria-label="Fechar">
+                          <X />
+                        </Button>
+                      </SheetClose>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Fechar</TooltipContent>
+                  </Tooltip>
+                </ButtonGroup>
+              </TooltipProvider>
+            ) : null}
+          </div>
         </SheetHeader>
 
         <form onSubmit={submit} className="flex h-full flex-col">

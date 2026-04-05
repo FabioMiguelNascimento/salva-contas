@@ -2,27 +2,18 @@
 
 import { FlagIcon } from "@/components/flag-icon";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatCardNumber, getFlagLabel, getStatusLabel, getStatusVariant } from "@/lib/card-utils";
 import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import type { CreditCard } from "@/types/finance";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 interface CreditCardTableProps {
   creditCards: CreditCard[];
   onEdit: (card: CreditCard) => void;
-  onDelete: (card: CreditCard) => void;
 }
 
-export function CreditCardTable({ creditCards, onEdit, onDelete }: CreditCardTableProps) {
+export function CreditCardTable({ creditCards, onEdit }: CreditCardTableProps) {
   if (creditCards.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">
@@ -42,7 +33,6 @@ export function CreditCardTable({ creditCards, onEdit, onDelete }: CreditCardTab
           <TableHead>Fechamento</TableHead>
           <TableHead>Vencimento</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead className="w-12" />
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -51,7 +41,11 @@ export function CreditCardTable({ creditCards, onEdit, onDelete }: CreditCardTab
           const isHighUsage = usedPercentage > 80;
 
           return (
-            <TableRow key={card.id}>
+            <TableRow
+              key={card.id}
+              onClick={() => onEdit(card)}
+              className="cursor-pointer hover:bg-muted/30"
+            >
               <TableCell>
                 <div className="max-w-[220px] min-w-0">
                   <p className="truncate font-semibold">{card.name}</p>
@@ -84,29 +78,6 @@ export function CreditCardTable({ creditCards, onEdit, onDelete }: CreditCardTab
                 >
                   {getStatusLabel(card.status)}
                 </Badge>
-              </TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                      <span className="sr-only">Abrir menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onEdit(card)}>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Editar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDelete(card)}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Excluir
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </TableCell>
             </TableRow>
           );

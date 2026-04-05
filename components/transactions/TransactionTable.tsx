@@ -1,31 +1,20 @@
 ﻿import { DynamicIcon } from "@/components/dynamic-icon";
 import { CardFlagStack } from "@/components/transactions/CardFlagStack";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { formatCurrency } from "@/lib/currency-utils";
 import { formatDate } from "@/lib/date-utils";
 import { cn, getTransactionCategoryLabel } from "@/lib/utils";
 import type { Transaction } from "@/types/finance";
-import { FileText, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 interface Props {
   transactions: Transaction[];
   isLoading: boolean;
   onEdit: (tx: Transaction) => void;
-  onDelete: (tx: Transaction) => void;
-  onViewAttachment?: (tx: Transaction) => void;
 }
 
-
-export function TransactionTable({ transactions, isLoading, onEdit, onDelete, onViewAttachment }: Props) {
+export function TransactionTable({ transactions, isLoading, onEdit }: Props) {
   const pageSize = 15;
 
   const copyTransactionId = async (transaction: Transaction) => {
@@ -48,21 +37,24 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
           <TableHead>Cartão</TableHead>
           <TableHead>Tipo</TableHead>
           <TableHead>Valor</TableHead>
-          <TableHead className="w-12" />
         </TableRow>
       </TableHeader>
       <TableBody>
         {isLoading ? (
           Array.from({ length: pageSize }).map((_, index) => (
             <TableRow key={`skeleton-${index}`}>
-              <TableCell colSpan={8}>
+              <TableCell colSpan={7}>
                 <div className="h-12 w-full bg-slate-100 animate-pulse" />
               </TableCell>
             </TableRow>
           ))
         ) : transactions.length ? (
           transactions.map((transaction) => (
-            <TableRow key={transaction.id}>
+            <TableRow
+              key={transaction.id}
+              onClick={() => onEdit(transaction)}
+              className="cursor-pointer hover:bg-muted/30"
+            >
               <TableCell className="text-xs text-muted-foreground">
                 {transaction.paymentDate ? formatDate(transaction.paymentDate) : transaction.dueDate ? `${formatDate(transaction.dueDate)}` : "—"}
               </TableCell>
@@ -70,8 +62,11 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
                 <div className="min-w-0">
                   <button
                     type="button"
-                    onClick={() => copyTransactionId(transaction)}
-                    className="flex w-full items-center gap-2 text-left hover:underline decoration-dotted"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      void copyTransactionId(transaction);
+                    }}
+                    className="inline-flex max-w-full items-center gap-2 text-left hover:underline decoration-dotted"
                     title="Clique para copiar o ID da transação"
                   >
                     <span className="block min-w-0 truncate font-semibold">
@@ -127,40 +122,11 @@ export function TransactionTable({ transactions, isLoading, onEdit, onDelete, on
                 {transaction.type === "income" ? "+" : "-"}
                 {formatCurrency(transaction.amount)}
               </TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                      <span className="sr-only">Abrir menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    {transaction.attachmentUrl && onViewAttachment && (
-                      <DropdownMenuItem onClick={() => onViewAttachment(transaction)}>
-                        <FileText className="mr-2 h-4 w-4" />
-                        Ver anexo
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem onClick={() => onEdit(transaction)}>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Editar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDelete(transaction)}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Excluir
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
             </TableRow>
           ))
         ) : (
           <TableRow>
-            <TableCell colSpan={8} className="text-center text-sm text-muted-foreground">
+            <TableCell colSpan={7} className="text-center text-sm text-muted-foreground">
               Nenhuma transação encontrada.
             </TableCell>
           </TableRow>

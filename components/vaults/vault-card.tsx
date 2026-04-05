@@ -1,29 +1,19 @@
 "use client";
 
 import { DynamicIcon } from "@/components/dynamic-icon";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency } from "@/lib/currency-utils";
 import type { Vault } from "@/types/finance";
-import { HandCoins, Landmark, TrendingUp } from "lucide-react";
 
 interface VaultCardProps {
   vault: Vault;
-  onDeposit: () => void;
-  onWithdraw: () => void;
-  onYield: () => void;
   onEdit: () => void;
-  onDelete: () => void;
 }
 
 export function VaultCard({
   vault,
-  onDeposit,
-  onWithdraw,
-  onYield,
   onEdit,
-  onDelete,
 }: VaultCardProps) {
   const progress =
     vault.targetAmount && vault.targetAmount > 0
@@ -31,7 +21,18 @@ export function VaultCard({
       : null;
 
   return (
-    <Card>
+    <Card
+      role="button"
+      tabIndex={0}
+      onClick={onEdit}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onEdit();
+        }
+      }}
+      className="cursor-pointer"
+    >
       <CardHeader className="flex flex-row items-start justify-between gap-3 space-y-0">
         <div>
           <CardTitle className="text-base">{vault.name}</CardTitle>
@@ -60,27 +61,6 @@ export function VaultCard({
           <p className="text-xs text-muted-foreground">Sem meta definida para este cofrinho.</p>
         )}
 
-        <div className="grid grid-cols-3 gap-2">
-          <Button size="sm" variant="outline" onClick={onDeposit}>
-            <Landmark data-icon="inline-start" />
-            Guardar
-          </Button>
-          <Button size="sm" variant="outline" onClick={onWithdraw}>
-            <HandCoins data-icon="inline-start" />
-            Resgatar
-          </Button>
-          <Button size="sm" variant="outline" onClick={onYield}>
-            <TrendingUp data-icon="inline-start" />
-            Rendimento
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          <Button size="sm" variant="ghost" onClick={onEdit}>Editar</Button>
-          <Button size="sm" variant="ghost" onClick={onDelete} className="text-destructive">
-            Excluir
-          </Button>
-        </div>
       </CardContent>
     </Card>
   );

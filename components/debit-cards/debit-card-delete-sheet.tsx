@@ -1,18 +1,22 @@
 ﻿"use client";
 
 import { Button } from '@/components/ui/button';
+import { ButtonGroup } from '@/components/ui/button-group';
 import {
     Sheet,
     SheetBody,
+    SheetClose,
     SheetContent,
     SheetDescription,
     SheetFooter,
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useCardsHook } from '@/hooks/use-cards';
 import { formatDebitCardNumber, getFlagLabel } from '@/lib/card-utils';
 import type { DebitCard } from '@/types/finance';
+import { Trash2, X } from 'lucide-react';
 import { useState } from 'react';
 
 interface DebitCardDeleteSheetProps {
@@ -41,12 +45,40 @@ export function DebitCardDeleteSheet({ card, open, onOpenChange }: DebitCardDele
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex flex-col overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Excluir cartão de débito</SheetTitle>
-          <SheetDescription>
-            Esta ação não pode ser desfeita. Tem certeza que deseja excluir este cartão?
-          </SheetDescription>
+      <SheetContent className="flex flex-col overflow-y-auto" showCloseButton={false}>
+        <SheetHeader className="gap-3">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <SheetTitle>Excluir cartão de débito</SheetTitle>
+              <SheetDescription>
+                Esta ação não pode ser desfeita. Tem certeza que deseja excluir este cartão?
+              </SheetDescription>
+            </div>
+
+            <TooltipProvider>
+              <ButtonGroup aria-label="Ações de exclusão do cartão de débito">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button type="button" variant="outline" size="icon-sm" aria-label="Excluindo cartão" disabled>
+                      <Trash2 />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Exclusão</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <SheetClose asChild>
+                      <Button type="button" variant="outline" size="icon-sm" aria-label="Fechar">
+                        <X />
+                      </Button>
+                    </SheetClose>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Fechar</TooltipContent>
+                </Tooltip>
+              </ButtonGroup>
+            </TooltipProvider>
+          </div>
         </SheetHeader>
 
         <SheetBody className="space-y-4">

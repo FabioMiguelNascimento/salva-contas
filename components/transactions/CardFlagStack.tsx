@@ -44,7 +44,10 @@ export function CardFlagStack({ transaction, maxVisible = 3 }: CardFlagStackProp
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <div className="relative h-7 w-20 cursor-help">
+        <div 
+          className="relative h-7 w-20 cursor-help"
+          onClick={(e) => e.stopPropagation()}
+        >
           {cards.slice(0, maxVisible).map((card, index) => (
             <div
               key={card.id}

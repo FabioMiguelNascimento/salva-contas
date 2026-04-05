@@ -1,13 +1,6 @@
 ﻿"use client";
 
 import { DynamicIcon } from "@/components/dynamic-icon";
-import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
 import {
     Table,
@@ -20,15 +13,13 @@ import {
 import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import type { BudgetProgress } from "@/types/finance";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 interface BudgetTableProps {
   budgetProgress: BudgetProgress[];
   onEdit: (budget: BudgetProgress["budget"]) => void;
-  onDelete: (budget: BudgetProgress["budget"]) => void;
 }
 
-export function BudgetTable({ budgetProgress, onEdit, onDelete }: BudgetTableProps) {
+export function BudgetTable({ budgetProgress, onEdit }: BudgetTableProps) {
   if (budgetProgress.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">
@@ -46,7 +37,6 @@ export function BudgetTable({ budgetProgress, onEdit, onDelete }: BudgetTablePro
           <TableHead className="text-right">Gasto</TableHead>
           <TableHead className="text-right">Disponível</TableHead>
           <TableHead className="w-[200px]">Progresso</TableHead>
-          <TableHead className="w-12" />
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -56,7 +46,11 @@ export function BudgetTable({ budgetProgress, onEdit, onDelete }: BudgetTablePro
           const isWarning = percentage > 80 && percentage <= 100;
 
           return (
-            <TableRow key={budget.id}>
+            <TableRow
+              key={budget.id}
+              onClick={() => onEdit(budget)}
+              className="cursor-pointer hover:bg-muted/30"
+            >
               <TableCell>
                 <div className="flex items-center gap-2">
                   <span className="flex items-center gap-2 min-w-0 max-w-[260px]">
@@ -108,29 +102,6 @@ export function BudgetTable({ budgetProgress, onEdit, onDelete }: BudgetTablePro
                     {percentage.toFixed(0)}%
                   </span>
                 </div>
-              </TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                      <span className="sr-only">Abrir menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onEdit(budget)}>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Editar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDelete(budget)}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Excluir
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
               </TableCell>
             </TableRow>
           );

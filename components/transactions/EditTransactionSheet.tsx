@@ -4,15 +4,17 @@ import { DatePicker } from "@/components/date-picker";
 import { DebitCardSelect } from "@/components/debit-card-select";
 import { SplitPaymentBuilder, SplitRow } from "@/components/new-transaction/split-payment-builder";
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Sheet, SheetBody, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetBody, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatDate } from "@/lib/date-utils";
 import { cn, getTransactionStatusLabel } from "@/lib/utils";
 import { PAYMENT_METHOD_LABELS, PaymentMethod, Transaction } from "@/types/finance";
-import { SplitSquareHorizontal } from "lucide-react";
+import { Paperclip, Pencil, SplitSquareHorizontal, Trash2, X } from "lucide-react";
 import { Badge } from "../ui/badge";
 
 const PAYMENT_METHODS = Object.entries(PAYMENT_METHOD_LABELS) as [PaymentMethod, string][];
@@ -47,6 +49,8 @@ interface Props {
   installmentTransactions: Transaction[];
   isLoadingInstallments: boolean;
   onClose: () => void;
+  onDeleteTransaction?: (transaction: Transaction) => void;
+  onViewAttachment?: (transaction: Transaction) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
@@ -80,6 +84,8 @@ export function EditTransactionSheet({
   installmentTransactions,
   isLoadingInstallments,
   onClose,
+  onDeleteTransaction,
+  onViewAttachment,
   onSubmit,
 }: Props) {
   const parsedAmount = Number(editAmount.replace(/,/g, ".")) || 0;
@@ -101,16 +107,84 @@ export function EditTransactionSheet({
 
   return (
     <Sheet open={open} onOpenChange={(o) => (o ? undefined : onClose())}>
-      <SheetContent className="flex flex-col">
-        <SheetHeader>
-          <SheetTitle>Editar transação</SheetTitle>
-          {transaction?.createdByName ? (
-            <p className="text-xs text-muted-foreground">Criado por {transaction.createdByName}</p>
-          ) : null}
+      <SheetContent className="flex min-h-0 flex-col" showCloseButton={false}>
+        <SheetHeader className="gap-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <SheetTitle>Editar transação</SheetTitle>
+              {transaction?.createdByName ? (
+                <p className="text-xs text-muted-foreground">Criado por {transaction.createdByName}</p>
+              ) : null}
+            </div>
+
+            <TooltipProvider>
+              <ButtonGroup aria-label="Ações da transação">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button type="button" variant="outline" size="icon-sm" aria-label="Editando transação atual" disabled>
+                      <Pencil />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Editando</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-sm"
+                      aria-label="Abrir anexo"
+                      disabled={!transaction?.attachmentUrl}
+                      onClick={() => {
+                        if (transaction && onViewAttachment) {
+                          onViewAttachment(transaction);
+                        }
+                      }}
+                    >
+                      <Paperclip />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Anexo</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-sm"
+                      aria-label="Excluir transação"
+                      disabled={!transaction}
+                      onClick={() => {
+                        if (transaction && onDeleteTransaction) {
+                          onDeleteTransaction(transaction);
+                        }
+                      }}
+                    >
+                      <Trash2 />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Excluir</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <SheetClose asChild>
+                      <Button type="button" variant="outline" size="icon-sm" aria-label="Fechar">
+                        <X />
+                      </Button>
+                    </SheetClose>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Fechar</TooltipContent>
+                </Tooltip>
+              </ButtonGroup>
+            </TooltipProvider>
+          </div>
         </SheetHeader>
 
-        <form id="edit-transaction-form" onSubmit={onSubmit} className="flex flex-1 flex-col">
-          <SheetBody className="space-y-4">
+        <form id="edit-transaction-form" onSubmit={onSubmit} className="flex min-h-0 flex-1 flex-col">
+          <SheetBody className="min-h-0 space-y-4">
             <div className="space-y-2">
               <Label>Descrição</Label>
               <Input value={editDescription} onChange={(event) => setEditDescription(event.target.value)} required />
@@ -120,7 +194,6 @@ export function EditTransactionSheet({
               <CategorySelect value={editCategoryId} onValueChange={setEditCategoryId} />
             </div>
 
-            {/* Payment section */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label>Forma de pagamento</Label>

@@ -1,20 +1,23 @@
 ﻿"use client";
 
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
     Sheet,
     SheetBody,
+    SheetClose,
     SheetContent,
     SheetDescription,
     SheetFooter,
     SheetHeader,
     SheetTitle,
 } from "@/components/ui/sheet";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { BudgetEditorHook } from "@/hooks/use-budget-editor";
 import { formatCurrency } from "@/lib/currency-utils";
-import { Loader2 } from "lucide-react";
+import { Loader2, Pencil, Trash2, X } from "lucide-react";
 
 interface BudgetEditSheetProps {
   editor: BudgetEditorHook;
@@ -22,7 +25,7 @@ interface BudgetEditSheetProps {
 
 export function BudgetEditSheet({ editor }: BudgetEditSheetProps) {
   const { editing, values, isSubmitting, error, actions } = editor;
-  const { setValue, closeEdit, handleEditSubmit } = actions;
+  const { setValue, closeEdit, handleEditSubmit, requestDelete } = actions;
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,12 +34,61 @@ export function BudgetEditSheet({ editor }: BudgetEditSheetProps) {
 
   return (
     <Sheet open={!!editing} onOpenChange={(open) => !open && closeEdit()}>
-      <SheetContent className="flex flex-col overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Editar orçamento</SheetTitle>
-          <SheetDescription>
-            {editing?.category?.name ?? "Categoria"} – Altere o valor limite para está categoria.
-          </SheetDescription>
+      <SheetContent className="flex flex-col overflow-y-auto" showCloseButton={false}>
+        <SheetHeader className="gap-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <SheetTitle>Editar orçamento</SheetTitle>
+              <SheetDescription>
+                {editing?.category?.name ?? "Categoria"} – Altere o valor limite para está categoria.
+              </SheetDescription>
+            </div>
+
+            <TooltipProvider>
+              <ButtonGroup aria-label="Ações do orçamento">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button type="button" variant="outline" size="icon-sm" aria-label="Editando orçamento atual" disabled>
+                      <Pencil />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Editando</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-sm"
+                      aria-label="Excluir orçamento"
+                      disabled={!editing}
+                      onClick={() => {
+                        if (editing) {
+                          requestDelete(editing);
+                          closeEdit();
+                        }
+                      }}
+                    >
+                      <Trash2 />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Excluir</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <SheetClose asChild>
+                      <Button type="button" variant="outline" size="icon-sm" aria-label="Fechar">
+                        <X />
+                      </Button>
+                    </SheetClose>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Fechar</TooltipContent>
+                </Tooltip>
+              </ButtonGroup>
+            </TooltipProvider>
+          </div>
         </SheetHeader>
 
         <form id="edit-budget-form" className="flex flex-1 flex-col" onSubmit={onSubmit}>

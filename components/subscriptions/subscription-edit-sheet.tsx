@@ -1,23 +1,26 @@
 ﻿import { CategorySelect } from "@/components/category-select";
 import { CreditCardSelect } from "@/components/credit-card-select";
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
-  Sheet,
-  SheetBody,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
+    Sheet,
+    SheetBody,
+    SheetClose,
+    SheetContent,
+    SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
 } from "@/components/ui/sheet";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import type { SubscriptionEditorHook } from "@/hooks/use-subscription-editor";
 import { frequencyOptions, months, weekDays } from "@/lib/subscriptions/constants";
 import type { SubscriptionFrequency } from "@/types/finance";
-import { Loader2 } from "lucide-react";
+import { Loader2, Pencil, Trash2, X } from "lucide-react";
 
 interface SubscriptionEditSheetProps {
   editor: SubscriptionEditorHook;
@@ -25,14 +28,63 @@ interface SubscriptionEditSheetProps {
 
 export function SubscriptionEditSheet({ editor }: SubscriptionEditSheetProps) {
   const { editing, values, error, isSubmitting, actions } = editor;
-  const { setValue, closeEdit, handleEditSubmit } = actions;
+  const { setValue, closeEdit, handleEditSubmit, requestDelete } = actions;
 
   return (
     <Sheet open={!!editing} onOpenChange={(open) => (!open ? closeEdit() : undefined)}>
-      <SheetContent className="flex flex-col overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Editar assinatura</SheetTitle>
-          <SheetDescription>Ajuste valores ou frequencia desta recorrência.</SheetDescription>
+      <SheetContent className="flex flex-col overflow-y-auto" showCloseButton={false}>
+        <SheetHeader className="gap-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <SheetTitle>Editar assinatura</SheetTitle>
+              <SheetDescription>Ajuste valores ou frequencia desta recorrência.</SheetDescription>
+            </div>
+
+            <TooltipProvider>
+              <ButtonGroup aria-label="Ações da assinatura">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button type="button" variant="outline" size="icon-sm" aria-label="Editando assinatura atual" disabled>
+                      <Pencil />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Editando</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-sm"
+                      aria-label="Cancelar assinatura"
+                      disabled={!editing}
+                      onClick={() => {
+                        if (editing) {
+                          requestDelete(editing);
+                          closeEdit();
+                        }
+                      }}
+                    >
+                      <Trash2 />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Excluir</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <SheetClose asChild>
+                      <Button type="button" variant="outline" size="icon-sm" aria-label="Fechar">
+                        <X />
+                      </Button>
+                    </SheetClose>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Fechar</TooltipContent>
+                </Tooltip>
+              </ButtonGroup>
+            </TooltipProvider>
+          </div>
         </SheetHeader>
         {editing && (
           <form className="flex flex-1 flex-col" onSubmit={handleEditSubmit}>

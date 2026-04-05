@@ -2,26 +2,17 @@
 
 import { FlagIcon } from '@/components/flag-icon';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatDebitCardNumber, getFlagLabel, getStatusLabel, getStatusVariant } from '@/lib/card-utils';
 import { cn } from '@/lib/utils';
 import type { DebitCard } from '@/types/finance';
-import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 
 interface DebitCardTableProps {
   debitCards: DebitCard[];
   onEdit: (card: DebitCard) => void;
-  onDelete: (card: DebitCard) => void;
 }
 
-export function DebitCardTable({ debitCards, onEdit, onDelete }: DebitCardTableProps) {
+export function DebitCardTable({ debitCards, onEdit }: DebitCardTableProps) {
   if (debitCards.length === 0) {
     return (
       <div className="rounded-2xl border border-dashed border-border/60 p-8 text-center text-sm text-muted-foreground">
@@ -37,12 +28,15 @@ export function DebitCardTable({ debitCards, onEdit, onDelete }: DebitCardTableP
           <TableHead>Cartão</TableHead>
           <TableHead>Bandeira</TableHead>
           <TableHead>Status</TableHead>
-          <TableHead className="w-12" />
         </TableRow>
       </TableHeader>
       <TableBody>
         {debitCards.map((card) => (
-          <TableRow key={card.id}>
+          <TableRow
+            key={card.id}
+            onClick={() => onEdit(card)}
+            className="cursor-pointer hover:bg-muted/30"
+          >
             <TableCell>
               <div className="max-w-60 min-w-0">
                 <p className="truncate font-semibold">{card.name}</p>
@@ -67,29 +61,6 @@ export function DebitCardTable({ debitCards, onEdit, onDelete }: DebitCardTableP
               >
                 {getStatusLabel(card.status)}
               </Badge>
-            </TableCell>
-            <TableCell>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8">
-                    <MoreHorizontal className="h-4 w-4" />
-                    <span className="sr-only">Abrir menu</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => onEdit(card)}>
-                    <Pencil className="mr-2 h-4 w-4" />
-                    Editar
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => onDelete(card)}
-                    className="text-destructive focus:text-destructive"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Excluir
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
             </TableCell>
           </TableRow>
         ))}

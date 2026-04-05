@@ -2,6 +2,7 @@
 
 import { FlagIcon } from '@/components/flag-icon';
 import { Button } from '@/components/ui/button';
+import { ButtonGroup } from '@/components/ui/button-group';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -14,24 +15,28 @@ import {
 import {
     Sheet,
     SheetBody,
+    SheetClose,
     SheetContent,
     SheetDescription,
     SheetFooter,
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useCardsHook } from '@/hooks/use-cards';
 import { cardFlags, cardStatuses } from '@/lib/card-utils';
 import type { CreditCardFlag, DebitCard, DebitCardStatus } from '@/types/finance';
+import { Pencil, Trash2, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface DebitCardEditSheetProps {
   card: DebitCard | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onRequestDelete?: (card: DebitCard) => void;
 }
 
-export function DebitCardEditSheet({ card, open, onOpenChange }: DebitCardEditSheetProps) {
+export function DebitCardEditSheet({ card, open, onOpenChange, onRequestDelete }: DebitCardEditSheetProps) {
   const { updateDebitCardEntry } = useCardsHook();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -70,12 +75,61 @@ export function DebitCardEditSheet({ card, open, onOpenChange }: DebitCardEditSh
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex flex-col overflow-y-auto">
-        <SheetHeader>
-          <SheetTitle>Editar cartão de débito</SheetTitle>
-          <SheetDescription>
-            Atualize as informações do seu cartão de débito.
-          </SheetDescription>
+      <SheetContent className="flex flex-col overflow-y-auto" showCloseButton={false}>
+        <SheetHeader className="gap-3">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <SheetTitle>Editar cartão de débito</SheetTitle>
+              <SheetDescription>
+                Atualize as informações do seu cartão de débito.
+              </SheetDescription>
+            </div>
+
+            <TooltipProvider>
+              <ButtonGroup aria-label="Ações do cartão de débito">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button type="button" variant="outline" size="icon-sm" aria-label="Editando cartão atual" disabled>
+                      <Pencil />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Editando</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="icon-sm"
+                      aria-label="Excluir cartão"
+                      disabled={!card}
+                      onClick={() => {
+                        if (card && onRequestDelete) {
+                          onRequestDelete(card);
+                          onOpenChange(false);
+                        }
+                      }}
+                    >
+                      <Trash2 />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Excluir</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <SheetClose asChild>
+                      <Button type="button" variant="outline" size="icon-sm" aria-label="Fechar">
+                        <X />
+                      </Button>
+                    </SheetClose>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Fechar</TooltipContent>
+                </Tooltip>
+              </ButtonGroup>
+            </TooltipProvider>
+          </div>
         </SheetHeader>
 
         <form id="edit-debit-card-form" onSubmit={handleSubmit} className="flex flex-1 flex-col">

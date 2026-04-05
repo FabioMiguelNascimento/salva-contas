@@ -10,7 +10,7 @@ import { SubscriptionTable } from "@/components/subscriptions/subscription-table
 import { SummaryCard } from "@/components/summary-card";
 import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { CardsProvider } from "@/context/cards-context";
 import { SubscriptionsProvider } from "@/context/subscriptions-context";
 import { TransactionsProvider } from "@/context/transactions-context";
@@ -112,7 +112,6 @@ function SubscriptionsPageContent() {
                 <SubscriptionTable
                   subscriptions={filteredSubscriptions}
                   onEdit={editorActions.openEdit}
-                  onDelete={editorActions.requestDelete}
                 />
               </div>
               <div className="grid gap-3 md:hidden">
@@ -121,7 +120,6 @@ function SubscriptionsPageContent() {
                     key={subscription.id}
                     subscription={subscription}
                     onEdit={editorActions.openEdit}
-                    onDelete={editorActions.requestDelete}
                   />
                 ))}
               </div>

@@ -1,29 +1,31 @@
 import { DynamicIcon } from "@/components/dynamic-icon";
 import { FlagIcon } from "@/components/flag-icon";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { formatCurrency } from "@/lib/currency-utils";
 import { getFrequencyLabel, getScheduleLabel } from "@/lib/subscriptions/utils";
 import type { Subscription } from "@/types/finance";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 interface SubscriptionListCardProps {
   subscription: Subscription;
   onEdit: (subscription: Subscription) => void;
-  onDelete: (subscription: Subscription) => void;
 }
 
-export function SubscriptionListCard({ subscription, onEdit, onDelete }: SubscriptionListCardProps) {
+export function SubscriptionListCard({ subscription, onEdit }: SubscriptionListCardProps) {
   const iconName = subscription.category?.icon ?? "tag";
 
   return (
-    <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => onEdit(subscription)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onEdit(subscription);
+        }
+      }}
+      className="rounded-2xl border border-gray-100 bg-white p-4 text-left shadow-sm cursor-pointer"
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <div className="w-10 h-10 rounded-full flex items-center justify-center bg-indigo-50 shrink-0">
@@ -34,27 +36,6 @@ export function SubscriptionListCard({ subscription, onEdit, onDelete }: Subscri
             <p className="text-xs text-gray-400">{subscription.category?.name ?? "Sem categoria"}</p>
           </div>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">Abrir menu</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onEdit(subscription)}>
-              <Pencil className="mr-2 h-4 w-4" />
-              Editar
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => onDelete(subscription)}
-              className="text-destructive focus:text-destructive"
-            >
-              <Trash2 className="mr-2 h-4 w-4" />
-              Cancelar assinatura
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
       <div className="mt-3 flex items-center justify-between">
         <strong className="font-bold text-gray-900">{formatCurrency(subscription.amount)}</strong>

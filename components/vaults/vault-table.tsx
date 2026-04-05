@@ -1,13 +1,6 @@
 "use client";
 
 import { DynamicIcon } from "@/components/dynamic-icon";
-import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Progress } from "@/components/ui/progress";
 import {
     Table,
@@ -20,31 +13,15 @@ import {
 import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import type { Vault } from "@/types/finance";
-import {
-    HandCoins,
-    Landmark,
-    MoreHorizontal,
-    Pencil,
-    Trash2,
-    TrendingUp
-} from "lucide-react";
 
 interface VaultTableProps {
   vaults: Vault[];
-  onDeposit: (vault: Vault) => void;
-  onWithdraw: (vault: Vault) => void;
-  onYield: (vault: Vault) => void;
   onEdit: (vault: Vault) => void;
-  onDelete: (vault: Vault) => void;
 }
 
 export function VaultTable({
   vaults,
-  onDeposit,
-  onWithdraw,
-  onYield,
   onEdit,
-  onDelete,
 }: VaultTableProps) {
   return (
     <Table className="min-w-[940px]">
@@ -54,7 +31,6 @@ export function VaultTable({
           <TableHead className="text-right">Saldo atual</TableHead>
           <TableHead className="text-right">Meta</TableHead>
           <TableHead className="w-[200px]">Progresso</TableHead>
-          <TableHead className="w-12" />
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -65,7 +41,11 @@ export function VaultTable({
             : 0;
 
           return (
-            <TableRow key={vault.id}>
+            <TableRow
+              key={vault.id}
+              onClick={() => onEdit(vault)}
+              className="cursor-pointer hover:bg-muted/30"
+            >
               <TableCell>
                 <div className="flex items-center gap-2">
                   <span
@@ -106,41 +86,6 @@ export function VaultTable({
                 )}
               </TableCell>
 
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8">
-                      <MoreHorizontal className="h-4 w-4" />
-                      <span className="sr-only">Abrir menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => onDeposit(vault)}>
-                      <Landmark className="mr-2 h-4 w-4" />
-                      Guardar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onWithdraw(vault)}>
-                      <HandCoins className="mr-2 h-4 w-4" />
-                      Resgatar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onYield(vault)}>
-                      <TrendingUp className="mr-2 h-4 w-4" />
-                      Rendimento
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => onEdit(vault)}>
-                      <Pencil className="mr-2 h-4 w-4" />
-                      Editar
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onClick={() => onDelete(vault)}
-                      className="text-destructive focus:text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Excluir
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
             </TableRow>
           );
         })}

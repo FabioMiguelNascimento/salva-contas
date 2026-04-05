@@ -1,19 +1,16 @@
 ﻿"use client";
 
-import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency } from "@/lib/currency-utils";
 import { cn } from "@/lib/utils";
 import type { BudgetProgress } from "@/types/finance";
-import { Pencil, Trash2 } from "lucide-react";
 
 interface BudgetProgressCardProps {
   progress: BudgetProgress;
   onEdit: (budget: BudgetProgress["budget"]) => void;
-  onDelete: (budget: BudgetProgress["budget"]) => void;
 }
 
-export function BudgetProgressCard({ progress, onEdit, onDelete }: BudgetProgressCardProps) {
+export function BudgetProgressCard({ progress, onEdit }: BudgetProgressCardProps) {
   const { budget, spent, remaining } = progress;
   const budgetAmount = Number(budget.amount) || 0;
   const utilizationPercentage = budgetAmount > 0 ? (spent / budgetAmount) * 100 : 0;
@@ -22,7 +19,18 @@ export function BudgetProgressCard({ progress, onEdit, onDelete }: BudgetProgres
   const isWarning = !isOverBudget && utilizationPercentage > 80;
 
   return (
-    <div className="group relative rounded-xl border bg-card p-4 transition-colors hover:bg-muted/30">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => onEdit(budget)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onEdit(budget);
+        }
+      }}
+      className="group relative rounded-xl border bg-card p-4 transition-colors hover:bg-muted/30 cursor-pointer"
+    >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 space-y-1">
           <div className="flex items-center gap-2">
@@ -41,17 +49,6 @@ export function BudgetProgressCard({ progress, onEdit, onDelete }: BudgetProgres
           <p className="text-xs text-muted-foreground">
             {budget.month}/{budget.year}
           </p>
-        </div>
-
-        <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(budget)}>
-            <Pencil className="h-4 w-4" />
-            <span className="sr-only">Editar</span>
-          </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onDelete(budget)}>
-            <Trash2 className="h-4 w-4" />
-            <span className="sr-only">Excluir</span>
-          </Button>
         </div>
       </div>
 

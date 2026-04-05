@@ -9,14 +9,15 @@ import { SummaryCard } from "@/components/summary-card";
 import { SummaryCardsGrid } from "@/components/summary-cards-grid";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetBody, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatCurrency } from "@/lib/currency-utils";
 import { cn, getTransactionCategoryLabel, parseDateOnly, toDateOnlyString } from "@/lib/utils";
 import { fetchPendingBills, updateTransaction } from "@/services/transactions";
@@ -24,7 +25,7 @@ import type { PendingBillsFilter, Transaction } from "@/types/finance";
 import { useQuery } from "@tanstack/react-query";
 import { differenceInCalendarDays, format } from "date-fns";
 import { ptBR } from "date-fns/locale";
-import { AlertTriangle, Calendar, CheckCircle2, FileText, MoreHorizontal, PencilLine, ShieldCheck } from "lucide-react";
+import { AlertTriangle, Calendar, CheckCircle2, FileText, PencilLine, ShieldCheck, X } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -193,14 +194,13 @@ function ContasPageContent() {
                   <TableHead>Valor</TableHead>
                   <TableHead>Vencimento</TableHead>
                   <TableHead>Dias restantes</TableHead>
-                  <TableHead className="text-right">Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {isLoading ? (
                   Array.from({ length: 4 }).map((_, index) => (
                     <TableRow key={`skeleton-${index}`}>
-                      <TableCell colSpan={6}>
+                      <TableCell colSpan={5}>
                         <Skeleton className="h-12 w-full" />
                       </TableCell>
                     </TableRow>
@@ -209,13 +209,20 @@ function ContasPageContent() {
                   filteredBills.map((bill) => {
                     const categoryLabel = getTransactionCategoryLabel(bill);
                     return (
-                      <TableRow key={bill.id}>
+                      <TableRow
+                        key={bill.id}
+                        onClick={() => openEditSheet(bill)}
+                        className="cursor-pointer hover:bg-muted/30"
+                      >
                         <TableCell className="max-w-[320px]">
                           <div className="min-w-0">
                             <button
                               type="button"
-                              onClick={() => copyTransactionId(bill)}
-                              className="block w-full truncate font-semibold text-left hover:underline decoration-dotted"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                void copyTransactionId(bill);
+                              }}
+                              className="inline-block max-w-full truncate font-semibold text-left hover:underline decoration-dotted"
                               title="Clique para copiar o ID da transação"
                             >
                               {bill.description}
@@ -238,38 +245,12 @@ function ContasPageContent() {
                         <TableCell>{formatCurrency(bill.amount)}</TableCell>
                         <TableCell>{bill.dueDate ? format(parseDateOnly(bill.dueDate)!, "dd/MM", { locale: ptBR }) : "—"}</TableCell>
                         <TableCell>{formatDaysRemaining(bill)}</TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon" className="h-8 w-8">
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Ações</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              {bill.attachmentUrl && (
-                                <DropdownMenuItem onClick={() => setAttachmentViewer({ open: true, bill })}>
-                                  <FileText className="mr-2 h-4 w-4" />
-                                  Ver anexo
-                                </DropdownMenuItem>
-                              )}
-                              <DropdownMenuItem onClick={() => setPayDialog({ open: true, bill })}>
-                                <CheckCircle2 className="mr-2 h-4 w-4" />
-                                Marcar como pago
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => openEditSheet(bill)}>
-                                <PencilLine className="mr-2 h-4 w-4" />
-                                Editar
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
                       </TableRow>
                     );
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-sm text-muted-foreground">
+                    <TableCell colSpan={5} className="text-center text-sm text-muted-foreground">
                       Nenhuma conta encontrada para este filtro.
                     </TableCell>
                   </TableRow>
@@ -350,12 +331,40 @@ function ContasPageContent() {
       </Card>
 
       <Sheet open={payDialog.open} onOpenChange={(open) => setPayDialog({ open })}>
-        <SheetContent className="flex flex-col">
-          <SheetHeader>
-            <SheetTitle>Confirmar pagamento</SheetTitle>
-            <SheetDescription>
-              Esta ação irá marcar a conta como paga.
-            </SheetDescription>
+        <SheetContent className="flex flex-col" showCloseButton={false}>
+          <SheetHeader className="gap-3">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <SheetTitle>Confirmar pagamento</SheetTitle>
+                <SheetDescription>
+                  Esta ação irá marcar a conta como paga.
+                </SheetDescription>
+              </div>
+
+              <TooltipProvider>
+                <ButtonGroup aria-label="Ações de confirmação de pagamento">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button type="button" variant="outline" size="icon-sm" aria-label="Confirmando pagamento" disabled>
+                        <CheckCircle2 />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Confirmar</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SheetClose asChild>
+                        <Button type="button" variant="outline" size="icon-sm" aria-label="Fechar">
+                          <X />
+                        </Button>
+                      </SheetClose>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Fechar</TooltipContent>
+                  </Tooltip>
+                </ButtonGroup>
+              </TooltipProvider>
+            </div>
           </SheetHeader>
 
           <SheetBody>
@@ -376,9 +385,76 @@ function ContasPageContent() {
       </Sheet>
 
       <Sheet open={editSheet.open} onOpenChange={(open) => setEditSheet({ open })}>
-        <SheetContent className="flex flex-col">
-          <SheetHeader>
-            <SheetTitle>Editar conta</SheetTitle>
+        <SheetContent className="flex flex-col" showCloseButton={false}>
+          <SheetHeader className="gap-3">
+            <div className="flex items-start justify-between gap-3">
+              <SheetTitle>Editar conta</SheetTitle>
+
+              <TooltipProvider>
+                <ButtonGroup aria-label="Ações da conta">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button type="button" variant="outline" size="icon-sm" aria-label="Editando conta atual" disabled>
+                        <PencilLine />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Editando</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon-sm"
+                        aria-label="Ver anexo"
+                        disabled={!editSheet.bill?.attachmentUrl}
+                        onClick={() => {
+                          if (editSheet.bill?.attachmentUrl) {
+                            setAttachmentViewer({ open: true, bill: editSheet.bill });
+                          }
+                        }}
+                      >
+                        <FileText />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Anexo</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon-sm"
+                        aria-label="Marcar como pago"
+                        disabled={!editSheet.bill}
+                        onClick={() => {
+                          if (editSheet.bill) {
+                            setEditSheet({ open: false });
+                            setPayDialog({ open: true, bill: editSheet.bill });
+                          }
+                        }}
+                      >
+                        <CheckCircle2 />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Pagar</TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SheetClose asChild>
+                        <Button type="button" variant="outline" size="icon-sm" aria-label="Fechar">
+                          <X />
+                        </Button>
+                      </SheetClose>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Fechar</TooltipContent>
+                  </Tooltip>
+                </ButtonGroup>
+              </TooltipProvider>
+            </div>
           </SheetHeader>
 
           <form id="edit-bill-form" onSubmit={handleEditSubmit} className="flex flex-1 flex-col">

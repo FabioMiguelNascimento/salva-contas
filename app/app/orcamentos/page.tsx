@@ -99,7 +99,6 @@ function BudgetsPageContent() {
                 <BudgetTable
                   budgetProgress={budgetProgress}
                   onEdit={editorActions.openEdit}
-                  onDelete={editorActions.requestDelete}
                 />
               </div>
               <div className="grid gap-3 md:hidden">
@@ -108,7 +107,6 @@ function BudgetsPageContent() {
                     key={progress.budget.id}
                     progress={progress}
                     onEdit={editorActions.openEdit}
-                    onDelete={editorActions.requestDelete}
                   />
                 ))}
               </div>

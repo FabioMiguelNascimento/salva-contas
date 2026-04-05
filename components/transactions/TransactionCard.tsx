@@ -8,8 +8,6 @@ import { toast } from "sonner";
 interface Props {
     transaction: Transaction;
     onEdit: (tx: Transaction) => void;
-    onDelete: (tx: Transaction) => void;
-    onViewAttachment?: (tx: Transaction) => void;
     isLoading: boolean;
 }
 
@@ -62,7 +60,7 @@ export function TransactionCard({
               event.stopPropagation();
               copyTransactionId();
             }}
-            className="block w-full truncate text-left text-[15px] font-medium leading-6 hover:underline decoration-dotted"
+            className="inline-block max-w-full truncate text-left text-[15px] font-medium leading-6 hover:underline decoration-dotted"
             title="Clique para copiar o ID da transação"
           >
             {transaction.description}
