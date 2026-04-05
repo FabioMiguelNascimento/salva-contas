@@ -30,15 +30,31 @@ export default function VaultActionSummaryVisualization({
     addedAmount?: number;
     actionType?: 'deposit' | 'withdraw' | 'yield';
     actionAmount?: number;
+    items?: Array<{
+      vault?: string;
+      action?: 'deposit' | 'withdraw' | 'yield';
+      amount?: number | string;
+      balance?: number | string;
+    }>;
   };
 
-  const currentAmount = Number(payload.currentAmount ?? 0);
+  const firstItem = Array.isArray(payload.items) && payload.items.length > 0
+    ? payload.items[0]
+    : null;
+
+  const actionType = firstItem?.action ?? payload.actionType;
+  const vaultName = firstItem?.vault ?? payload.name;
+  const currentAmount = Number(firstItem?.balance ?? payload.currentAmount ?? 0);
   const targetAmount = Number(payload.targetAmount ?? 0);
-  const actionAmount = Number(payload.actionAmount ?? 0);
+  const actionAmount = Number(
+    firstItem?.amount ?? payload.actionAmount ?? payload.addedAmount ?? 0,
+  );
+
   const missingAmount = targetAmount > 0 ? Math.max(0, targetAmount - currentAmount) : 0;
-  const isDeposit = payload.actionType === 'deposit' || payload.actionType === 'yield';
-  const actionLabel = payload.actionType === 'withdraw' ? 'Resgatado (hoje)' : 'Adicionado (hoje)';
-  const actionDisplay = isDeposit ? actionAmount : Math.abs(actionAmount);
+  const isDeposit = actionType === 'deposit' || actionType === 'yield';
+  const hasTarget = targetAmount > 0;
+  const actionLabel = actionType === 'withdraw' ? 'Resgatado' : 'Adicionado';
+  const actionDisplay = Math.abs(actionAmount);
 
   return (
     <div className="mt-3 w-full min-w-0 overflow-hidden rounded-2xl border border-emerald-900/30 bg-emerald-950/80 p-4 shadow-lg">
@@ -51,7 +67,7 @@ export default function VaultActionSummaryVisualization({
         </div>
         <div>
           <p className="text-sm uppercase tracking-widest text-emerald-300/90">Meta</p>
-          <p className="text-2xl font-bold text-white">{payload.name ?? 'Cofrinho'}</p>
+          <p className="text-2xl font-bold text-white">{vaultName ?? 'Cofrinho'}</p>
         </div>
       </div>
 
@@ -67,26 +83,35 @@ export default function VaultActionSummaryVisualization({
           <p className="text-xs text-emerald-300">Já acumulado</p>
           <p className="text-xl font-bold text-white">{formatCurrency(currentAmount)}</p>
         </div>
-        <div className="rounded-lg border border-emerald-800 bg-emerald-900/60 p-3">
-          <p className="text-xs text-emerald-300">Meta total</p>
-          <p className="text-xl font-bold text-white">{formatCurrency(targetAmount)}</p>
-        </div>
+        {hasTarget ? (
+          <div className="rounded-lg border border-emerald-800 bg-emerald-900/60 p-3">
+            <p className="text-xs text-emerald-300">Meta total</p>
+            <p className="text-xl font-bold text-white">{formatCurrency(targetAmount)}</p>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-emerald-800 bg-emerald-900/60 p-3">
+            <p className="text-xs text-emerald-300">Objetivo</p>
+            <p className="text-base font-semibold text-white">Sem meta definida</p>
+          </div>
+        )}
       </div>
 
-      <div className="mt-3 flex items-center justify-between rounded-lg border border-emerald-800 bg-emerald-900/60 p-3">
-        <p className="text-sm font-medium text-emerald-300">Falta</p>
-        <p className="text-lg font-bold text-white">{formatCurrency(missingAmount)}</p>
-      </div>
+      {hasTarget && (
+        <div className="mt-3 flex items-center justify-between rounded-lg border border-emerald-800 bg-emerald-900/60 p-3">
+          <p className="text-sm font-medium text-emerald-300">Falta</p>
+          <p className="text-lg font-bold text-white">{formatCurrency(missingAmount)}</p>
+        </div>
+      )}
 
       <div className="mt-3 h-2 w-full rounded-full bg-white/10">
         <div
           className="h-full rounded-full bg-emerald-300"
-          style={{ width: `${Math.min(100, targetAmount > 0 ? (currentAmount / targetAmount) * 100 : 0)}%` }}
+          style={{ width: `${Math.min(100, hasTarget ? (currentAmount / targetAmount) * 100 : 0)}%` }}
         />
       </div>
 
       <p className="mt-1 text-xs text-emerald-200">
-        {targetAmount > 0
+        {hasTarget
           ? `${Math.min(100, (currentAmount / targetAmount) * 100).toFixed(0)}% Concluido`
           : 'Sem meta definida'}
       </p>
