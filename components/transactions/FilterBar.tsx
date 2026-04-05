@@ -5,6 +5,7 @@ import { getAvailableYears, monthsShort } from "@/lib/subscriptions/constants";
 import type { TransactionCategory } from "@/types/finance";
 import { Loader2 } from "lucide-react";
 import { ChangeEvent, useEffect, useState } from "react";
+import { DynamicIcon } from "../dynamic-icon";
 
 interface Props {
   search: string;
@@ -130,7 +131,10 @@ export function FilterBar({
               <SelectItem value="all">Todas as categorias</SelectItem>
               {categories.map((category) => (
                 <SelectItem key={category.id} value={category.id}>
-                  {category.name}
+                  <span  className="flex gap-4">
+                    <DynamicIcon name={category.icon!} />
+                    {category.name}
+                    </span>
                 </SelectItem>
               ))}
             </SelectContent>
