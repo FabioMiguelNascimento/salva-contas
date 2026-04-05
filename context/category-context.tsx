@@ -1,6 +1,6 @@
 "use client";
 
-import { fetchCategories } from "@/services/categories";
+import { categoriesQueryKey, fetchCategories } from "@/services/categories";
 import type { TransactionCategory } from "@/types/finance";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createContext, useCallback, useContext } from "react";
@@ -19,13 +19,13 @@ export function CategoryProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
 
   const categoriesQuery = useQuery({
-    queryKey: ["transaction-categories"],
+    queryKey: categoriesQueryKey,
     queryFn: fetchCategories,
     staleTime: 10 * 60_000,
   });
 
   const refresh = useCallback(async () => {
-    await queryClient.invalidateQueries({ queryKey: ["transaction-categories"] });
+    await queryClient.invalidateQueries({ queryKey: categoriesQueryKey });
   }, [queryClient]);
 
   return (

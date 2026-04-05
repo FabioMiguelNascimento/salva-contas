@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Sheet, SheetBody, SheetClose, SheetContent, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { formatDate } from "@/lib/date-utils";
 import { cn, getTransactionStatusLabel } from "@/lib/utils";
 import { PAYMENT_METHOD_LABELS, PaymentMethod, Transaction } from "@/types/finance";
@@ -106,7 +105,7 @@ export function EditTransactionSheet({
   }
 
   return (
-    <Sheet open={open} onOpenChange={(o) => (o ? undefined : onClose())}>
+    <Sheet open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
       <SheetContent className="flex min-h-0 flex-col" showCloseButton={false}>
         <SheetHeader className="gap-3">
           <div className="flex items-start justify-between gap-3">
@@ -117,69 +116,55 @@ export function EditTransactionSheet({
               ) : null}
             </div>
 
-            <TooltipProvider>
-              <ButtonGroup aria-label="Ações da transação">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button type="button" variant="outline" size="icon-sm" aria-label="Editando transação atual" disabled>
-                      <Pencil />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">Editando</TooltipContent>
-                </Tooltip>
+            <ButtonGroup aria-label="Ações da transação">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon-sm"
+                aria-label="Editando transação atual"
+                disabled
+              >
+                <Pencil data-icon="inline-start" />
+              </Button>
 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon-sm"
-                      aria-label="Abrir anexo"
-                      disabled={!transaction?.attachmentUrl}
-                      onClick={() => {
-                        if (transaction && onViewAttachment) {
-                          onViewAttachment(transaction);
-                        }
-                      }}
-                    >
-                      <Paperclip />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">Anexo</TooltipContent>
-                </Tooltip>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon-sm"
+                aria-label="Abrir anexo"
+                disabled={!transaction?.attachmentUrl}
+                className={cn(!transaction?.attachmentUrl && "hidden")}
+                onClick={() => {
+                  if (transaction && onViewAttachment) {
+                    onViewAttachment(transaction);
+                  }
+                }}
+              >
+                <Paperclip data-icon="inline-start" />
+              </Button>
 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon-sm"
-                      aria-label="Excluir transação"
-                      disabled={!transaction}
-                      onClick={() => {
-                        if (transaction && onDeleteTransaction) {
-                          onDeleteTransaction(transaction);
-                        }
-                      }}
-                    >
-                      <Trash2 />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">Excluir</TooltipContent>
-                </Tooltip>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon-sm"
+                aria-label="Excluir transação"
+                className="hover:border-destructive/50 hover:text-destructive"
+                disabled={!transaction}
+                onClick={() => {
+                  if (transaction && onDeleteTransaction) {
+                    onDeleteTransaction(transaction);
+                  }
+                }}
+              >
+                <Trash2 data-icon="inline-start" />
+              </Button>
 
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <SheetClose asChild>
-                      <Button type="button" variant="outline" size="icon-sm" aria-label="Fechar">
-                        <X />
-                      </Button>
-                    </SheetClose>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">Fechar</TooltipContent>
-                </Tooltip>
-              </ButtonGroup>
-            </TooltipProvider>
+              <SheetClose asChild>
+                <Button type="button" variant="outline" size="icon-sm" aria-label="Fechar">
+                  <X data-icon="inline-start" />
+                </Button>
+              </SheetClose>
+            </ButtonGroup>
           </div>
         </SheetHeader>
 

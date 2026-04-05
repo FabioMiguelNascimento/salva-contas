@@ -1,9 +1,8 @@
-﻿import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { Sheet, SheetBody, SheetClose, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { AlertTriangle, Trash2, X } from "lucide-react";
 import type { Transaction } from "@/types/finance";
-import { Trash2, X } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -21,57 +20,54 @@ export function DeleteTransactionDialog({
   onDelete,
 }: Props) {
   return (
-    <Sheet open={open} onOpenChange={(o) => (o ? undefined : onClose())}>
-      <SheetContent className="flex flex-col" showCloseButton={false}>
+    <Sheet open={open} onOpenChange={(nextOpen) => !nextOpen && onClose()}>
+      <SheetContent className="flex min-h-0 flex-col" showCloseButton={false}>
         <SheetHeader className="gap-3">
           <div className="flex items-start justify-between gap-3">
-            <div>
+            <div className="min-w-0">
               <SheetTitle>Remover transação</SheetTitle>
-              <SheetDescription>Esta ação não pode ser desfeita.</SheetDescription>
+              <SheetDescription>Essa ação não pode ser desfeita.</SheetDescription>
             </div>
 
-            <TooltipProvider>
-              <ButtonGroup aria-label="Ações de remoção da transação">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button type="button" variant="outline" size="icon-sm" aria-label="Removendo transação" disabled>
-                      <Trash2 />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">Remover</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <SheetClose asChild>
-                      <Button type="button" variant="outline" size="icon-sm" aria-label="Fechar">
-                        <X />
-                      </Button>
-                    </SheetClose>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">Fechar</TooltipContent>
-                </Tooltip>
-              </ButtonGroup>
-            </TooltipProvider>
+            <ButtonGroup aria-label="Ações de remoção da transação">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon-sm"
+                aria-label="Removendo transação"
+                disabled
+              >
+                <Trash2 data-icon="inline-start" />
+              </Button>
+              <SheetClose asChild>
+                <Button type="button" variant="outline" size="icon-sm" aria-label="Fechar">
+                  <X data-icon="inline-start" />
+                </Button>
+              </SheetClose>
+            </ButtonGroup>
           </div>
         </SheetHeader>
 
-        <SheetBody>
-          <p className="text-sm text-muted-foreground">
-            {transaction
-              ? `Deseja excluir a transação "${transaction.description}"?`
-              : ""}
-          </p>
+        <SheetBody className="flex min-h-0 flex-1 flex-col gap-4">
+          <div className="flex items-center gap-3 rounded-xl border border-destructive/20 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+            <AlertTriangle className="shrink-0" />
+            <span>
+              Tem certeza que deseja excluir &ldquo;{transaction?.description}&rdquo;?
+            </span>
+          </div>
+
           {transaction?.createdByName ? (
-            <p className="mt-2 text-xs text-muted-foreground">Criado por {transaction.createdByName}</p>
+            <div className="rounded-xl border border-border/60 bg-muted/20 px-3 py-2 text-sm text-muted-foreground">
+              Criado por {transaction.createdByName}
+            </div>
           ) : null}
         </SheetBody>
 
         <SheetFooter className="flex-row gap-2">
-          <Button variant="ghost" onClick={onClose} disabled={isProcessing} className="flex-1">
+          <Button type="button" variant="outline" className="flex-1" onClick={onClose} disabled={isProcessing}>
             Cancelar
           </Button>
-          <Button variant="destructive" onClick={onDelete} disabled={isProcessing} className="flex-1">
+          <Button type="button" variant="destructive" className="flex-1" onClick={onDelete} disabled={isProcessing}>
             {isProcessing ? "Removendo..." : "Excluir"}
           </Button>
         </SheetFooter>
@@ -79,4 +75,3 @@ export function DeleteTransactionDialog({
     </Sheet>
   );
 }
-

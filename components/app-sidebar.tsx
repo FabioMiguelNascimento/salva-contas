@@ -1,33 +1,34 @@
 "use client";
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarGroup,
+    SidebarGroupContent,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuButton,
+    SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import UserInitials from "@/components/ui/user-initials";
 import { useAuth } from "@/contexts/auth-context";
 import { getPlanLabel } from "@/lib/utils";
 import {
-  CalendarClock,
-  CreditCard,
-  HandCoins,
-  LayoutDashboard,
-  LogOut,
-  PiggyBank,
-  ReceiptText,
-  Repeat,
-  Settings,
-  Sparkles,
-  User,
-  Users,
+    CalendarClock,
+    CreditCard,
+    HandCoins,
+    LayoutDashboard,
+    LogOut,
+    PiggyBank,
+    ReceiptText,
+    Repeat,
+    Settings,
+    Sparkles,
+    Tags,
+    User,
+    Users,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -58,6 +59,7 @@ export function AppSidebar({ onOpenSettings, onOpenAiAdvisor }: AppSidebarProps)
     { label: "Assinaturas", href: "/app/assinaturas", icon: Repeat },
     { label: "Cartões", href: "/app/cartoes", icon: CreditCard },
     { label: "Orçamentos", href: "/app/orcamentos", icon: HandCoins },
+    { label: "Categorias", href: "/app/categorias", icon: Tags },
     { label: "Cofrinhos", href: "/app/cofrinhos", icon: PiggyBank },
     { label: "Extrato / Transações", href: "/app/extrato", icon: ReceiptText },
     { label: "Assistente Boletinho", icon: Sparkles, onClick: onOpenAiAdvisor },

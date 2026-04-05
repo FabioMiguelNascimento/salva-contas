@@ -1,12 +1,28 @@
 import { apiClient } from "@/lib/api-client";
 import type { TransactionCategory } from "@/types/finance";
 
+export const categoriesQueryKey = ["transaction-categories"] as const;
+
 interface CategoriesApiResponse {
   data: TransactionCategory[];
   meta: {
     total: number;
     hasNextPage: boolean;
   };
+}
+
+interface CategoryApiResponse {
+  data: TransactionCategory;
+}
+
+export interface CreateCategoryPayload {
+  name: string;
+  icon?: string;
+}
+
+export interface UpdateCategoryPayload {
+  name?: string;
+  icon?: string;
 }
 
 export async function fetchCategories(): Promise<TransactionCategory[]> {
@@ -34,4 +50,27 @@ export async function fetchCategories(): Promise<TransactionCategory[]> {
   }
 
   return allCategories;
+}
+
+export async function createCategory(
+  payload: CreateCategoryPayload,
+): Promise<TransactionCategory> {
+  const response = await apiClient.post<CategoryApiResponse>("/categories", payload);
+
+  return response.data.data;
+}
+
+export async function updateCategory(
+  id: string,
+  payload: UpdateCategoryPayload,
+): Promise<TransactionCategory> {
+  const response = await apiClient.patch<CategoryApiResponse>(`/categories/${id}`, payload);
+
+  return response.data.data;
+}
+
+export async function deleteCategory(id: string): Promise<TransactionCategory> {
+  const response = await apiClient.delete<CategoryApiResponse>(`/categories/${id}`);
+
+  return response.data.data;
 }
