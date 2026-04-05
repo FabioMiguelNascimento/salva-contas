@@ -346,7 +346,7 @@ function DashboardContent() {
           <KpiSparklineCard
             variant="balance"
             icon={Wallet2}
-            title={hasDateRange ? "Saldo disponível no período" : "Saldo disponível"}
+            title="Saldo disponível atual"
             value={formatCurrency(metrics?.financials.availableBalance ?? metrics?.financials.balance ?? 0)}
             change={`${(metrics?.financials.balanceChangePercent ?? 0) > 0 ? '+' : ''}${metrics?.financials.balanceChangePercent ?? 0}% ${comparisonLabel}`}
             sparklineData={sparklineBalance}

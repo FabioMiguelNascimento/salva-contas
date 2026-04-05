@@ -1,20 +1,20 @@
 "use client";
 
 import {
-    addVaultYield,
-    createVault,
-    deleteVault,
-    depositToVault,
-    fetchVaultsSummary,
-    updateVault,
-    withdrawFromVault,
-    type VaultsSummaryResponse
+  addVaultYield,
+  createVault,
+  deleteVault,
+  depositToVault,
+  fetchVaultsSummary,
+  updateVault,
+  withdrawFromVault,
+  type VaultsSummaryResponse
 } from "@/services/vaults";
 import type {
-    CreateVaultPayload,
-    UpdateVaultPayload,
-    Vault,
-    VaultAmountPayload,
+  CreateVaultPayload,
+  UpdateVaultPayload,
+  Vault,
+  VaultAmountPayload,
 } from "@/types/finance";
 import { usePathname } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
@@ -137,7 +137,7 @@ export function VaultsProvider({ children }: { children: React.ReactNode }) {
 
   const stats = useMemo<VaultsStats>(() => {
     const savedAmount = metrics?.financials.savedAmount ?? 0;
-    const availableBalance = metrics?.financials.availableBalance ?? metrics?.financials.balance ?? 0;
+    const availableBalance = metrics?.financials.availableBalance ?? 0;
     const withTargetCount = vaults.filter((vault) => (vault.targetAmount ?? 0) > 0).length;
 
     return {
