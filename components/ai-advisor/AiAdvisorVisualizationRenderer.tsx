@@ -12,6 +12,7 @@ import TransactionDiffVisualization from "./visualizations/TransactionDiffVisual
 import TransactionVisualization from "./visualizations/TransactionVisualization";
 import { VisualizationStatus } from "./visualizations/types";
 import VaultActionSummaryVisualization from "./visualizations/VaultActionSummaryVisualization";
+import DeleteTransactionVisualization from "./visualizations/DeleteTransactionVisualization";
 
 
 interface AiAdvisorVisualizationRendererProps {
@@ -120,6 +121,15 @@ export default function AiAdvisorVisualizationRenderer({
         requiresConfirmation={requiresConfirmation}
       />
     ),
+    delete_transaction: (
+      <DeleteTransactionVisualization
+        visualization={{ ...visualization, type: 'table_summary' }}
+        status={status}
+        onConfirm={() => onConfirm()}
+        onCancel={onCancel}
+        requiresConfirmation={requiresConfirmation}
+      />
+    ),
     vault_ai_action: (
       <VaultActionSummaryVisualization
         visualization={visualization}
@@ -141,15 +151,19 @@ export default function AiAdvisorVisualizationRenderer({
   };
 
   const rendererKey =
-    visualization.type === 'table_summary' && visualization.toolName === 'get_transaction_details' && Array.isArray((payload as any).items)
-      ? 'transaction_details'
-      : visualization.type === 'table_summary' && visualization.toolName === 'vault_ai_action'
-        ? 'vault_ai_action'
-        : visualization.type === 'table_summary' && requiresConfirmation && Array.isArray((payload as any).items)
-          ? 'confirmation_list'
-          : visualization.type === 'table_summary' && payload && typeof payload === 'object' && 'description' in visualization.payload && 'amount' in visualization.payload
-            ? 'single_transaction_summary'
-            : visualization.type;
+    visualization.toolName === 'delete_transaction' && Array.isArray((payload as any).items)
+      ? 'confirmation_list'
+      : visualization.toolName === 'delete_transaction'
+        ? 'delete_transaction'
+        : visualization.type === 'table_summary' && visualization.toolName === 'get_transaction_details' && Array.isArray((payload as any).items)
+          ? 'transaction_details'
+          : visualization.type === 'table_summary' && visualization.toolName === 'vault_ai_action'
+            ? 'vault_ai_action'
+            : visualization.type === 'table_summary' && requiresConfirmation && Array.isArray((payload as any).items)
+              ? 'confirmation_list'
+              : visualization.type === 'table_summary' && payload && typeof payload === 'object' && 'description' in visualization.payload && 'amount' in visualization.payload
+                ? 'single_transaction_summary'
+                : visualization.type;
 
   return renderers[rendererKey] ?? renderers.summary;
 }

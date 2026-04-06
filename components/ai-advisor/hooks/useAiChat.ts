@@ -1,7 +1,7 @@
 "use client";
 
 import { chatWithAiAdvisor } from '@/services/ai-advisor';
-import { confirmTransaction, updateTransaction } from '@/services/transactions';
+import { confirmTransaction, deleteTransaction, updateTransaction } from '@/services/transactions';
 import type {
     AiAdvisorChatHistoryMessage,
     ChatAttachment,
@@ -238,6 +238,70 @@ export function useAiChat({ month, year }: UseAiChatParams) {
             content:
               `[SISTEMA]: A transação foi atualizada pelo usuário e salva no banco. ` +
               `O ID oficial é: ${confirmed.id}. Caso o usuário peça detalhes a partir de agora, use este ID.`,
+          };
+
+          setMessages((currentMessages) => [...currentMessages, systemMessage]);
+          return;
+        }
+
+        if (toolName === 'delete_transaction') {
+          const items = Array.isArray(payload) ? payload : payload?.items;
+          let deletedIds: string[] = [];
+
+          if (Array.isArray(items) && items.length > 0) {
+            const ids = items.map((item: any) => item.id).filter(Boolean);
+            if (ids.length === 0) {
+              throw new Error('Não foi possível identificar as transações para deletar.');
+            }
+            await Promise.all(ids.map((id: string) => deleteTransaction(id)));
+            deletedIds = ids;
+          } else {
+            const transactionId = payload?.deleteTransaction?.id
+              ?? payload?.id
+              ?? payload?.transactionId;
+
+            if (!transactionId) {
+              throw new Error('Não foi possível identificar a transação para deletar.');
+            }
+
+            await deleteTransaction(transactionId);
+            deletedIds = [transactionId];
+          }
+
+          toast.success(`${deletedIds.length} transação(ões) deletada(s) com sucesso.`);
+
+          setMessages((currentMessages) =>
+            currentMessages.map((message) =>
+              message.id === messageId
+                ? {
+                    ...message,
+                    visualizationStatuses: {
+                      ...(message.visualizationStatuses ?? {}),
+                      [index]: 'confirmed',
+                    },
+                    visualizations: message.visualizations?.map((visualizationItem, visualIndex) =>
+                      visualIndex === index
+                        ? {
+                            ...visualizationItem,
+                            payload: {
+                              ...(visualizationItem.payload as Record<string, any>),
+                              requiresConfirmation: false,
+                              deleted: true,
+                            },
+                          }
+                        : visualizationItem,
+                    ),
+                  }
+                : message,
+            ),
+          );
+
+          const systemMessage: ChatMessage = {
+            id: `system-${Date.now()}`,
+            role: 'user',
+            content:
+              `[SISTEMA]: ${deletedIds.length} transa${deletedIds.length === 1 ? 'ção' : 'ções'} foi(foram) deletada(s) pelo usuário e removida(s) do banco. ` +
+              `Os IDs deletados são: ${deletedIds.join(', ')}. Não busque ou referencie estes IDs novamente.`,
           };
 
           setMessages((currentMessages) => [...currentMessages, systemMessage]);
