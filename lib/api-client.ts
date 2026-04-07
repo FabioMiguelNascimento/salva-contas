@@ -17,6 +17,15 @@ export const apiClient = axios.create({
   }
 });
 
+apiClient.interceptors.request.use(
+  (config) => {
+    if (config.method && ["post", "put", "patch"].includes(config.method)) {
+      config.headers["Idempotency-Key"] = globalThis.crypto?.randomUUID?.() ?? crypto.randomUUID();
+    }
+    return config;
+  },
+);
+
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
