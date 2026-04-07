@@ -56,15 +56,18 @@ function SpendingBarChart({ data }: { data: { day: string; amount: number }[] })
           <YAxis hide />
           <Tooltip
             cursor={{ fill: "rgba(244, 63, 94, 0.08)" }}
-            formatter={(value: number | string | undefined) =>
-              formatCurrency(Number(value ?? 0))
-            }
-            labelFormatter={(label) => `Dia ${label}`}
-            contentStyle={{
-              borderRadius: 10,
-              border: "1px solid #e5e7eb",
-              boxShadow: "0 8px 24px rgba(15, 23, 42, 0.08)",
-              fontSize: 12,
+            content={({ payload }) => {
+              if (!payload?.length) return null;
+              const { value } = payload[0];
+              const day = (payload[0].payload as { day?: string })?.day;
+              const numValue = Number(value);
+              if (!numValue) return null;
+              return (
+                <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 shadow-md">
+                  {day && <div className="text-xs text-gray-400">{day}</div>}
+                  <span className="font-medium text-gray-800">{formatCurrency(numValue)}</span>
+                </div>
+              );
             }}
           />
           <Bar dataKey="amount" fill="#f43f5e" radius={[6, 6, 0, 0]} barSize={barSize} />
