@@ -5,14 +5,14 @@ import * as authService from "@/services/auth";
 import type { AuthState, LoginPayload, RegisterPayload, User } from "@/types/auth";
 import { useRouter } from "next/navigation";
 import {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useRef,
-    useState,
-    type ReactNode,
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
 } from "react";
 
 const TOKEN_KEY = "salva_contas_token";
@@ -23,9 +23,18 @@ const AI_ADVISOR_MESSAGES = "ai-advisor-messages"
 
 const TOKEN_REFRESH_MARGIN = 5 * 60 * 1000;
 
+function resolveRedirectPath(next: string | null) {
+  if (!next) {
+    return "/app/dashboard";
+  }
+
+  return next.startsWith("/") ? next : `/${next}`;
+}
+
 interface AuthContextValue extends AuthState {
   login: (payload: LoginPayload) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<{ needsEmailConfirmation: boolean }>;
+  loginWithGoogle: () => void;
   logout: () => void;
   updateUser: (user: User) => void;
   refreshUser: () => Promise<void>;
@@ -362,12 +371,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = useCallback(async (payload: RegisterPayload): Promise<{ needsEmailConfirmation: boolean }> => {
     const response = await authService.signup(payload);
-    
+
     if (response.session === null) {
       return { needsEmailConfirmation: true };
     }
-    
+
     return { needsEmailConfirmation: false };
+  }, []);
+
+  const loginWithGoogle = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const next = new URLSearchParams(window.location.search).get('next');
+    const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+    if (!apiBaseUrl) {
+      console.error('NEXT_PUBLIC_API_BASE_URL não configurada');
+      return;
+    }
+
+    const loginUrl = new URL('auth/providers/google', apiBaseUrl);
+
+    if (next) {
+      loginUrl.searchParams.set('next', next);
+    }
+
+    window.location.href = loginUrl.toString();
   }, []);
 
   const logout = useCallback(() => {
@@ -421,11 +449,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const refreshToken = params.get("refresh_token");
       const expiresIn = params.get("expires_in");
       const type = params.get("type");
+      const next = new URLSearchParams(window.location.search).get("next");
 
       if (!accessToken || !refreshToken) return;
-      if (type !== "signup" && type !== "recovery") return;
 
-      console.log(`Processing Supabase ${type} callback...`);
+      console.log(`Processing auth callback${type ? ` (${type})` : ""}...`);
 
       try {
         const expiresAt = Math.floor(Date.now() / 1000) + parseInt(expiresIn || "3600", 10);
@@ -449,21 +477,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         scheduleTokenRefresh(expiresAt);
 
-        window.history.replaceState(null, "", window.location.pathname);
+        window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
+
+        const redirectPath = type === "recovery" ? "/update-password" : resolveRedirectPath(next);
 
         if (type === "signup") {
-          (await import("sonner")).toast.success("Email confirmado com sucesso! Bem-vindo(a)!");
-          router.push("/");
+          (await import("sonner")).toast.success("Login realizado com sucesso.");
+          router.replace(redirectPath);
         } else if (type === "recovery") {
           (await import("sonner")).toast.success("Email confirmado! Agora você pode redefinir sua senha.");
-          router.push("/update-password");
+          router.replace(redirectPath);
+        } else {
+          router.replace(redirectPath);
         }
 
-        console.log(`Supabase ${type} callback processed successfully`);
+        console.log(`Auth callback processed successfully${type ? ` (${type})` : ""}`);
       } catch (error) {
-        console.error("Failed to process Supabase callback:", error);
+        console.error("Failed to process auth callback:", error);
         (await import("sonner")).toast.error("Erro ao processar confirmação. Tente fazer login.");
-        window.history.replaceState(null, "", window.location.pathname);
+        window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}`);
       }
     };
 
@@ -475,6 +507,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ...state,
       login,
       register,
+      loginWithGoogle,
       logout,
       updateUser,
       refreshUser,

@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/auth-context"
 import { ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useState, type FormEvent } from "react"
 
 interface AuthFormProps {
@@ -16,11 +16,11 @@ interface AuthFormProps {
 
 export function AuthForm({ mode }: AuthFormProps) {
   const router = useRouter()
-  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams()
+  const searchParams = useSearchParams()
   const planFromQuery = searchParams.get("plan")
   const cycleFromQuery = searchParams.get("cycle")
   const nextFromQuery = searchParams.get("next")
-  const { login, register } = useAuth()
+  const { login, register, loginWithGoogle } = useAuth()
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
@@ -254,6 +254,7 @@ export function AuthForm({ mode }: AuthFormProps) {
                 variant="outline"
                 className="h-13 border-border hover:bg-secondary rounded-xl"
                 type="button"
+                onClick={loginWithGoogle}
               >
                 <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
                   <path
