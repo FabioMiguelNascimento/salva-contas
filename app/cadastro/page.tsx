@@ -1,5 +1,6 @@
-import { AuthForm } from "@/components/auth/auth-form"
+import { AuthPageWrapper } from "@/components/auth/auth-page-wrapper"
 import type { Metadata } from "next"
+import { Suspense } from "react"
 
 export const metadata: Metadata = {
   title: "Criar conta - Salva Contas",
@@ -7,5 +8,9 @@ export const metadata: Metadata = {
 }
 
 export default function CadastroPage() {
-  return <AuthForm mode="register" />
+  return (
+    <Suspense>
+      <AuthPageWrapper mode="register" />
+    </Suspense>
+  )
 }
