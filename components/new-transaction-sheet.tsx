@@ -3,7 +3,7 @@
 import { AiTransactionTab } from "@/components/new-transaction/ai-transaction-tab";
 import { ManualTransactionTab } from "@/components/new-transaction/manual-transaction-tab";
 import type { SplitRow } from "@/components/new-transaction/split-payment-builder";
-import { TransactionDetails } from "@/components/new-transaction/transaction-details";
+import { TransactionsDetails } from "@/components/new-transaction/transaction-details";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -258,7 +258,7 @@ export function NewTransactionDialog({ trigger }: NewTransactionSheetProps) {
               />
             </Tabs>
 
-            <TransactionDetails
+            <TransactionsDetails
               isScheduled={isScheduled}
               onIsScheduledChange={(v) => setIsScheduled(v)}
               date={selectedDate}

@@ -8,11 +8,11 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select"
 import { PAYMENT_METHOD_LABELS, PaymentMethod } from "@/types/finance"
 import { SplitSquareHorizontal } from "lucide-react"
@@ -24,14 +24,12 @@ export type TransactionDetailsProps = {
   onIsScheduledChange: (value: boolean) => void
   date?: Date | undefined
   onDateChange: (date?: Date) => void
-  // Simple (no-split) mode
   creditCardId?: string | null
   onCreditCardChange: (id: string | null) => void
   debitCardId?: string | null
   onDebitCardChange: (id: string | null) => void
   paymentMethod?: PaymentMethod
   onPaymentMethodChange: (method: PaymentMethod) => void
-  // Split mode
   isSplitMode: boolean
   onSplitModeChange: (v: boolean) => void
   splits: SplitRow[]
@@ -40,7 +38,7 @@ export type TransactionDetailsProps = {
   className?: string
 }
 
-export function TransactionDetails({
+export function TransactionsDetails({
   isScheduled,
   onIsScheduledChange,
   date,
@@ -58,13 +56,12 @@ export function TransactionDetails({
   totalAmount,
   className,
 }: TransactionDetailsProps) {
-
+  
   function toggleSplitMode() {
     if (!isSplitMode) {
-      // Enter split mode — pre-populate with one row for the current selection
       const initialSplit: SplitRow = {
         amount: totalAmount || 0,
-        paymentMethod: paymentMethod === "credit_card" ? "credit_card" : paymentMethod,
+        paymentMethod,
         creditCardId: paymentMethod === "credit_card" ? (creditCardId ?? null) : null,
         debitCardId: paymentMethod === "debit" ? (debitCardId ?? null) : null,
       }
@@ -78,93 +75,89 @@ export function TransactionDetails({
 
   return (
     <div className={className}>
-      <div className="space-y-3">
-        <Label className="text-base font-semibold">Detalhes do lançamento</Label>
+      <div className="space-y-5">
+        
+        <h4 className="text-base font-semibold">Detalhes do lançamento</h4>
 
-        <label className="flex flex-col gap-2 rounded-xl border border-border/60 bg-muted/20 p-2 sm:flex-row sm:items-center">
+        <label className="flex flex-row items-center gap-3 rounded-lg border bg-muted/40 p-3 cursor-pointer hover:bg-muted/60 transition-colors">
           <Checkbox id="schedule" checked={isScheduled} onCheckedChange={(value) => onIsScheduledChange(Boolean(value))} />
-          <div className="space-y-0.5">
-            <div className="font-medium">E uma conta a pagar/agendamento?</div>
-            <p className="text-xs text-muted-foreground">
-              Se marcado, definimos data de vencimento. Caso contrario, consideramos como compra já realizada.
-            </p>
-          </div>
+          <span className="text-sm font-medium leading-none">É uma conta a pagar ou agendamento?</span>
         </label>
 
-        <div className="grid gap-3 sm:grid-cols-3">
-          <div className="space-y-2 sm:col-span-3">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-2 sm:col-span-2">
             <Label>{isScheduled ? "Data de vencimento" : "Data da compra"}</Label>
-            <div className="w-full">
-              <DatePicker
-                date={date}
-                onChange={onDateChange}
-                placeholder={isScheduled ? "Quando vence?" : "Quando aconteceu?"}
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Payment section */}
-        <div className="space-y-2">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <Label>Forma de pagamento</Label>
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              className="h-7 gap-1.5 text-xs text-muted-foreground"
-              onClick={toggleSplitMode}
-            >
-              <SplitSquareHorizontal className="h-3.5 w-3.5" />
-              {isSplitMode ? "Pagamento unico" : "Dividir pagamento"}
-            </Button>
-          </div>
-
-          {isSplitMode ? (
-            <SplitPaymentBuilder
-              splits={splits}
-              totalAmount={totalAmount}
-              onChange={onSplitsChange}
+            <DatePicker
+              date={date}
+              onChange={onDateChange}
+              placeholder={isScheduled ? "Quando vence?" : "Quando aconteceu?"}
             />
-          ) : (
-            <div className="space-y-2">
-              <Select value={paymentMethod} onValueChange={(v) => onPaymentMethodChange(v as PaymentMethod)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PAYMENT_METHODS.map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          </div>
 
-              {paymentMethod === "credit_card" && (
-                <CreditCardSelect
-                  value={creditCardId ?? null}
-                  onValueChange={onCreditCardChange}
-                  placeholder="Selecione o cartão"
-                  allowClear
-                />
-              )}
-
-              {paymentMethod === "debit" && (
-                <DebitCardSelect
-                  value={debitCardId ?? null}
-                  onValueChange={onDebitCardChange}
-                  placeholder="Selecione o cartão de débito"
-                  allowClear
-                />
-              )}
+          <div className="space-y-2 sm:col-span-2">
+            <div className="flex items-center justify-between">
+              <Label>Forma de pagamento</Label>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-6 px-2 text-xs text-muted-foreground"
+                onClick={toggleSplitMode}
+              >
+                <SplitSquareHorizontal className="mr-1.5 h-3.5 w-3.5" />
+                {isSplitMode ? "Pagamento único" : "Dividir pagamento"}
+              </Button>
             </div>
-          )}
+
+            {isSplitMode ? (
+              <SplitPaymentBuilder
+                splits={splits}
+                totalAmount={totalAmount}
+                onChange={onSplitsChange}
+              />
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className={paymentMethod === "credit_card" || paymentMethod === "debit" ? "sm:col-span-1" : "sm:col-span-2"}>
+                  <Select value={paymentMethod} onValueChange={(v) => onPaymentMethodChange(v as PaymentMethod)}>
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAYMENT_METHODS.map(([value, label]) => (
+                        <SelectItem key={value} value={value}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {(paymentMethod === "credit_card" || paymentMethod === "debit") && (
+                  <div className="sm:col-span-1">
+                    {paymentMethod === "credit_card" ? (
+                      <CreditCardSelect
+                        value={creditCardId ?? null}
+                        onValueChange={onCreditCardChange}
+                        placeholder="Selecione o cartão"
+                        allowClear
+                      />
+                    ) : (
+                      <DebitCardSelect
+                        value={debitCardId ?? null}
+                        onValueChange={onDebitCardChange}
+                        placeholder="Cartão de débito"
+                        allowClear
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
   )
 }
 
-export default TransactionDetails
-
+export default TransactionsDetails
