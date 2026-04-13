@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"
 import { MessageSquare, PiggyBank, Receipt } from "lucide-react"
 import { useState } from "react"
+import Image from "next/image"
 
 const tabs = [
   {
@@ -11,7 +12,7 @@ const tabs = [
     icon: PiggyBank,
     title: "Crie metas e guarde dinheiro",
     description: "Separe dinheiro para seus sonhos com cofrinhos personalizados. Acompanhe o progresso e comemore cada conquista.",
-    image: "https:"
+    image: "/showcases/cofrinhos.png",
   },
   {
     id: "boletinho",
@@ -19,7 +20,7 @@ const tabs = [
     icon: MessageSquare,
     title: "Converse com seu assistente",
     description: "O Boletinho entende suas finanças e te ajuda a tomar decisões. Pergunte sobre gastos, metas ou peça sugestões.",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-dvbFRUY7VgEt550lk94wNjo97vFQkK.png",
+    image: "/showcases/boletinho.png",
   },
   {
     id: "extrato",
@@ -28,7 +29,7 @@ const tabs = [
     title: "Cadastre por extrato PDF ou foto",
     description:
       "Envie PDF, foto ou anexo e o Boletinho registra transações e contas a pagar automaticamente. Menos digitação, mais controle.",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-V8Mt2dymS39aiG97BWJqKRWOCglh1P.png",
+    image: "/showcases/extrato.png",
   },
 ]
 
@@ -85,10 +86,6 @@ export function Showcase() {
           <div className="order-1 lg:order-2 relative">
             <div className="absolute -inset-4 bg-linear-to-r from-primary/20 to-chart-5/20 rounded-3xl blur-2xl opacity-50" />
             <div className="relative rounded-2xl overflow-hidden border border-accent-foreground/10 shadow-2xl">
-              <div className="w-full h-[420px] bg-muted/20 flex items-center justify-center text-muted-foreground">
-                Imagem de showcase (placeholder)
-              </div>
-              {/*
               <Image
                 src={activeContent?.image || ""}
                 alt={activeContent?.title || ""}
@@ -96,7 +93,6 @@ export function Showcase() {
                 height={600}
                 className="w-full h-auto transition-all duration-500"
               />
-              */}
             </div>
           </div>
         </div>

@@ -307,18 +307,13 @@ export function AuthForm({ mode }: AuthFormProps) {
         <div className="relative z-10 max-w-lg text-center">
           {/* App preview */}
           <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-accent-foreground/10 mb-12">
-            <div className="w-full h-[260px] bg-muted/20 flex items-center justify-center text-muted-foreground">
-              Imagem de preview (placeholder)
-            </div>
-            {/*
             <Image
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-O1xYQ0vjvkYGedo8fJgKK9Hv7qpupq.png"
+              src="/showcases/dashboard.png"
               alt="Dashboard do Salva Contas"
               width={600}
               height={400}
               className="w-full h-auto"
             />
-            */}
           </div>
           <h2 className="text-3xl font-medium text-accent-foreground mb-4 text-balance">
             Suas finanças organizadas em um só lugar
